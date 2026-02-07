@@ -44,7 +44,7 @@ export function QuestionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
     >
-      <Card className={`transition-all ${isAnswered ? `border-l-4 ${accent.cardTop} ${accent.cardBg} border-opacity-60` : 'border-zinc-200 bg-white/50 dark:border-zinc-800 dark:bg-zinc-950/50'}`}>
+      <Card className={`group transition-all duration-300 hover:shadow-xl hover:scale-[1.01] ${isAnswered ? `${accent.cardBg} shadow-md` : 'border-zinc-200/30 bg-white/60 dark:border-zinc-700/30 dark:bg-zinc-900/60'}`}>
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-1">
@@ -156,7 +156,7 @@ export function QuestionCard({
                     className="min-h-[100px] resize-none font-mono text-xs"
                   />
                 ) : (
-                  <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50/50 to-white p-4 dark:border-zinc-700 dark:from-zinc-900/50 dark:to-zinc-950">
+                  <div className="rounded-lg border border-zinc-200/50 bg-gradient-to-br from-zinc-50/70 to-white p-4 shadow-sm backdrop-blur dark:border-zinc-700/50 dark:from-zinc-900/70 dark:to-zinc-950">
                     <MarkdownViewer content={typeof reason === 'string' ? reason : ''} />
                   </div>
                 )}

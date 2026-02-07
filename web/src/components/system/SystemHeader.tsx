@@ -111,7 +111,7 @@ export function SystemHeader({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-3 rounded-lg border-2 border-zinc-200 bg-white px-4 py-2 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200/50 bg-white/90 px-4 py-2 text-sm shadow-md backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/90"
             >
               <div className="flex items-center gap-1.5">
                 <span className="font-medium text-zinc-900 dark:text-zinc-50">

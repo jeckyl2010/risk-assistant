@@ -10,13 +10,13 @@ base:
   _reasons:
     affects_production: Because I had to.
     external_access: 'What is this '
-    uses_ai: www.dr.dk
+    uses_ai: '*www.dr.dk*'
     handles_sensitive_data: |-
       Paul starts in the Obeya shift handover and picks any ruggedized device (phone or tablet) from the charging rack.
 
-      He taps his physical employee badge (NFC) on the device.
-      He reviews the previous shift's notes, open deviations, safety call-outs, and today's priorities.
-      If assigned, he completes a short Rock Academy refresher (managed browser + SSO).
+      - He taps his physical employee badge (NFC) on the device.
+      - He reviews the previous shift's notes, open deviations, safety call-outs, and today's priorities.
+      - If assigned, he completes a short Rock Academy refresher (managed browser + SSO).
 criticality:
   criticality_level: null
   hard_wan_cloud_dependency: true

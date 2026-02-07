@@ -37,7 +37,7 @@ export function QuestionsList({
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <Card className="border-2">
+      <Card className="border border-zinc-200/40 shadow-md dark:border-zinc-700/40">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{title}</CardTitle>

@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-br from-indigo-50/30 via-purple-50/20 to-pink-50/30 dark:from-indigo-950/30 dark:via-purple-950/20 dark:to-pink-950/30 text-foreground antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-br from-indigo-100/60 via-purple-100/50 to-pink-100/60 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 text-foreground antialiased font-sans`}
       >
         <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
 

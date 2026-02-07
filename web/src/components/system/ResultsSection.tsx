@@ -44,7 +44,7 @@ export function ResultsSection({
     >
       {/* Missing Questions */}
       {missingQuestions.length > 0 ? (
-        <Card className="border-2 border-amber-200 dark:border-amber-900/50">
+        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 shadow-md dark:from-amber-950/30 dark:to-orange-950/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
               <AlertCircle className="h-5 w-5" />
@@ -100,7 +100,7 @@ export function ResultsSection({
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-green-200 dark:border-green-900/50">
+        <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 shadow-md dark:from-emerald-950/30 dark:to-teal-950/30">
           <CardContent className="flex items-center gap-3 p-4">
             <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
             <span className="font-medium text-green-900 dark:text-green-100">
@@ -123,7 +123,7 @@ export function ResultsSection({
         </CardHeader>
         <CardContent>
           {derivedControls.length === 0 ? (
-            <div className="rounded-lg border-2 border-dashed border-zinc-200 p-8 text-center text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+            <div className="rounded-lg border border-dashed border-zinc-300/70 bg-zinc-50/50 p-8 text-center text-zinc-600 backdrop-blur dark:border-zinc-700/70 dark:bg-zinc-900/50 dark:text-zinc-400">
               No controls have been derived yet
             </div>
           ) : (
@@ -135,7 +135,7 @@ export function ResultsSection({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="border-2">
+                  <Card className="shadow-md">
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between gap-4">
                         <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
@@ -166,7 +166,7 @@ export function ResultsSection({
                             {control.because.map((b, i) => (
                               <div
                                 key={i}
-                                className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 font-mono text-xs dark:border-zinc-800 dark:bg-zinc-900"
+                                className="rounded-lg border border-zinc-200/50 bg-zinc-50/80 p-3 font-mono text-xs shadow-sm backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/80"
                               >
                                 {Object.entries(b).map(([key, val]) => (
                                   <div key={key} className="text-zinc-700 dark:text-zinc-300">

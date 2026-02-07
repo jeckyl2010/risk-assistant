@@ -92,7 +92,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <Card className="border-2">
+          <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-base">Version Comparison</CardTitle>
               <CardDescription>

@@ -72,7 +72,7 @@ export function ThemeSelect() {
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-center gap-1 rounded-xl border-2 border-zinc-200/80 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40"
+      className="flex items-center gap-1 rounded-xl border border-zinc-200/50 bg-white/90 p-1 shadow-md backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/90"
     >
       {themes.map(({ value, icon: Icon, label }) => (
         <button
