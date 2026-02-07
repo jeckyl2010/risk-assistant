@@ -59,7 +59,7 @@ export default async function Home() {
                 Risk Assistant
               </h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                Lightweight, deterministic, facts-based guardrail engine
+                Smart questions. Clear controls. No scores, no guesswork.
               </p>
             </div>
           </div>

@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Risk Assistant",
-  description: "Lightweight, deterministic, facts-based guardrail engine",
+  description: "Smart questions. Clear controls. No scores, no guesswork.",
 };
 
 export default function RootLayout({
