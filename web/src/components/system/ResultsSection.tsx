@@ -7,6 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { 
+  formatPhase, 
+  formatReferenceType, 
+  formatScope, 
+  formatEnforcementIntent, 
+  formatEvidenceType 
+} from '@/lib/formatting'
 
 interface DerivedControl {
   id: string
@@ -17,23 +24,16 @@ interface DerivedControl {
   activation_phase: string
   evidence_type: string[]
   because: Record<string, unknown>[]
+  references?: Array<{
+    type: string
+    ref: string
+    description?: string
+  }>
 }
 
 interface RequiredQuestion {
   id: string
   answered: boolean
-}
-
-// Format activation phase for display
-function formatPhase(phase: string): string {
-  const labels: Record<string, string> = {
-    plan: 'Plan',
-    build: 'Build',
-    deploy: 'Deploy',
-    run: 'Run',
-    operate: 'Operate'
-  }
-  return labels[phase] || phase.charAt(0).toUpperCase() + phase.slice(1)
 }
 
 interface ResultsSectionProps {
@@ -494,16 +494,16 @@ export function ResultsSection({
                                       )}
 
                                       <div className="flex flex-wrap gap-2">
-                                        <Badge variant="secondary">scope: {control.scope}</Badge>
+                                        <Badge variant="secondary">scope: {formatScope(control.scope)}</Badge>
                                         <Badge variant="secondary">
-                                          intent: {control.enforcement_intent}
+                                          intent: {formatEnforcementIntent(control.enforcement_intent)}
                                         </Badge>
                                         <Badge variant="secondary">
                                           phase: {formatPhase(control.activation_phase)}
                                         </Badge>
                                         {control.evidence_type?.length > 0 && (
                                           <Badge variant="secondary">
-                                            evidence: {control.evidence_type.join(', ')}
+                                            evidence: {control.evidence_type.map(formatEvidenceType).join(', ')}
                                           </Badge>
                                         )}
                                       </div>
@@ -561,27 +561,71 @@ export function ResultsSection({
                                               </div>
                                             </div>
                                           </div>
+                                        </div>
+                                      )}
 
-                                          {/* Details (Collapsed by default) */}
-                                          <details className="mt-2">
-                                            <summary className="cursor-pointer text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300">
-                                              View raw data
-                                            </summary>
-                                            <div className="mt-2 space-y-2">
-                                              {control.because.map((b, i) => (
+                                      {/* Implementation References */}
+                                      {control.references && control.references.length > 0 && (
+                                        <div>
+                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2">
+                                            Implementation
+                                          </div>
+                                          <div className="space-y-1.5">
+                                            {control.references.map((ref, i) => {
+                                              const isUrl = ref.ref.startsWith('http://') || ref.ref.startsWith('https://')
+                                              const isFilePath = !isUrl
+                                              
+                                              // Subtle color coding by type
+                                              const typeColors: Record<string, string> = {
+                                                requirement: 'border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30',
+                                                work_item: 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30',
+                                                test: 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/30',
+                                                documentation: 'border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30',
+                                              }
+                                              
+                                              const typeBadgeColors: Record<string, string> = {
+                                                requirement: 'border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300',
+                                                work_item: 'border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300',
+                                                test: 'border-emerald-300 text-emerald-700 dark:border-emerald-600 dark:text-emerald-300',
+                                                documentation: 'border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300',
+                                              }
+                                              
+                                              const containerColor = typeColors[ref.type] || 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50'
+                                              const badgeColor = typeBadgeColors[ref.type] || 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300'
+                                              
+                                              return (
                                                 <div
                                                   key={i}
-                                                  className="rounded-lg border border-zinc-200/50 bg-zinc-50/80 p-3 font-mono text-xs shadow-sm backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/80"
+                                                  className={`flex items-start gap-2 rounded-md border px-2.5 py-1.5 text-xs ${containerColor}`}
                                                 >
-                                                  {Object.entries(b).map(([key, val]) => (
-                                                    <div key={key} className="text-zinc-700 dark:text-zinc-300">
-                                                      {key}: {JSON.stringify(val)}
-                                                    </div>
-                                                  ))}
+                                                  <Badge variant="outline" className={`mt-0.5 text-[10px] ${badgeColor}`}>
+                                                    {formatReferenceType(ref.type)}
+                                                  </Badge>
+                                                  <div className="flex-1 min-w-0">
+                                                    {isUrl ? (
+                                                      <a
+                                                        href={ref.ref}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 break-all"
+                                                      >
+                                                        {ref.description || ref.ref}
+                                                      </a>
+                                                    ) : (
+                                                      <span className="font-mono text-zinc-700 dark:text-zinc-300">
+                                                        {ref.ref}
+                                                      </span>
+                                                    )}
+                                                    {ref.description && isUrl && (
+                                                      <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400 break-all">
+                                                        {ref.ref}
+                                                      </div>
+                                                    )}
+                                                  </div>
                                                 </div>
-                                              ))}
-                                            </div>
-                                          </details>
+                                              )
+                                            })}
+                                          </div>
                                         </div>
                                       )}
                                     </div>

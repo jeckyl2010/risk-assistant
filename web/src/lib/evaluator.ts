@@ -3,6 +3,12 @@ import type { ModelPaths } from './model'
 
 export type Facts = Record<string, unknown>
 
+export type ControlReference = {
+  type: string
+  ref: string
+  description?: string
+}
+
 export type ControlCatalogEntry = {
   id: string
   title?: string
@@ -26,6 +32,7 @@ export type EvaluateResult = {
     activation_phase: string
     evidence_type: string[]
     because: Record<string, unknown>[]
+    references?: ControlReference[]
   }>
 }
 
@@ -179,16 +186,59 @@ export function normalizeFactsForDump(facts: Facts): Facts {
   return out
 }
 
+async function loadControlLinks(paths: ModelPaths): Promise<Map<string, ControlReference[]>> {
+  const linksMap = new Map<string, ControlReference[]>()
+  try {
+    const linksDoc = await loadYamlFile<unknown>(paths.controlsLinksFile)
+    if (linksDoc && typeof linksDoc === 'object' && 'links' in (linksDoc as Record<string, unknown>)) {
+      const links = (linksDoc as Record<string, unknown>).links
+      if (Array.isArray(links)) {
+        for (const link of links) {
+          if (!link || typeof link !== 'object') continue
+          const ll = link as Record<string, unknown>
+          const controlId = ll.control_id
+          const refs = ll.references
+          if (typeof controlId !== 'string' || !Array.isArray(refs)) continue
+
+          const controlRefs: ControlReference[] = []
+          for (const ref of refs) {
+            if (!ref || typeof ref !== 'object') continue
+            const rr = ref as Record<string, unknown>
+            const type = rr.type
+            const refVal = rr.ref
+            if (typeof type !== 'string' || typeof refVal !== 'string') continue
+
+            controlRefs.push({
+              type,
+              ref: refVal,
+              ...(typeof rr.description === 'string' ? { description: rr.description } : {}),
+            })
+          }
+          if (controlRefs.length > 0) {
+            linksMap.set(controlId, controlRefs)
+          }
+        }
+      }
+    }
+  } catch {
+    // Links file is optional - if it doesn't exist or fails to parse, just return empty map
+  }
+  return linksMap
+}
+
 export async function evaluateFacts(facts: Facts, paths: ModelPaths): Promise<EvaluateResult> {
   const activated = await deriveActivatedDomains(facts, paths)
   const req = await requiredQuestionIds(paths, activated)
   const required = req.map((id) => ({ id, answered: deepGet(facts, id) !== null }))
 
   const derived = await deriveControls(facts, paths)
+  const linksMap = await loadControlLinks(paths)
+
   const derived_controls = Object.keys(derived)
     .sort()
     .map((id) => {
       const c = derived[id].control
+      const references = linksMap.get(id)
       return {
         id,
         title: c?.title ?? '(missing from catalog)',
@@ -198,6 +248,7 @@ export async function evaluateFacts(facts: Facts, paths: ModelPaths): Promise<Ev
         activation_phase: c?.activation_phase ?? 'unknown',
         evidence_type: c?.evidence_type ?? [],
         because: derived[id].because,
+        ...(references && references.length > 0 ? { references } : {}),
       }
     })
 

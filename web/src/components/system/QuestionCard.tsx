@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { MarkdownViewer } from '@/components/ui/markdown-viewer'
 import { sectionAccent } from '../systemEditor/sectionAccent'
+import { formatBoolean, formatIdentifier } from '@/lib/formatting'
 import { SENTINEL_VALUES } from '@/lib/constants'
 
 interface QuestionCardProps {
@@ -142,8 +143,8 @@ export function QuestionCard({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={SENTINEL_VALUES.UNSET}>(unset)</SelectItem>
-                    <SelectItem value="true">true</SelectItem>
-                    <SelectItem value="false">false</SelectItem>
+                    <SelectItem value="true">Yes</SelectItem>
+                    <SelectItem value="false">No</SelectItem>
                   </SelectContent>
                 </Select>
               ) : question.type === 'enum' && question.allowed ? (
@@ -158,7 +159,7 @@ export function QuestionCard({
                     <SelectItem value={SENTINEL_VALUES.UNSET}>(unset)</SelectItem>
                     {question.allowed.map((v) => (
                       <SelectItem key={v} value={v}>
-                        {v}
+                        {formatIdentifier(v)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -189,7 +190,7 @@ export function QuestionCard({
                           className="h-4 w-4 rounded border-zinc-300 bg-white text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:focus:ring-zinc-50"
                         />
                         <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                          {option}
+                          {formatIdentifier(option)}
                         </span>
                       </label>
                     )

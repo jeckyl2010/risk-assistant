@@ -5,6 +5,7 @@ import { AutoGrowTextArea } from './AutoGrowTextArea'
 import type { SectionAccent } from './sectionAccent'
 import { sectionAccent } from './sectionAccent'
 import styles from './systemEditorStyles.module.css'
+import { formatBoolean, formatIdentifier } from '@/lib/formatting'
 
 export function QuestionField({
   q,
@@ -76,8 +77,8 @@ export function QuestionField({
               }
             >
               <option value="">(unset)</option>
-              <option value="true">true</option>
-              <option value="false">false</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
           ) : null}
 
@@ -94,7 +95,7 @@ export function QuestionField({
                 <option value="">(unset)</option>
                 {(q.allowed ?? []).map((a) => (
                   <option key={a} value={a}>
-                    {a}
+                    {formatIdentifier(a)}
                   </option>
                 ))}
               </select>
@@ -120,7 +121,7 @@ export function QuestionField({
                         }}
                         className="h-4 w-4 accent-zinc-900 dark:accent-zinc-50"
                       />
-                      {a}
+                      {formatIdentifier(a)}
                     </label>
                   )
                 })}

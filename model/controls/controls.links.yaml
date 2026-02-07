@@ -1,0 +1,29 @@
+schema_version: 1.0
+# Optional linking of controls to implementation artifacts
+# Links are loose references - can point to local files, URLs, or work items
+links:
+  # Example: Linking a security control to implementation artifacts
+  - control_id: SEC-SBD-001
+    references:
+      - type: requirement
+        ref: "docs/requirements/security-baseline.md"
+        description: "Security baseline requirements (includes test criteria)"
+        
+      - type: work_item
+        ref: "https://dev.azure.com/yourorg/project/_workitems/edit/12345"
+        description: "Implement threat modeling review process"
+
+  # Example: Linking IAM control
+  - control_id: IAM-STRONG-001
+    references:
+      - type: requirement
+        ref: "docs/requirements/authentication.md"
+        description: "Authentication requirements and acceptance criteria"
+        
+      - type: work_item
+        ref: "https://github.com/yourorg/yourrepo/issues/789"
+        description: "Configure service principal authentication"
+        
+      - type: documentation
+        ref: "docs/operations/entra-id-setup.md"
+        description: "Operations guide for Entra ID configuration"
