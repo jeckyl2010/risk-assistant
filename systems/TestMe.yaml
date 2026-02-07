@@ -12,11 +12,14 @@ base:
     external_access: 'What is this '
     uses_ai: '*www.dr.dk*'
     handles_sensitive_data: |-
-      Paul starts in the Obeya shift handover and picks any ruggedized device (phone or tablet) from the charging rack.
+      **Bold** and *italic* text
 
-      - He taps his physical employee badge (NFC) on the device.
-      - He reviews the previous shift's notes, open deviations, safety call-outs, and today's priorities.
-      - If assigned, he completes a short Rock Academy refresher (managed browser + SSO).
+      - First item
+      - Second item
+      - Third item 
+
+      1. Numbered item
+      2. Another one
 criticality:
   criticality_level: null
   hard_wan_cloud_dependency: true
