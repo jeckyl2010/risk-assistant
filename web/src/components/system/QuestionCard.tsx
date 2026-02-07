@@ -163,18 +163,38 @@ export function QuestionCard({
                     ))}
                   </SelectContent>
                 </Select>
-              ) : question.type === 'set' ? (
-                <Input
-                  value={Array.isArray(value) ? value.join(', ') : ''}
-                  onChange={(e) => {
-                    const arr = e.target.value
-                      .split(',')
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                    handleChange(arr.length ? arr : null)
-                  }}
-                  placeholder="Enter comma-separated values"
-                />
+              ) : question.type === 'set' && question.allowed ? (
+                <div className="space-y-2">
+                  {question.allowed.map((option) => {
+                    const arr = Array.isArray(value) ? value : []
+                    const isChecked = arr.includes(option)
+                    return (
+                      <label
+                        key={option}
+                        className="flex items-center gap-3 rounded-lg border border-zinc-200/50 bg-white/50 px-4 py-3 hover:bg-zinc-50/80 dark:border-zinc-700/50 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const newSet = new Set(arr)
+                            if (e.target.checked) {
+                              newSet.add(option)
+                            } else {
+                              newSet.delete(option)
+                            }
+                            const newArr = Array.from(newSet).sort()
+                            handleChange(newArr.length > 0 ? newArr : null)
+                          }}
+                          className="h-4 w-4 rounded border-zinc-300 bg-white text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:focus:ring-zinc-50"
+                        />
+                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                          {option}
+                        </span>
+                      </label>
+                    )
+                  })}
+                </div>
               ) : null}
             </div>
 

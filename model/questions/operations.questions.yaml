@@ -19,3 +19,15 @@ questions:
     description: "CI/CD = automated pipelines. Manual = direct changes. Vendor release train = updates controlled by vendor schedule/process." 
     type: enum
     allowed: [cicd, manual, vendor_release_train]
+
+  - id: observability_signals
+    text: Which observability signals are collected?
+    description: "Select all that apply. Metrics = performance/health data. Logs = application events. Traces = distributed request tracking. Alerts = proactive notifications on critical conditions."
+    type: set
+    allowed: [metrics, logs, traces, alerts, none]
+
+  - id: observability_scope
+    text: Where are observability signals aggregated?
+    description: "Local = each deployment independently. Site-centralized = aggregated per factory/location. Global = enterprise-wide central platform. None = no aggregation/retention."
+    type: enum
+    allowed: [none, local, site_centralized, global_centralized]

@@ -44,15 +44,28 @@ rules:
   - when: { data.data_leaves_manufacturing_zone: true }
     require: [DATA-ENC-001, SEC-NET-001]
 
-  # Operations
-  - when: { availability_critical: true }
-    require: [OPS-OBS-001, OPS-DR-001]
-
-  - when: { affects_production: true }
-    require: [OPS-OBS-001, INT-ISO-001]
+  # Operations - Observability
+  # Signal-based rules (what observability exists)
+  - when: { operations.observability_signals: none, operations.environment: prod }
+    require: [OPS-OBS-001]
 
   - when: { operations.environment: prod }
     require: [OPS-OBS-001]
+
+  - when: { availability_critical: true }
+    require: [OPS-OBS-001, OPS-DR-001]
+
+  # Scope-based rules (where signals are aggregated)
+  # Global deployments should have centralized observability for coordinated incident response
+  - when: { operations.deployment_scale: global, operations.observability_scope: local }
+    require: [OPS-OBS-001]
+
+  - when: { operations.deployment_scale: global, operations.observability_scope: none }
+    require: [OPS-OBS-001]
+
+  # Operations - Other
+  - when: { affects_production: true }
+    require: [INT-ISO-001]
 
   - when: { operations.deployment_scale: global }
     require: [OPS-DR-001]
