@@ -11,6 +11,11 @@ interface PortfolioStats {
   totalMissing: number
   completionRate: number
   systemStatus: Record<string, number>
+  portfolioRows: Array<{
+    id: string
+    domains: string[]
+    derivedControls: number
+  }>
 }
 
 interface StatsCardProps {
@@ -251,6 +256,95 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
             </Card>
           </motion.div>
         </div>
+      )}
+
+      {/* Domain Coverage Heatmap */}
+      {stats.portfolioRows.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-base">Domain Coverage Matrix</CardTitle>
+              <CardDescription>Which domains are activated across your systems</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                // Get all unique domains across all systems
+                const allDomains = Array.from(
+                  new Set(stats.portfolioRows.flatMap(r => r.domains))
+                ).sort()
+                
+                if (allDomains.length === 0) {
+                  return (
+                    <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
+                      No domains activated yet
+                    </div>
+                  )
+                }
+
+                return (
+                  <div className="overflow-x-auto">
+                    <div className="inline-block min-w-full">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr>
+                            <th className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 sticky left-0 z-10">
+                              System
+                            </th>
+                            {allDomains.map(domain => (
+                              <th
+                                key={domain}
+                                className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap"
+                              >
+                                {domain}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {stats.portfolioRows.map((row, rowIndex) => (
+                            <tr key={row.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                              <td className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 font-medium text-sm text-zinc-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 sticky left-0 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/50">
+                                {row.id}
+                              </td>
+                              {allDomains.map((domain, colIndex) => {
+                                const isActivated = row.domains.includes(domain)
+                                return (
+                                  <td
+                                    key={`${row.id}-${domain}`}
+                                    className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-center"
+                                  >
+                                    <div
+                                      className={`
+                                        inline-flex h-8 w-8 items-center justify-center rounded-md transition-all
+                                        ${isActivated 
+                                          ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-md' 
+                                          : 'bg-zinc-100 dark:bg-zinc-800'
+                                        }
+                                      `}
+                                      title={isActivated ? `${domain} activated` : `${domain} not activated`}
+                                    >
+                                      {isActivated && (
+                                        <CheckCircle2 className="h-4 w-4 text-white" />
+                                      )}
+                                    </div>
+                                  </td>
+                                )
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )
+              })()}
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
     </div>
   )

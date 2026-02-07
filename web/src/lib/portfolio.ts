@@ -8,6 +8,7 @@ export type PortfolioRow = {
   derivedControls: number
   missingAnswers: number
   activatedDomains: number
+  domains: string[] // List of activated domain names
 }
 
 export async function buildPortfolio(modelDir: string = 'model'): Promise<{ modelVersion: string; rows: PortfolioRow[] }> {
@@ -28,6 +29,7 @@ export async function buildPortfolio(modelDir: string = 'model'): Promise<{ mode
       derivedControls: res.derived_controls.length,
       missingAnswers: missing,
       activatedDomains: res.activated_domains.length,
+      domains: res.activated_domains,
     })
   }
 

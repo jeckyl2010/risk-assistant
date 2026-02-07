@@ -38,6 +38,7 @@ export default async function Home() {
     totalMissing,
     completionRate,
     systemStatus,
+    portfolioRows: rows, // Pass full data for heatmap
   }
 
   return (
