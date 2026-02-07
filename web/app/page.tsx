@@ -21,10 +21,15 @@ export default async function Home() {
   const answeredQuestions = totalPossibleAnswers - totalMissing
   const completionRate = totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0
 
-  // Domain distribution - simplified since we only have counts
-  const domainDistribution: Record<string, number> = {
-    'Base': rows.length, // All systems have base domain
-    'Active': rows.reduce((sum, r) => sum + r.activatedDomains, 0),
+  // System status - how many systems are complete vs need work
+  const systemsComplete = rows.filter(r => r.missingAnswers === 0).length
+  const systemsInProgress = rows.filter(r => r.missingAnswers > 0 && r.missingAnswers <= 5).length
+  const systemsNeedWork = rows.filter(r => r.missingAnswers > 5).length
+
+  const systemStatus = {
+    'Complete': systemsComplete,
+    'In Progress': systemsInProgress,
+    'Need Work': systemsNeedWork,
   }
 
   const stats = {
@@ -32,7 +37,7 @@ export default async function Home() {
     totalControls,
     totalMissing,
     completionRate,
-    domainDistribution,
+    systemStatus,
   }
 
   return (

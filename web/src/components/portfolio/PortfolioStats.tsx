@@ -2,15 +2,15 @@
 
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shield, CheckCircle2, AlertCircle, TrendingUp, Network } from 'lucide-react'
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { Shield, CheckCircle2, AlertCircle, TrendingUp, Network, CircleCheckBig, CircleAlert } from 'lucide-react'
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, RadialBarChart, RadialBar } from 'recharts'
 
 interface PortfolioStats {
   totalSystems: number
   totalControls: number
   totalMissing: number
   completionRate: number
-  domainDistribution: Record<string, number>
+  systemStatus: Record<string, number>
 }
 
 interface StatsCardProps {
@@ -60,16 +60,32 @@ function StatsCard({ title, value, description, icon, trend, delay }: StatsCardP
 }
 
 export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
-  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
+  const COLORS = ['#10b981', '#f59e0b', '#ef4444'] // Green, Amber, Red
 
-  const domainData = Object.entries(stats.domainDistribution).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    value,
-  }))
+  const statusData = Object.entries(stats.systemStatus)
+    .filter(([_, value]) => value > 0) // Only show categories with systems
+    .map(([name, value], index) => ({
+      name,
+      value,
+      fill: COLORS[index % COLORS.length]
+    }))
 
-  const completionData = [
-    { name: 'Complete', value: stats.totalSystems - stats.totalMissing, fill: '#10b981' },
-    { name: 'Incomplete', value: stats.totalMissing, fill: '#f59e0b' },
+  // Calculate question breakdown
+  const avgQuestionsPerSystem = 15
+  const totalPossibleQuestions = stats.totalSystems * avgQuestionsPerSystem
+  const answeredQuestions = totalPossibleQuestions - stats.totalMissing
+  
+  const questionData = [
+    { name: 'Answered', value: answeredQuestions, fill: '#10b981' },
+    { name: 'Missing', value: stats.totalMissing, fill: '#f59e0b' },
+  ]
+
+  const radialData = [
+    {
+      name: 'Completion',
+      value: stats.completionRate,
+      fill: stats.completionRate >= 80 ? '#10b981' : stats.completionRate >= 50 ? '#f59e0b' : '#ef4444'
+    }
   ]
 
   return (
@@ -99,10 +115,10 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           delay={0.2}
         />
         <StatsCard
-          title="Active Domains"
-          value={Object.keys(stats.domainDistribution).length}
-          description="Across portfolio"
-          icon={<Network className="h-5 w-5" />}
+          title="Systems Complete"
+          value={stats.systemStatus['Complete'] || 0}
+          description="Fully assessed systems"
+          icon={<CheckCircle2 className="h-5 w-5" />}
           delay={0.3}
         />
       </div>
@@ -110,7 +126,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
       {/* Charts */}
       {stats.totalSystems > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Domain Distribution */}
+          {/* System Status */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -118,29 +134,36 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           >
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-base">Domain Distribution</CardTitle>
-                <CardDescription>Active domains across systems</CardDescription>
+                <CardTitle className="text-base">System Status</CardTitle>
+                <CardDescription>Assessment completion by system</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <PieChart>
-                    <Pie
-                      data={domainData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {domainData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                {statusData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value, percent }) => 
+                          `${name}: ${value} (${((percent ?? 0) * 100).toFixed(0)}%)`
+                        }
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {statusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-60 items-center justify-center text-sm text-zinc-500">
+                    No systems yet
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -153,22 +176,77 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           >
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-base">Completion Status</CardTitle>
-                <CardDescription>Question coverage</CardDescription>
+                <CardTitle className="text-base">Question Coverage</CardTitle>
+                <CardDescription>Portfolio-wide assessment progress</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <BarChart data={completionData}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                      {completionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <CardContent className="space-y-6">
+                {/* Overall Progress Bar */}
+                <div className="space-y-3">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <div className="text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                        Overall Progress
+                      </div>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
+                          {answeredQuestions}
+                        </span>
+                        <span className="text-lg text-zinc-500 dark:text-zinc-400">
+                          / {totalPossibleQuestions}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                        {stats.completionRate}%
+                      </div>
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        complete
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Large Progress Bar */}
+                  <div className="h-6 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
+                      style={{ width: `${stats.completionRate}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Breakdown */}
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-gradient-to-br from-green-500 to-emerald-500" />
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Answered
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                      {answeredQuestions}
+                    </div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {stats.completionRate}% of total
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-gradient-to-br from-amber-500 to-orange-500" />
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Missing
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                      {stats.totalMissing}
+                    </div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {Math.round((stats.totalMissing / totalPossibleQuestions) * 100)}% remaining
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

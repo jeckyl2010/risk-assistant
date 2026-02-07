@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, AlertCircle, Shield, ArrowRight, BarChart3, PieChart as PieChartIcon, ChevronDown, Filter, X } from 'lucide-react'
+import { CheckCircle2, AlertCircle, Shield, ArrowRight, BarChart3, PieChart as PieChartIcon, ChevronDown, Filter, X, GitBranch } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -510,23 +510,78 @@ export function ResultsSection({
 
                                       {control.because && control.because.length > 0 && (
                                         <div>
-                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                                            Because
+                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
+                                            <GitBranch className="h-3 w-3" />
+                                            Derivation Path
                                           </div>
-                                          <div className="mt-2 space-y-2">
-                                            {control.because.map((b, i) => (
-                                              <div
-                                                key={i}
-                                                className="rounded-lg border border-zinc-200/50 bg-zinc-50/80 p-3 font-mono text-xs shadow-sm backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/80"
-                                              >
-                                                {Object.entries(b).map(([key, val]) => (
-                                                  <div key={key} className="text-zinc-700 dark:text-zinc-300">
-                                                    {key}: {JSON.stringify(val)}
+                                          
+                                          {/* Visual Flow Diagram */}
+                                          <div className="mt-3 overflow-x-auto pb-2">
+                                            <div className="flex items-center gap-2 min-w-max">
+                                              {/* Facts Nodes */}
+                                              {control.because.map((fact, i) => (
+                                                <div key={i} className="flex items-center">
+                                                  <div className="group relative">
+                                                    <div className="rounded-lg border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:from-indigo-950/50 dark:to-blue-950/50">
+                                                      {Object.entries(fact).map(([key, val], idx) => (
+                                                        <div key={idx} className="flex items-center gap-1.5 text-xs">
+                                                          <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                                                            {key}:
+                                                          </span>
+                                                          <span className="font-mono text-indigo-900 dark:text-indigo-100">
+                                                            {JSON.stringify(val)}
+                                                          </span>
+                                                        </div>
+                                                      ))}
+                                                    </div>
                                                   </div>
-                                                ))}
+                                                  {i < control.because.length - 1 && (
+                                                    <div className="flex items-center px-2">
+                                                      <div className="h-0.5 w-6 bg-gradient-to-r from-indigo-300 to-purple-300 dark:from-indigo-600 dark:to-purple-600" />
+                                                      <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-purple-300 dark:border-l-purple-600" />
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              ))}
+                                              
+                                              {/* Arrow to Control */}
+                                              <div className="flex items-center px-2">
+                                                <div className="h-0.5 w-8 bg-gradient-to-r from-purple-300 to-emerald-300 dark:from-purple-600 dark:to-emerald-600" />
+                                                <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-emerald-300 dark:border-l-emerald-600" />
                                               </div>
-                                            ))}
+                                              
+                                              {/* Control Node */}
+                                              <div className="rounded-lg border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:from-emerald-950/50 dark:to-teal-950/50">
+                                                <div className="flex items-center gap-2">
+                                                  <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                                  <span className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">
+                                                    {control.id}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
+
+                                          {/* Details (Collapsed by default) */}
+                                          <details className="mt-2">
+                                            <summary className="cursor-pointer text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300">
+                                              View raw data
+                                            </summary>
+                                            <div className="mt-2 space-y-2">
+                                              {control.because.map((b, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="rounded-lg border border-zinc-200/50 bg-zinc-50/80 p-3 font-mono text-xs shadow-sm backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/80"
+                                                >
+                                                  {Object.entries(b).map(([key, val]) => (
+                                                    <div key={key} className="text-zinc-700 dark:text-zinc-300">
+                                                      {key}: {JSON.stringify(val)}
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </details>
                                         </div>
                                       )}
                                     </div>
