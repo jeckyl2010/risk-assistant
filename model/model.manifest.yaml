@@ -1,0 +1,3 @@
+# Model manifest for versioning and upgrade workflows
+# SemVer: https://semver.org/
+model_version: 0.1.0
