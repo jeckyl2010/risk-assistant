@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSystemFacts, saveSystemFacts } from '@/lib/storage'
+import { getSystemFacts, saveSystemFacts, deleteSystem } from '@/lib/storage'
 import { SaveSystemRequestSchema } from '@/lib/schemas'
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -40,6 +40,25 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('Save system error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await context.params
+    const deleted = await deleteSystem(id)
+    
+    if (!deleted) {
+      return NextResponse.json({ error: 'System not found' }, { status: 404 })
+    }
+    
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('Delete system error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

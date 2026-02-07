@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, CheckCircle2, AlertCircle, TrendingUp, Network, CircleCheckBig, CircleAlert } from 'lucide-react'
@@ -265,12 +266,15 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-base">Domain Coverage Matrix</CardTitle>
+          <Card className="overflow-hidden shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Network className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                Domain Coverage Matrix
+              </CardTitle>
               <CardDescription>Which domains are activated across your systems</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {(() => {
                 // Get all unique domains across all systems
                 const allDomains = Array.from(
@@ -287,36 +291,41 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
 
                 return (
                   <div className="overflow-x-auto">
-                    <div className="inline-block min-w-full">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr>
-                            <th className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 sticky left-0 z-10">
-                              System
+                    <table className="w-full">
+                      <thead className="border-b-2 border-zinc-200 dark:border-zinc-800">
+                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 sticky left-0 bg-zinc-50/50 dark:bg-zinc-900/50">
+                            System
+                          </th>
+                          {allDomains.map(domain => (
+                            <th
+                              key={domain}
+                              className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400"
+                            >
+                              {domain}
                             </th>
-                            {allDomains.map(domain => (
-                              <th
-                                key={domain}
-                                className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap"
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                        {stats.portfolioRows.map((row) => (
+                          <tr key={row.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                            <td className="px-6 py-4 sticky left-0 bg-white dark:bg-zinc-950 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/50">
+                              <Link
+                                className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
+                                href={`/systems/${encodeURIComponent(row.id)}`}
                               >
-                                {domain}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stats.portfolioRows.map((row, rowIndex) => (
-                            <tr key={row.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-                              <td className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 font-medium text-sm text-zinc-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 sticky left-0 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/50">
                                 {row.id}
-                              </td>
-                              {allDomains.map((domain, colIndex) => {
-                                const isActivated = row.domains.includes(domain)
-                                return (
-                                  <td
-                                    key={`${row.id}-${domain}`}
-                                    className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-center"
-                                  >
+                              </Link>
+                            </td>
+                            {allDomains.map((domain) => {
+                              const isActivated = row.domains.includes(domain)
+                              return (
+                                <td
+                                  key={`${row.id}-${domain}`}
+                                  className="px-6 py-4 text-center"
+                                >
+                                  <div className="flex justify-center">
                                     <div
                                       className={`
                                         inline-flex h-8 w-8 items-center justify-center rounded-md transition-all
@@ -331,14 +340,14 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                                         <CheckCircle2 className="h-4 w-4 text-white" />
                                       )}
                                     </div>
-                                  </td>
-                                )
-                              })}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                                  </div>
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )
               })()}

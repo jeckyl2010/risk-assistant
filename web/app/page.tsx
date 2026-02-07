@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { buildPortfolio } from '@/lib/portfolio'
 import { NewSystemForm } from '@/components/NewSystemForm'
 import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
+import { PortfolioTable } from '@/components/portfolio/PortfolioTable'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Shield, FileCheck, Activity, ArrowRight } from 'lucide-react'
+import { Shield, FileCheck, Activity } from 'lucide-react'
 import { NoSystemsEmpty } from '@/components/ui/empty-state'
 
 export default async function Home() {
@@ -71,9 +72,6 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Stats Dashboard */}
-      {rows.length > 0 && <PortfolioStats stats={stats} />}
-
       {/* Create New System Card */}
       <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20">
         <CardHeader>
@@ -105,71 +103,13 @@ export default async function Home() {
           {rows.length === 0 ? (
             <NoSystemsEmpty onCreateSystem={() => {}} />
           ) : (
-            <div className="overflow-hidden">
-              <table className="w-full">
-                <thead className="border-b-2 border-zinc-200 dark:border-zinc-800">
-                  <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                      System
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                      Controls
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                      Missing Answers
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                      Activated Domains
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                  {rows.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
-                    >
-                      <td className="px-6 py-4">
-                        <Link
-                          className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
-                          href={`/systems/${encodeURIComponent(r.id)}`}
-                        >
-                          {r.id}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant="secondary">{r.derivedControls}</Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        {r.missingAnswers > 0 ? (
-                          <Badge variant="warning">{r.missingAnswers}</Badge>
-                        ) : (
-                          <Badge variant="success">0</Badge>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                        {r.activatedDomains || '—'}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/systems/${encodeURIComponent(r.id)}`}
-                          className="inline-flex items-center gap-1 text-sm font-medium text-zinc-600 opacity-0 transition-all group-hover:opacity-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                        >
-                          Open
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <PortfolioTable rows={rows} />
           )}
         </CardContent>
       </Card>
+
+      {/* Stats Dashboard */}
+      {rows.length > 0 && <PortfolioStats stats={stats} />}
     </div>
   )
 }

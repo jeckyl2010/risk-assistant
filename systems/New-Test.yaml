@@ -1,3 +1,4 @@
 scope: system
 description: ''
-base: {}
+base:
+  external_access: true

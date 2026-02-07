@@ -78,3 +78,16 @@ export async function saveSystemFacts(id: string, facts: Facts): Promise<void> {
   const yamlPath = path.join(dir, `${safe}.yaml`)
   await fs.writeFile(yamlPath, dumpYaml(normalizeFactsForDump(facts)), 'utf-8')
 }
+
+export async function deleteSystem(id: string): Promise<boolean> {
+  const dir = await ensureSystemsDir()
+  const safe = sanitizeSystemId(id)
+  const yamlPath = path.join(dir, `${safe}.yaml`)
+  
+  try {
+    await fs.unlink(yamlPath)
+    return true
+  } catch {
+    return false
+  }
+}
