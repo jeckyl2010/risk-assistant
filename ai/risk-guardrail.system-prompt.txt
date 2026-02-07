@@ -47,7 +47,7 @@ CONTROL MODEL
 Each control must define:
 - scope (program | system | deployment)
 - enforcement_intent (automatic | procedural)
-- activation_phase (design | pre_go_live | runtime | post_go_live)
+- activation_phase (plan | build | deploy | run | operate)
 - evidence_type (config | pipeline | log | document)
 - lifecycle_state (required | planned | satisfied | waived)
 

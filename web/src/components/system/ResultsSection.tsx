@@ -23,6 +23,18 @@ interface RequiredQuestion {
   answered: boolean
 }
 
+// Format activation phase for display
+function formatPhase(phase: string): string {
+  const labels: Record<string, string> = {
+    plan: 'Plan',
+    build: 'Build',
+    deploy: 'Deploy',
+    run: 'Run',
+    operate: 'Operate'
+  }
+  return labels[phase] || phase.charAt(0).toUpperCase() + phase.slice(1)
+}
+
 interface ResultsSectionProps {
   derivedControls: DerivedControl[]
   requiredQuestions: RequiredQuestion[]
@@ -45,7 +57,8 @@ export function ResultsSection({
   }, {} as Record<string, number>)
 
   const phaseDistribution = derivedControls.reduce((acc, c) => {
-    acc[c.activation_phase] = (acc[c.activation_phase] || 0) + 1
+    const formattedPhase = formatPhase(c.activation_phase)
+    acc[formattedPhase] = (acc[formattedPhase] || 0) + 1
     return acc
   }, {} as Record<string, number>)
 
@@ -333,7 +346,7 @@ export function ResultsSection({
                       <div className="mt-3 flex flex-wrap gap-2">
                         <Badge variant="secondary">scope: {control.scope}</Badge>
                         <Badge variant="secondary">intent: {control.enforcement_intent}</Badge>
-                        <Badge variant="secondary">phase: {control.activation_phase}</Badge>
+                        <Badge variant="secondary">phase: {formatPhase(control.activation_phase)}</Badge>
                         {control.evidence_type?.length > 0 && (
                           <Badge variant="secondary">
                             evidence: {control.evidence_type.join(', ')}

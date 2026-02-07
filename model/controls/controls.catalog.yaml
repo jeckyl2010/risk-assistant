@@ -5,7 +5,7 @@ controls:
     description: Ensures all access to the system uses strong, verifiable identities rather than shared credentials or anonymous access. This includes service-to-service authentication and user access.
     scope: system
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config, pipeline]
 
   - id: SEC-LOG-001
@@ -13,7 +13,7 @@ controls:
     description: Security-relevant events (authentication, authorization, access violations, configuration changes) are captured and sent to a centralized logging system for monitoring, alerting, and forensic analysis.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: runtime
+    activation_phase: run
     evidence_type: [config, log]
 
   - id: SEC-NET-001
@@ -21,7 +21,7 @@ controls:
     description: Network-level trust ends at deployment boundaries. All communication crossing trust boundaries requires authentication and authorization, implementing zero-trust principles.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config]
 
   - id: SEC-SBD-001
@@ -30,7 +30,7 @@ controls:
       Security is built into the design from the start. Includes conducting threat modeling, applying least privilege principles, securing defaults, and documenting security architecture decisions. Strongly encouraged: threat models as code, policy-as-code definitions, and automated architecture validation.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
 
   - id: SEC-MFA-001
@@ -38,7 +38,7 @@ controls:
     description: Multi-factor authentication is mandatory for all human interactive access and any privileged operations. This reduces the risk of credential theft and unauthorized access.
     scope: system
     enforcement_intent: procedural
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [document, config]
 
   - id: SEC-TLS-001
@@ -46,7 +46,7 @@ controls:
     description: All data transmitted across network boundaries is encrypted using TLS 1.2 or higher. For service-to-service communication, mutual TLS (mTLS) should be used where applicable.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config]
 
   - id: SEC-SECRETS-001
@@ -55,7 +55,7 @@ controls:
       Secrets (passwords, API keys, certificates) are never stored in code or configuration files. They must be stored in a dedicated secrets management system with support for rotation, auditing, and scoped access. Strongly encouraged: automated secrets scanning in CI/CD pipelines and infrastructure-as-code for secrets management configuration.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
 
   - id: SEC-ACCESS-REV-001
@@ -64,7 +64,7 @@ controls:
       Regular reviews of user access rights and privileged accounts to ensure access remains appropriate. Reviews should identify and remove unnecessary privileges and dormant accounts. Strongly encouraged: automated access review workflows, identity governance platforms, and alerting on stale accounts.
     scope: system
     enforcement_intent: procedural
-    activation_phase: post_go_live
+    activation_phase: operate
     evidence_type: [document]
 
   - id: SEC-WAF-001
@@ -72,7 +72,7 @@ controls:
     description: Systems exposed to the internet must have protective layers including Web Application Firewall (WAF), rate limiting, DDoS protection, and abuse detection to defend against common attacks.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config]
 
   - id: DATA-ENC-001
@@ -80,7 +80,7 @@ controls:
     description: Sensitive data must be encrypted both when stored (at rest) and when transmitted (in transit). Encryption keys must be properly managed and rotated according to best practices.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config]
 
   - id: OPS-OBS-001
@@ -88,7 +88,7 @@ controls:
     description: The system must expose comprehensive observability signals including metrics, structured logs, and distributed traces. Critical conditions must trigger alerts to enable rapid incident response.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: runtime
+    activation_phase: run
     evidence_type: [config, log]
 
   - id: OPS-DR-001
@@ -97,7 +97,7 @@ controls:
       A documented disaster recovery strategy must exist, including Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO). The strategy must be regularly tested to verify effectiveness. Strongly encouraged: infrastructure-as-code for DR environments, automated failover testing in pipelines, and chaos engineering practices.
     scope: system
     enforcement_intent: procedural
-    activation_phase: pre_go_live
+    activation_phase: build
     evidence_type: [document]
 
   - id: INT-ISO-001
@@ -106,7 +106,7 @@ controls:
       System integrations must implement resilience patterns including timeouts, retries with exponential backoff, circuit breakers, buffering, and backpressure handling to prevent cascading failures. Strongly encouraged: resilience patterns as code (e.g., service mesh configs, SDK decorators), automated chaos testing, and observability-driven validation.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
 
   - id: OT-CMD-001
@@ -114,7 +114,7 @@ controls:
     description: Manufacturing/OT command channels require additional protections including command validation, authorization checks, audit logging, and emergency shutdown capabilities to prevent unauthorized or harmful operations.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: pre_go_live
+    activation_phase: deploy
     evidence_type: [config, pipeline]
 
   - id: AI-GOV-001
@@ -123,7 +123,7 @@ controls:
       AI/ML components require clear ownership, validation of model outputs, ongoing monitoring for drift and bias, version control, and documented decision-making processes for model updates and rollbacks. Strongly encouraged: MLOps pipelines for automated model validation, drift detection as code, model versioning in Git, and automated compliance checks.
     scope: system
     enforcement_intent: procedural
-    activation_phase: pre_go_live
+    activation_phase: build
     evidence_type: [document]
 
   - id: AI-HITL-001
@@ -132,7 +132,7 @@ controls:
       Higher-risk or higher-autonomy AI decisions require human-in-the-loop oversight. Critical actions should require human approval, and all AI decisions must be auditable and explainable. Strongly encouraged: automated workflow systems for approval routing, audit trails as structured logs, and explainability tooling integrated into pipelines.
     scope: system
     enforcement_intent: procedural
-    activation_phase: runtime
+    activation_phase: run
     evidence_type: [document]
 
   - id: COST-GUARD-001
@@ -140,7 +140,7 @@ controls:
     description: Automated cost controls including budget limits, spending alerts, and resource quotas to prevent runaway costs. Critical systems should have mechanisms to prevent cost-based outages.
     scope: deployment
     enforcement_intent: automatic
-    activation_phase: runtime
+    activation_phase: run
     evidence_type: [config, log]
 
   - id: GDPR-ART-32
@@ -149,7 +149,7 @@ controls:
       Compliance with GDPR Article 32 requirements for appropriate technical and organizational measures to ensure security appropriate to the risk of processing personal data. Strongly encouraged: automated compliance scanning, data classification as code, privacy-by-design patterns in infrastructure-as-code, and continuous compliance monitoring.
     scope: system
     enforcement_intent: procedural
-    activation_phase: pre_go_live
+    activation_phase: build
     evidence_type: [document]
 
   - id: CRIT-DECL-001
@@ -158,7 +158,7 @@ controls:
       Systems supporting manufacturing must declare their criticality level based on the impact of failure. Levels range from C0 (production-critical) to C4 (non-critical support), with evidence supporting the classification. Strongly encouraged: criticality metadata as code (YAML/JSON), automated policy enforcement based on criticality tags, and integration with deployment pipelines.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
 
   - id: CRIT-CONN-001
@@ -167,7 +167,7 @@ controls:
       Production-critical systems (C0/C1) must be able to operate without continuous WAN or cloud connectivity. Essential functions must remain available during network outages to prevent production shutdowns. Strongly encouraged: architecture-as-code validation for dependency graphs, automated network partition testing, and edge computing patterns defined as infrastructure-as-code.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
 
   - id: CRIT-ISO-001
@@ -176,7 +176,7 @@ controls:
       Critical systems must demonstrate they can continue operating during complete site isolation from external networks for 24-48 hours, including ability to maintain basic operations and local decision-making. Strongly encouraged: automated isolation testing as part of release pipelines, simulated blackout scenarios in test environments, and resilience validation dashboards.
     scope: system
     enforcement_intent: procedural
-    activation_phase: pre_go_live
+    activation_phase: build
     evidence_type: [document]
 
   - id: CRIT-AI-001
@@ -185,5 +185,5 @@ controls:
       Production-critical systems (C0/C1) must not have AI/ML models in the control path for safety-critical decisions. If AI is used, there must be safe fallback mechanisms and human override capabilities. Strongly encouraged: fallback logic as code with automated testing, circuit breakers for AI failures, and runtime policy enforcement for AI decision boundaries.
     scope: system
     enforcement_intent: procedural
-    activation_phase: design
+    activation_phase: plan
     evidence_type: [document]
