@@ -16,7 +16,7 @@ export default async function SystemPage({ params }: { params: Promise<{ id: str
   const ui = await loadModelForUI(paths)
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-10">
       <SystemEditor
         id={sys.id}
         initialFacts={sys.facts}

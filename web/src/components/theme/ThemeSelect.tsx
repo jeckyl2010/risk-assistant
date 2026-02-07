@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { Moon, Sun, Monitor } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { applyTheme } from './theme'
 import { THEME_STORAGE_KEY, type ThemeMode } from './themeInit'
-
-/* eslint-disable react-hooks/set-state-in-effect */
 
 function safeGetStoredTheme(): ThemeMode {
   try {
@@ -60,29 +60,39 @@ export function ThemeSelect() {
     }
   }, [theme])
 
-  const label = useMemo(() => {
-    if (theme === 'system') return 'System'
-    if (theme === 'light') return 'Light'
-    return 'Dark'
-  }, [theme])
-
   if (!mounted) return null
 
+  const themes: { value: ThemeMode; icon: typeof Sun; label: string }[] = [
+    { value: 'light', icon: Sun, label: 'Light' },
+    { value: 'dark', icon: Moon, label: 'Dark' },
+    { value: 'system', icon: Monitor, label: 'System' },
+  ]
+
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white/80 px-3 py-2 text-sm shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
-      <div className="text-xs font-medium text-zinc-800 dark:text-zinc-200">Theme</div>
-      <select
-        aria-label="Theme"
-        value={theme}
-        onChange={(e) => setTheme(e.target.value as ThemeMode)}
-        className="h-8 rounded-lg border border-zinc-200/70 bg-white px-2 text-sm text-zinc-900 outline-none [color-scheme:light] dark:[color-scheme:dark] focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50"
-      >
-        <option value="system">System</option>
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-      </select>
-      <div className="text-xs text-zinc-500 dark:text-zinc-400">{label}</div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex items-center gap-1 rounded-xl border-2 border-zinc-200/80 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40"
+    >
+      {themes.map(({ value, icon: Icon, label }) => (
+        <button
+          key={value}
+          onClick={() => setTheme(value)}
+          className="relative rounded-lg p-2 text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          aria-label={label}
+          title={label}
+        >
+          {theme === value && (
+            <motion.div
+              layoutId="theme-indicator"
+              className="absolute inset-0 rounded-lg bg-zinc-100 dark:bg-zinc-800"
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+          )}
+          <Icon className="relative h-4 w-4" />
+        </button>
+      ))}
+    </motion.div>
   )
 }
 

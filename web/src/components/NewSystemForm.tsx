@@ -2,52 +2,94 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { motion } from 'framer-motion'
+import { Plus, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+const formSchema = z.object({
+  id: z.string()
+    .min(1, 'System ID is required')
+    .regex(/^[a-zA-Z0-9-_]+$/, 'Only letters, numbers, dashes, and underscores allowed')
+})
+
+type FormData = z.infer<typeof formSchema>
 
 export function NewSystemForm() {
-  const [id, setId] = useState('')
   const [isCreating, setIsCreating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  async function onCreate(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(formSchema)
+  })
+
+  async function onSubmit(data: FormData) {
     setIsCreating(true)
     try {
       const res = await fetch('/api/systems', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify(data),
       })
       if (!res.ok) throw new Error(`Failed: ${res.status}`)
       const json = (await res.json()) as { id: string }
+      toast.success('System created successfully!')
       router.push(`/systems/${encodeURIComponent(json.id)}`)
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to create system')
+      toast.error(e instanceof Error ? e.message : 'Failed to create system')
     } finally {
       setIsCreating(false)
     }
   }
 
   return (
-    <form onSubmit={onCreate} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-      <div className="flex flex-1 flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-200">New system ID</label>
-        <input
-          value={id}
-          onChange={(e) => setId(e.target.value)}
+    <motion.form
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-4 sm:flex-row sm:items-start"
+    >
+      <div className="flex flex-1 flex-col gap-2">
+        <Label htmlFor="system-id">New system ID</Label>
+        <Input
+          id="system-id"
+          {...register('id')}
           placeholder="e.g. shopfloor-analytics"
-          className="h-10 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm shadow-sm outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          disabled={isCreating}
         />
+        {errors.id && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm text-red-600 dark:text-red-400"
+          >
+            {errors.id.message}
+          </motion.p>
+        )}
       </div>
-      <button
+      <Button
         type="submit"
         disabled={isCreating}
-        className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-white"
+        className="mt-auto"
+        size="default"
       >
-        {isCreating ? 'Creating…' : 'Create'}
-      </button>
-      {error ? <div className="text-sm text-red-600">{error}</div> : null}
-    </form>
+        {isCreating ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Creating…
+          </>
+        ) : (
+          <>
+            <Plus className="h-4 w-4" />
+            Create
+          </>
+        )}
+      </Button>
+    </motion.form>
   )
 }

@@ -4,6 +4,7 @@ import Script from 'next/script'
 import "./globals.css";
 import { ThemeSelect } from '@/components/theme/ThemeSelect'
 import { getThemeInitScript } from '@/components/theme/themeInit'
+import { Toaster } from '@/components/ui/toaster'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-foreground antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 text-foreground antialiased font-sans`}
       >
         <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
 
@@ -36,6 +37,7 @@ export default function RootLayout({
           <ThemeSelect />
         </div>
         {children}
+        <Toaster />
       </body>
     </html>
   );
