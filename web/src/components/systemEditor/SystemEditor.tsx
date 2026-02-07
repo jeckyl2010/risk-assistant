@@ -305,6 +305,7 @@ export function SystemEditor({
               title={currentSection.title}
               questions={currentSection.questions}
               prefix={currentSection.prefix}
+              domain={currentSection.key}
               getValue={(qid) => getValue(currentSection.key, qid)}
               getReason={(qid) => getReason(currentSection.key, qid)}
               onChange={(qid, value) => handleQuestionChange(currentSection.key, qid, value)}

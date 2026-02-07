@@ -11,6 +11,7 @@ interface QuestionsListProps {
   description?: string
   questions: Question[]
   prefix: string
+  domain?: string
   getValue: (questionId: string) => unknown
   getReason: (questionId: string) => unknown
   onChange: (questionId: string, value: unknown) => void
@@ -22,6 +23,7 @@ export function QuestionsList({
   description,
   questions,
   prefix,
+  domain,
   getValue,
   getReason,
   onChange,
@@ -64,6 +66,7 @@ export function QuestionsList({
               onChange={(v) => onChange(q.id, v)}
               onReasonChange={(v) => onReasonChange(q.id, v)}
               index={index}
+              domain={domain}
             />
           ))}
         </div>

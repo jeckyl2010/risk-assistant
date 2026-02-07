@@ -18,17 +18,21 @@ base:
       He reviews the previous shift's notes, open deviations, safety call-outs, and today's priorities.
       If assigned, he completes a short Rock Academy refresher (managed browser + SSO).
 criticality:
-  criticality_level: C2
+  criticality_level: null
   hard_wan_cloud_dependency: true
+  _reasons:
+    hard_wan_cloud_dependency: '**Test**'
 security:
   user_population: internal
   crosses_trust_boundary: true
   privileged_access: false
   internet_facing: false
   interactive_users: true
+  _reasons:
+    internet_facing: '**Test** '
 data:
   personal_data: true
-  data_subject_region: null
+  data_subject_region: non_eu
   data_leaves_manufacturing_zone: true
 ai:
   ai_autonomy: advisory

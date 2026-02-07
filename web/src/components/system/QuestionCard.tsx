@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircle, Eye, Edit3 } from 'lucide-react'
 import type { Question } from '@/lib/uiTypes'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -9,6 +10,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { MarkdownViewer } from '@/components/ui/markdown-viewer'
+import { sectionAccent } from '../systemEditor/sectionAccent'
 
 interface QuestionCardProps {
   question: Question
@@ -17,6 +21,7 @@ interface QuestionCardProps {
   onChange: (value: unknown) => void
   onReasonChange: (value: string) => void
   index: number
+  domain?: string
 }
 
 export function QuestionCard({
@@ -25,9 +30,13 @@ export function QuestionCard({
   reason,
   onChange,
   onReasonChange,
-  index
+  index,
+  domain = 'base'
 }: QuestionCardProps) {
   const isAnswered = value !== null
+  const [isEditingReason, setIsEditingReason] = useState(false)
+  const hasReason = typeof reason === 'string' && reason.trim().length > 0
+  const accent = sectionAccent(domain)
 
   return (
     <motion.div
@@ -35,7 +44,7 @@ export function QuestionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
     >
-      <Card className={`transition-all ${isAnswered ? 'border-green-200 dark:border-green-900/50' : 'border-amber-200 dark:border-amber-900/50'}`}>
+      <Card className={`transition-all ${isAnswered ? `border-l-4 ${accent.cardTop} ${accent.cardBg} border-opacity-60` : 'border-zinc-200 bg-white/50 dark:border-zinc-800 dark:bg-zinc-950/50'}`}>
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-1">
@@ -111,15 +120,46 @@ export function QuestionCard({
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-2"
               >
-                <Label>Reason (optional)</Label>
-                <Textarea
-                  value={typeof reason === 'string' ? reason : ''}
-                  onChange={(e) => onReasonChange(e.target.value)}
-                  placeholder="Explain why this answer was chosen..."
-                  className="min-h-[80px] resize-none"
-                />
+                <div className="flex items-center justify-between">
+                  <Label>
+                    Reason (optional)
+                    <span className="text-xs text-zinc-500 ml-1">• Markdown supported</span>
+                  </Label>
+                  {hasReason && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditingReason(!isEditingReason)}
+                      className="h-7 px-2 gap-1.5"
+                    >
+                      {isEditingReason ? (
+                        <>
+                          <Eye className="h-3.5 w-3.5" />
+                          Preview
+                        </>
+                      ) : (
+                        <>
+                          <Edit3 className="h-3.5 w-3.5" />
+                          Edit
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+                {!hasReason || isEditingReason ? (
+                  <Textarea
+                    value={typeof reason === 'string' ? reason : ''}
+                    onChange={(e) => onReasonChange(e.target.value)}
+                    placeholder="Explain why this answer was chosen... (Markdown supported: **bold**, *italic*, `code`, lists, links, etc.)"
+                    className="min-h-[100px] resize-none font-mono text-xs"
+                  />
+                ) : (
+                  <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50/50 to-white p-4 dark:border-zinc-700 dark:from-zinc-900/50 dark:to-zinc-950">
+                    <MarkdownViewer content={typeof reason === 'string' ? reason : ''} />
+                  </div>
+                )}
               </motion.div>
             )}
           </div>
