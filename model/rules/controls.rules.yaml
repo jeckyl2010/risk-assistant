@@ -32,8 +32,17 @@ rules:
   - when: { data.personal_data: true }
     require: [GDPR-ART-32, DATA-ENC-001]
 
+  - when: { data.personal_data: true, data.data_subject_region: eu }
+    require: [GDPR-ART-32]
+
+  - when: { data.personal_data: true, data.data_subject_region: mixed }
+    require: [GDPR-ART-32]
+
   - when: { handles_sensitive_data: true }
     require: [DATA-ENC-001]
+
+  - when: { data.data_leaves_manufacturing_zone: true }
+    require: [DATA-ENC-001, SEC-NET-001]
 
   # Operations
   - when: { availability_critical: true }
@@ -41,6 +50,15 @@ rules:
 
   - when: { affects_production: true }
     require: [OPS-OBS-001, INT-ISO-001]
+
+  - when: { operations.environment: prod }
+    require: [OPS-OBS-001]
+
+  - when: { operations.deployment_scale: global }
+    require: [OPS-DR-001]
+
+  - when: { operations.change_model: manual, affects_production: true }
+    require: [SEC-ACCESS-REV-001]
 
   # Manufacturing criticality taxonomy
   - when: { affects_production: true }
@@ -65,11 +83,17 @@ rules:
     require: [CRIT-AI-001]
 
   # Integration
+  - when: { integration_present: true, affects_production: true }
+    require: [INT-ISO-001]
+
   - when: { integration.integration_modes: commands }
     require: [OT-CMD-001]
 
   - when: { integration.commands_into_manufacturing: true }
     require: [OT-CMD-001, SEC-NET-001]
+
+  - when: { integration.coupling: sync, affects_production: true }
+    require: [INT-ISO-001]
 
   # AI
   - when: { uses_ai: true }
@@ -78,9 +102,18 @@ rules:
   - when: { ai.ai_autonomy: autonomous }
     require: [AI-HITL-001]
 
+  - when: { ai.impacts_people_rights: true }
+    require: [AI-HITL-001]
+
+  - when: { ai.model_change: retrained }
+    require: [AI-GOV-001]
+
   # Cost
   - when: { cost_commitment_level: high }
     require: [COST-GUARD-001]
 
   - when: { cost.cost_scaling_model: usage_based }
+    require: [COST-GUARD-001]
+
+  - when: { cost.vendor_lock_in: high, cost_commitment_level: high }
     require: [COST-GUARD-001]
