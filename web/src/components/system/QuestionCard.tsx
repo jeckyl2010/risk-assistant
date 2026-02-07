@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { HelpCircle, Eye, Edit3 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { HelpCircle, Eye, Edit3, CheckCircle2, Circle, Sparkles } from 'lucide-react'
 import type { Question } from '@/lib/uiTypes'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -36,45 +36,106 @@ export function QuestionCard({
 }: QuestionCardProps) {
   const isAnswered = value !== null
   const [isEditingReason, setIsEditingReason] = useState(false)
+  const [justAnswered, setJustAnswered] = useState(false)
   const hasReason = typeof reason === 'string' && reason.trim().length > 0
   const accent = sectionAccent(domain)
+
+  const handleChange = (newValue: unknown) => {
+    const wasUnanswered = value === null
+    onChange(newValue)
+    if (wasUnanswered && newValue !== null) {
+      setJustAnswered(true)
+      setTimeout(() => setJustAnswered(false), 1000)
+    }
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
+      layout
     >
-      <Card className={`group transition-all duration-300 hover:shadow-xl hover:scale-[1.01] ${isAnswered ? `${accent.cardBg} shadow-md` : 'border-zinc-200/30 bg-white/60 dark:border-zinc-700/30 dark:bg-zinc-900/60'}`}>
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 space-y-1">
-              <div className="flex items-start gap-2">
-                <HelpCircle className="h-5 w-5 mt-0.5 shrink-0 text-zinc-500 dark:text-zinc-400" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
-                    {question.text}
-                  </h3>
-                  {question.description && (
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                      {question.description}
-                    </p>
-                  )}
+      <motion.div
+        whileHover={{ scale: 1.01, y: -2 }}
+        whileTap={{ scale: 0.99 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      >
+        <Card className={`group relative overflow-hidden transition-all duration-300 ${
+          isAnswered 
+            ? `${accent.cardBg} shadow-lg ring-1 ring-offset-2 ring-zinc-200 dark:ring-zinc-700 ring-offset-white dark:ring-offset-zinc-950` 
+            : 'border-zinc-200/40 bg-white/70 dark:border-zinc-700/40 dark:bg-zinc-900/70 shadow-sm hover:shadow-md'
+        }`}>
+          {/* Answered celebration effect */}
+          <AnimatePresence>
+            {justAnswered && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute top-4 right-4 z-10"
+              >
+                <Sparkles className="h-6 w-6 text-yellow-500" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Progress indicator bar */}
+          {isAnswered && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              className={`absolute top-0 left-0 right-0 h-1 ${accent.bar} origin-left`}
+            />
+          )}
+
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 space-y-1">
+                <div className="flex items-start gap-2">
+                  <motion.div
+                    animate={{
+                      scale: isAnswered ? [1, 1.2, 1] : 1,
+                      rotate: isAnswered ? [0, 5, -5, 0] : 0,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {isAnswered ? (
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <Circle className="h-5 w-5 mt-0.5 shrink-0 text-zinc-400 dark:text-zinc-600" />
+                    )}
+                  </motion.div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-50 group-hover:text-zinc-950 dark:group-hover:text-zinc-100 transition-colors">
+                      {question.text}
+                    </h3>
+                    {question.description && (
+                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                        {question.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
+              <motion.div
+                animate={{
+                  scale: isAnswered ? 1 : 0.95,
+                }}
+              >
+                <Badge variant={isAnswered ? 'success' : 'warning'} className="shadow-sm">
+                  {isAnswered ? 'Answered' : 'Pending'}
+                </Badge>
+              </motion.div>
             </div>
-            <Badge variant={isAnswered ? 'success' : 'warning'}>
-              {isAnswered ? 'Answered' : 'Pending'}
-            </Badge>
-          </div>
 
           <div className="mt-4 space-y-3">
             <div className="space-y-2">
-              <Label>Answer</Label>
+              <Label className="text-sm font-medium">Answer</Label>
               {question.type === 'bool' ? (
                 <Select
                   value={value === true ? 'true' : value === false ? 'false' : SENTINEL_VALUES.UNSET}
-                  onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v === 'true')}
+                  onValueChange={(v) => handleChange(v === SENTINEL_VALUES.UNSET ? null : v === 'true')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an answer" />
@@ -88,7 +149,7 @@ export function QuestionCard({
               ) : question.type === 'enum' && question.allowed ? (
                 <Select
                   value={typeof value === 'string' ? value : SENTINEL_VALUES.UNSET}
-                  onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v)}
+                  onValueChange={(v) => handleChange(v === SENTINEL_VALUES.UNSET ? null : v)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an answer" />
@@ -110,62 +171,67 @@ export function QuestionCard({
                       .split(',')
                       .map((s) => s.trim())
                       .filter(Boolean)
-                    onChange(arr.length ? arr : null)
+                    handleChange(arr.length ? arr : null)
                   }}
                   placeholder="Enter comma-separated values"
                 />
               ) : null}
             </div>
 
-            {isAnswered && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-              >
-                <div className="flex items-center justify-between">
-                  <Label>
-                    Reason (optional)
-                    <span className="text-xs text-zinc-500 ml-1">• Markdown supported</span>
-                  </Label>
-                  {hasReason && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsEditingReason(!isEditingReason)}
-                      className="h-7 px-2 gap-1.5"
-                    >
-                      {isEditingReason ? (
-                        <>
-                          <Eye className="h-3.5 w-3.5" />
-                          Preview
-                        </>
-                      ) : (
-                        <>
-                          <Edit3 className="h-3.5 w-3.5" />
-                          Edit
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-                {!hasReason || isEditingReason ? (
-                  <Textarea
-                    value={typeof reason === 'string' ? reason : ''}
-                    onChange={(e) => onReasonChange(e.target.value)}
-                    placeholder="Explain why this answer was chosen... (Markdown supported: **bold**, *italic*, `code`, lists, links, etc.)"
-                    className="min-h-[100px] resize-none font-mono text-xs"
-                  />
-                ) : (
-                  <div className="rounded-lg border border-zinc-200/50 bg-gradient-to-br from-zinc-50/70 to-white p-4 shadow-sm backdrop-blur dark:border-zinc-700/50 dark:from-zinc-900/70 dark:to-zinc-950">
-                    <MarkdownViewer content={typeof reason === 'string' ? reason : ''} />
+            <AnimatePresence mode="wait">
+              {isAnswered && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <Label>
+                      Reason (optional)
+                      <span className="text-xs text-zinc-500 ml-1">• Markdown supported</span>
+                    </Label>
+                    {hasReason && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditingReason(!isEditingReason)}
+                        className="h-7 px-2 gap-1.5"
+                      >
+                        {isEditingReason ? (
+                          <>
+                            <Eye className="h-3.5 w-3.5" />
+                            Preview
+                          </>
+                        ) : (
+                          <>
+                            <Edit3 className="h-3.5 w-3.5" />
+                            Edit
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
-                )}
-              </motion.div>
-            )}
+                  {!hasReason || isEditingReason ? (
+                    <Textarea
+                      value={typeof reason === 'string' ? reason : ''}
+                      onChange={(e) => onReasonChange(e.target.value)}
+                      placeholder="Explain why this answer was chosen... (Markdown supported: **bold**, *italic*, `code`, lists, links, etc.)"
+                      className="min-h-[100px] resize-none font-mono text-xs"
+                    />
+                  ) : (
+                    <div className="rounded-lg border border-zinc-200/50 bg-gradient-to-br from-zinc-50/70 to-white p-4 shadow-sm backdrop-blur dark:border-zinc-700/50 dark:from-zinc-900/70 dark:to-zinc-950">
+                      <MarkdownViewer content={typeof reason === 'string' ? reason : ''} />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </CardContent>
       </Card>
+      </motion.div>
     </motion.div>
   )
 }

@@ -1,10 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CheckCircle2, AlertCircle, Shield, ArrowRight } from 'lucide-react'
+import { CheckCircle2, AlertCircle, Shield, ArrowRight, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
 interface DerivedControl {
   id: string
@@ -35,6 +36,22 @@ export function ResultsSection({
   onNavigateToSection
 }: ResultsSectionProps) {
   const missingQuestions = requiredQuestions.filter(q => !q.answered)
+
+  // Analytics data
+  const scopeDistribution = derivedControls.reduce((acc, c) => {
+    acc[c.scope] = (acc[c.scope] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const phaseDistribution = derivedControls.reduce((acc, c) => {
+    acc[c.activation_phase] = (acc[c.activation_phase] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const scopeData = Object.entries(scopeDistribution).map(([name, value]) => ({ name, value }))
+  const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }))
+
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
 
   return (
     <motion.div
@@ -108,6 +125,72 @@ export function ResultsSection({
             </span>
           </CardContent>
         </Card>
+      )}
+
+      {/* Control Analytics */}
+      {derivedControls.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="h-4 w-4" />
+                  Controls by Scope
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={scopeData}>
+                    <XAxis dataKey="name" fontSize={12} />
+                    <YAxis fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <PieChartIcon className="h-4 w-4" />
+                  Controls by Phase
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={phaseData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                      outerRadius={70}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {phaseData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       )}
 
       {/* Derived Controls */}

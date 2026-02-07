@@ -12,6 +12,8 @@ import { DescriptionSection } from '../system/DescriptionSection'
 import { QuestionsList } from '../system/QuestionsList'
 import { ResultsSection } from '../system/ResultsSection'
 import { DiffSection } from '../system/DiffSection'
+import { CommandPalette } from '../ui/command-palette'
+import { KeyboardShortcutHint } from '../ui/keyboard-shortcut-hint'
 import { useSaveSystem, useEvaluateSystem, useDiffSystem } from '@/hooks/useSystemApi'
 import { SECTION_IDS } from '@/lib/constants'
 
@@ -247,6 +249,34 @@ export function SystemEditor({
   const handleDescriptionChange = useCallback((value: string) => {
     setFacts(prev => deepSet(prev, 'description', value))
   }, [])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Save: Cmd/Ctrl + S
+      {/* Command Palette */}
+      <CommandPalette
+        systemId={id}
+        onSave={handleSave}
+        onEvaluate={handleEvaluate}
+        onNavigate={setActiveSection}
+        questionSections={questionSections}
+      />
+
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault()
+        handleSave()
+      }
+      // Evaluate: Cmd/Ctrl + E
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault()
+        handleEvaluate()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyPress)
+    return () => document.removeEventListener('keydown', handleKeyPress)
+  }, [handleSave, handleEvaluate])
 
   const currentSection = questionSections.find(s => s.key === activeSection)
 

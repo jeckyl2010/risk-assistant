@@ -1,41 +1,78 @@
 import Link from 'next/link'
 import { buildPortfolio } from '@/lib/portfolio'
 import { NewSystemForm } from '@/components/NewSystemForm'
+import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Shield, FileCheck, AlertCircle, Activity, ArrowRight } from 'lucide-react'
+import { Shield, FileCheck, Activity, ArrowRight } from 'lucide-react'
+import { NoSystemsEmpty } from '@/components/ui/empty-state'
 
 export default async function Home() {
   const { modelVersion, rows } = await buildPortfolio('model')
 
+  // Calculate stats
+  const totalSystems = rows.length
+  const totalControls = rows.reduce((sum, r) => sum + r.derivedControls, 0)
+  const totalMissing = rows.reduce((sum, r) => sum + r.missingAnswers, 0)
+  
+  // Calculate completion rate (rough estimate based on missing answers)
+  const avgQuestionsPerSystem = 15 // rough estimate
+  const totalPossibleAnswers = rows.length * avgQuestionsPerSystem
+  const answeredQuestions = totalPossibleAnswers - totalMissing
+  const completionRate = totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0
+
+  // Domain distribution - simplified since we only have counts
+  const domainDistribution: Record<string, number> = {
+    'Base': rows.length, // All systems have base domain
+    'Active': rows.reduce((sum, r) => sum + r.activatedDomains, 0),
+  }
+
+  const stats = {
+    totalSystems,
+    totalControls,
+    totalMissing,
+    completionRate,
+    domainDistribution,
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-700 dark:from-zinc-50 dark:to-zinc-300">
-            <Shield className="h-6 w-6 text-white dark:text-zinc-900" />
+      {/* Header with gradient background */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-8 shadow-2xl">
+        <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,rgba(255,255,255,0.6))]" />
+        <div className="relative flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-xl">
+              <Shield className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-md">
+                Risk Assistant
+              </h1>
+              <p className="text-indigo-100 drop-shadow">
+                Lightweight, deterministic, facts-based guardrail engine
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Risk Assistant
-            </h1>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Lightweight, deterministic, facts-based guardrail engine
-            </p>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+              Model {modelVersion}
+            </Badge>
+            <Badge variant="outline" className="bg-white/10 text-white border-white/30 backdrop-blur-sm">
+              {rows.length} {rows.length === 1 ? 'System' : 'Systems'}
+            </Badge>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary">Model {modelVersion}</Badge>
-          <Badge variant="outline">{rows.length} {rows.length === 1 ? 'System' : 'Systems'}</Badge>
         </div>
       </div>
 
+      {/* Stats Dashboard */}
+      {rows.length > 0 && <PortfolioStats stats={stats} />}
+
       {/* Create New System Card */}
-      <Card className="border-2 border-dashed">
+      <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileCheck className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+          <CardTitle className="flex items-center gap-2 text-indigo-900 dark:text-indigo-100">
+            <FileCheck className="h-5 w-5" />
             Create New System
           </CardTitle>
           <CardDescription>
@@ -48,10 +85,10 @@ export default async function Home() {
       </Card>
 
       {/* Portfolio Table */}
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
           <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+            <Activity className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             Portfolio
           </CardTitle>
           <CardDescription>
@@ -60,17 +97,7 @@ export default async function Home() {
         </CardHeader>
         <CardContent className="p-0">
           {rows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                <AlertCircle className="h-10 w-10 text-zinc-400 dark:text-zinc-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">No systems yet</h3>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Get started by creating your first system above
-                </p>
-              </div>
-            </div>
+            <NoSystemsEmpty onCreateSystem={() => {}} />
           ) : (
             <div className="overflow-hidden">
               <table className="w-full">
