@@ -39,8 +39,8 @@ export function ResultsSection({
   const missingQuestions = requiredQuestions.filter(q => !q.answered)
 
   // Analytics data
-  const scopeDistribution = derivedControls.reduce((acc, c) => {
-    acc[c.scope] = (acc[c.scope] || 0) + 1
+  const enforcementDistribution = derivedControls.reduce((acc, c) => {
+    acc[c.enforcement_intent] = (acc[c.enforcement_intent] || 0) + 1
     return acc
   }, {} as Record<string, number>)
 
@@ -49,10 +49,25 @@ export function ResultsSection({
     return acc
   }, {} as Record<string, number>)
 
-  const scopeData = Object.entries(scopeDistribution).map(([name, value]) => ({ name, value }))
-  const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }))
+  const evidenceDistribution = derivedControls.reduce((acc, c) => {
+    c.evidence_type?.forEach(type => {
+      acc[type] = (acc[type] || 0) + 1
+    })
+    return acc
+  }, {} as Record<string, number>)
 
-  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
+  const categoryDistribution = derivedControls.reduce((acc, c) => {
+    const prefix = c.id.split('-')[0] // Extract prefix like SEC, DATA, AI, etc.
+    acc[prefix] = (acc[prefix] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const enforcementData = Object.entries(enforcementDistribution).map(([name, value]) => ({ name, value }))
+  const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }))
+  const evidenceData = Object.entries(evidenceDistribution).map(([name, value]) => ({ name, value }))
+  const categoryData = Object.entries(categoryDistribution).map(([name, value]) => ({ name, value }))
+
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#06b6d4', '#f43f5e']
 
   return (
     <motion.div
@@ -131,62 +146,140 @@ export function ResultsSection({
       {/* Control Analytics */}
       {derivedControls.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
+          {/* Enforcement Intent */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
           >
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <BarChart3 className="h-4 w-4" />
-                  Controls by Scope
+                  Enforcement Intent
                 </CardTitle>
+                <CardDescription className="text-xs">
+                  How controls can be enforced
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={scopeData}>
-                    <XAxis dataKey="name" fontSize={12} />
+                <ResponsiveContainer width="100%" height={180}>
+                  <PieChart>
+                    <Pie
+                      data={enforcementData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                      outerRadius={60}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {enforcementData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Activation Phase */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <PieChartIcon className="h-4 w-4" />
+                  Activation Phase
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  When controls must be satisfied
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={phaseData}>
+                    <XAxis dataKey="name" fontSize={11} angle={-45} textAnchor="end" height={80} />
                     <YAxis fontSize={12} />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                      {phaseData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </motion.div>
 
+          {/* Evidence Types */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <PieChartIcon className="h-4 w-4" />
-                  Controls by Phase
+                  <Shield className="h-4 w-4" />
+                  Evidence Required
                 </CardTitle>
+                <CardDescription className="text-xs">
+                  Verification methods needed
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={phaseData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                      outerRadius={70}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {phaseData.map((entry, index) => (
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={evidenceData}>
+                    <XAxis dataKey="name" fontSize={12} />
+                    <YAxis fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                      {evidenceData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </Pie>
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Control Categories */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="h-4 w-4" />
+                  Control Categories
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Distribution by domain
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={categoryData}>
+                    <XAxis dataKey="name" fontSize={12} />
+                    <YAxis fontSize={12} />
                     <Tooltip />
-                  </PieChart>
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>

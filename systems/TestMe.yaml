@@ -6,7 +6,7 @@ base:
   handles_sensitive_data: true
   integration_present: true
   availability_critical: true
-  cost_commitment_level: medium
+  cost_commitment_level: high
   _reasons:
     affects_production: Because I had to.
     external_access: 'What is this '
@@ -21,7 +21,7 @@ base:
       1. Numbered item
       2. Another one
 criticality:
-  criticality_level: null
+  criticality_level: C0
   hard_wan_cloud_dependency: true
   _reasons:
     hard_wan_cloud_dependency: '**Test**'
@@ -69,3 +69,6 @@ operations:
   change_model: cicd
   deployment_scale: global
   environment: prod
+cost:
+  cost_scaling_model: growth_based
+  vendor_lock_in: medium

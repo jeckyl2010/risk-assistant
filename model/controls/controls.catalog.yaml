@@ -26,7 +26,8 @@ controls:
 
   - id: SEC-SBD-001
     title: Secure-by-design baseline (threat modeling, least privilege, secure defaults)
-    description: Security is built into the design from the start. Includes conducting threat modeling, applying least privilege principles, securing defaults, and documenting security architecture decisions.
+    description: |-
+      Security is built into the design from the start. Includes conducting threat modeling, applying least privilege principles, securing defaults, and documenting security architecture decisions. Strongly encouraged: threat models as code, policy-as-code definitions, and automated architecture validation.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -50,7 +51,8 @@ controls:
 
   - id: SEC-SECRETS-001
     title: Secrets management baseline (no secrets in code; rotation; scoped access)
-    description: Secrets (passwords, API keys, certificates) are never stored in code or configuration files. They must be stored in a dedicated secrets management system with support for rotation, auditing, and scoped access.
+    description: |-
+      Secrets (passwords, API keys, certificates) are never stored in code or configuration files. They must be stored in a dedicated secrets management system with support for rotation, auditing, and scoped access. Strongly encouraged: automated secrets scanning in CI/CD pipelines and infrastructure-as-code for secrets management configuration.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -58,7 +60,8 @@ controls:
 
   - id: SEC-ACCESS-REV-001
     title: Periodic access review for user and privileged access
-    description: Regular reviews of user access rights and privileged accounts to ensure access remains appropriate. Reviews should identify and remove unnecessary privileges and dormant accounts.
+    description: |-
+      Regular reviews of user access rights and privileged accounts to ensure access remains appropriate. Reviews should identify and remove unnecessary privileges and dormant accounts. Strongly encouraged: automated access review workflows, identity governance platforms, and alerting on stale accounts.
     scope: system
     enforcement_intent: procedural
     activation_phase: post_go_live
@@ -90,7 +93,8 @@ controls:
 
   - id: OPS-DR-001
     title: Recovery strategy defined and tested
-    description: A documented disaster recovery strategy must exist, including Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO). The strategy must be regularly tested to verify effectiveness.
+    description: |-
+      A documented disaster recovery strategy must exist, including Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO). The strategy must be regularly tested to verify effectiveness. Strongly encouraged: infrastructure-as-code for DR environments, automated failover testing in pipelines, and chaos engineering practices.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -98,7 +102,8 @@ controls:
 
   - id: INT-ISO-001
     title: Integration isolation (timeouts/retries/buffering/backpressure)
-    description: System integrations must implement resilience patterns including timeouts, retries with exponential backoff, circuit breakers, buffering, and backpressure handling to prevent cascading failures.
+    description: |-
+      System integrations must implement resilience patterns including timeouts, retries with exponential backoff, circuit breakers, buffering, and backpressure handling to prevent cascading failures. Strongly encouraged: resilience patterns as code (e.g., service mesh configs, SDK decorators), automated chaos testing, and observability-driven validation.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -114,7 +119,8 @@ controls:
 
   - id: AI-GOV-001
     title: AI governance baseline (ownership, validation, monitoring)
-    description: AI/ML components require clear ownership, validation of model outputs, ongoing monitoring for drift and bias, version control, and documented decision-making processes for model updates and rollbacks.
+    description: |-
+      AI/ML components require clear ownership, validation of model outputs, ongoing monitoring for drift and bias, version control, and documented decision-making processes for model updates and rollbacks. Strongly encouraged: MLOps pipelines for automated model validation, drift detection as code, model versioning in Git, and automated compliance checks.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -122,7 +128,8 @@ controls:
 
   - id: AI-HITL-001
     title: Human oversight for higher autonomy
-    description: Higher-risk or higher-autonomy AI decisions require human-in-the-loop oversight. Critical actions should require human approval, and all AI decisions must be auditable and explainable.
+    description: |-
+      Higher-risk or higher-autonomy AI decisions require human-in-the-loop oversight. Critical actions should require human approval, and all AI decisions must be auditable and explainable. Strongly encouraged: automated workflow systems for approval routing, audit trails as structured logs, and explainability tooling integrated into pipelines.
     scope: system
     enforcement_intent: procedural
     activation_phase: runtime
@@ -138,7 +145,8 @@ controls:
 
   - id: GDPR-ART-32
     title: GDPR Art. 32 appropriate security of processing
-    description: Compliance with GDPR Article 32 requirements for appropriate technical and organizational measures to ensure security appropriate to the risk of processing personal data.
+    description: |-
+      Compliance with GDPR Article 32 requirements for appropriate technical and organizational measures to ensure security appropriate to the risk of processing personal data. Strongly encouraged: automated compliance scanning, data classification as code, privacy-by-design patterns in infrastructure-as-code, and continuous compliance monitoring.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -146,7 +154,8 @@ controls:
 
   - id: CRIT-DECL-001
     title: Declare manufacturing criticality level (C0-C4) with evidence
-    description: Systems supporting manufacturing must declare their criticality level based on the impact of failure. Levels range from C0 (production-critical) to C4 (non-critical support), with evidence supporting the classification.
+    description: |-
+      Systems supporting manufacturing must declare their criticality level based on the impact of failure. Levels range from C0 (production-critical) to C4 (non-critical support), with evidence supporting the classification. Strongly encouraged: criticality metadata as code (YAML/JSON), automated policy enforcement based on criticality tags, and integration with deployment pipelines.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -154,7 +163,8 @@ controls:
 
   - id: CRIT-CONN-001
     title: No hard dependency on WAN/cloud for production-critical operation
-    description: Production-critical systems (C0/C1) must be able to operate without continuous WAN or cloud connectivity. Essential functions must remain available during network outages to prevent production shutdowns.
+    description: |-
+      Production-critical systems (C0/C1) must be able to operate without continuous WAN or cloud connectivity. Essential functions must remain available during network outages to prevent production shutdowns. Strongly encouraged: architecture-as-code validation for dependency graphs, automated network partition testing, and edge computing patterns defined as infrastructure-as-code.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -162,7 +172,8 @@ controls:
 
   - id: CRIT-ISO-001
     title: Demonstrate operability during site isolation/blackout (24-48h)
-    description: Critical systems must demonstrate they can continue operating during complete site isolation from external networks for 24-48 hours, including ability to maintain basic operations and local decision-making.
+    description: |-
+      Critical systems must demonstrate they can continue operating during complete site isolation from external networks for 24-48 hours, including ability to maintain basic operations and local decision-making. Strongly encouraged: automated isolation testing as part of release pipelines, simulated blackout scenarios in test environments, and resilience validation dashboards.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -170,7 +181,8 @@ controls:
 
   - id: CRIT-AI-001
     title: For C0/C1, AI/ML must not be in the control path (safe fallback + override)
-    description: Production-critical systems (C0/C1) must not have AI/ML models in the control path for safety-critical decisions. If AI is used, there must be safe fallback mechanisms and human override capabilities.
+    description: |-
+      Production-critical systems (C0/C1) must not have AI/ML models in the control path for safety-critical decisions. If AI is used, there must be safe fallback mechanisms and human override capabilities. Strongly encouraged: fallback logic as code with automated testing, circuit breakers for AI failures, and runtime policy enforcement for AI decision boundaries.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
