@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: criticality
+description: Determines manufacturing impact classification and production dependencies. Establishes isolation requirements, availability expectations, and operational resilience controls for production-critical systems.
 questions:
   - id: criticality_level
     text: What is the manufacturing criticality level for this system?

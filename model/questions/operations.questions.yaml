@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: operations
+description: Examines deployment scale, change management, and operational lifecycle. Establishes observability, disaster recovery, and access control expectations based on operational maturity.
 questions:
   - id: environment
     text: Target environment stage

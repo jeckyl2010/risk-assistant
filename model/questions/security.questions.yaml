@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: security
+description: Evaluates security exposure through user population, internet accessibility, and trust boundary crossings. Triggers secure-by-design, secrets management, and network security controls.
 questions:
   - id: user_population
     text: Who will access the solution?

@@ -22,7 +22,9 @@ export default async function SystemPage({ params }: { params: Promise<{ id: str
         initialFacts={sys.facts}
         model={{ modelDir: 'model', modelVersion }}
         baseQuestions={ui.baseQuestions}
+        baseDescription={ui.baseDescription}
         domainQuestions={ui.domainQuestions}
+        domainDescriptions={ui.domainDescriptions}
         triggers={ui.triggers}
       />
     </div>

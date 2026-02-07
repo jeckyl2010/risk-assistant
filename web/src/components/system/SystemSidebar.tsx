@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import { CheckCircle2, Circle } from 'lucide-react'
+import { sectionAccent } from '../systemEditor/sectionAccent'
 
 export interface NavItem {
   id: string
@@ -20,9 +20,10 @@ interface SystemSidebarProps {
 
 export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProps) {
   return (
-    <nav className="sticky top-6 flex flex-col gap-2">
+    <nav className="sticky top-6 flex flex-col gap-1.5">
       {items.map((item, index) => {
         const isActive = activeId === item.id
+        const accent = sectionAccent(item.id)
         
         return (
           <motion.button
@@ -32,40 +33,49 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
             transition={{ delay: index * 0.05 }}
             onClick={() => onNavigate(item.id)}
             className={cn(
-              "group relative flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-all",
+              "group relative flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all",
               isActive
-                ? "bg-zinc-900 text-zinc-50 shadow-md dark:bg-zinc-50 dark:text-zinc-900"
-                : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                ? cn(accent.navActive, "shadow-sm")
+                : cn(accent.navIdle)
             )}
           >
             {isActive && (
               <motion.div
                 layoutId="sidebar-indicator"
-                className="absolute left-0 top-0 h-full w-1 rounded-r-full bg-zinc-50 dark:bg-zinc-900"
+                className={cn("absolute left-0 top-0 h-full w-1 rounded-r-full", accent.bar)}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
             
             <div className="flex flex-1 items-center gap-3">
-              {item.icon}
-              <span>{item.label}</span>
+              {item.icon && (
+                <div className={cn(
+                  "transition-all",
+                  isActive ? "scale-110" : "scale-100 group-hover:scale-105"
+                )}>
+                  {item.icon}
+                </div>
+              )}
+              <span className="truncate">{item.label}</span>
             </div>
 
             {item.badge !== undefined && (
-              <span
+              <motion.span
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 className={cn(
-                  "rounded-full px-2 py-0.5 text-xs font-semibold",
+                  "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
                   isActive
-                    ? "bg-zinc-800 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                    ? "bg-white/80 text-zinc-900 dark:bg-zinc-900/80 dark:text-zinc-50"
                     : item.variant === 'success'
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                     : item.variant === 'warning'
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                     : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                 )}
               >
                 {item.badge}
-              </span>
+              </motion.span>
             )}
           </motion.button>
         )

@@ -45,14 +45,18 @@ export function SystemEditor({
   initialFacts,
   model,
   baseQuestions,
+  baseDescription,
   domainQuestions,
+  domainDescriptions,
   triggers,
 }: {
   id: string
   initialFacts: Facts
   model: { modelDir: string; modelVersion: string }
   baseQuestions: Question[]
+  baseDescription?: string
   domainQuestions: Record<string, Question[]>
+  domainDescriptions: Record<string, string>
   triggers: TriggerRule[]
 }) {
   // Local state
@@ -117,24 +121,27 @@ export function SystemEditor({
   const questionSections: Array<{ 
     key: string
     title: string
+    description?: string
     questions: Question[]
     prefix: string 
   }> = useMemo(() => {
     return [
       { 
         key: SECTION_IDS.BASE, 
-        title: domainTitle(SECTION_IDS.BASE), 
+        title: domainTitle(SECTION_IDS.BASE),
+        description: baseDescription,
         questions: baseQuestions, 
         prefix: SECTION_IDS.BASE 
       },
       ...activatedDomains.map((d) => ({ 
         key: d, 
-        title: domainTitle(d), 
+        title: domainTitle(d),
+        description: domainDescriptions[d],
         questions: domainQuestions[d] ?? [], 
         prefix: d 
       })),
     ]
-  }, [activatedDomains, baseQuestions, domainQuestions])
+  }, [activatedDomains, baseQuestions, baseDescription, domainQuestions, domainDescriptions])
 
   const questionProgress = useMemo(() => {
     const out: Record<string, { answered: number; total: number }> = {}
@@ -316,6 +323,7 @@ export function SystemEditor({
           {currentSection && (
             <QuestionsList
               title={currentSection.title}
+              description={currentSection.description}
               questions={currentSection.questions}
               prefix={currentSection.prefix}
               domain={currentSection.key}

@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: integration
+description: Assesses integration patterns, coupling levels, and blast radius concerns. Determines resilience and isolation requirements to prevent cascading failures across system boundaries.
 questions:
   - id: integration_modes
     text: Which interaction modes exist?

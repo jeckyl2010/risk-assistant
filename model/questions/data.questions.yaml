@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: data
+description: Identifies personal data handling, regulatory jurisdiction, and data protection requirements. Triggers GDPR compliance, encryption, and data governance controls where applicable.
 questions:
   - id: personal_data
     text: Does it process personal data?

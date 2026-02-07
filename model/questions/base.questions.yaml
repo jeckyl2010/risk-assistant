@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: base
+description: Core system characteristics that establish the foundation for risk assessment. These facts determine which specialized domain questions will be activated.
 questions:
   - id: affects_production
     text: Does the solution affect production operations (availability/throughput/quality)?

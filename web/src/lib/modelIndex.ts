@@ -18,7 +18,9 @@ export async function listDomainNames(paths: ModelPaths): Promise<string[]> {
 
 export async function loadModelForUI(paths: ModelPaths): Promise<{
   baseQuestions: Question[]
+  baseDescription?: string
   domainQuestions: Record<string, Question[]>
+  domainDescriptions: Record<string, string>
   triggers: TriggerRule[]
 }> {
   const baseDoc = await loadYamlFile<unknown>(paths.baseQuestionsFile)
@@ -26,14 +28,27 @@ export async function loadModelForUI(paths: ModelPaths): Promise<{
 
   const domains = await listDomainNames(paths)
   const domainQuestions: Record<string, Question[]> = {}
+  const domainDescriptions: Record<string, string> = {}
 
   for (const d of domains) {
     const fp = path.join(paths.questionsDir, `${d}.questions.yaml`)
     try {
       const doc = await loadYamlFile<unknown>(fp)
-      if (doc && typeof doc === 'object' && 'questions' in (doc as Record<string, unknown>)) {
-        const qs = (doc as Record<string, unknown>).questions
-        domainQuestions[d] = parseQuestions(Array.isArray(qs) ? (qs as unknown[]) : [])
+      if (doc && typeof doc === 'object') {
+        const docRec = doc as Record<string, unknown>
+        
+        // Extract description
+        if ('description' in docRec && typeof docRec.description === 'string') {
+          domainDescriptions[d] = docRec.description.trim()
+        }
+        
+        // Extract questions
+        if ('questions' in docRec) {
+          const qs = docRec.questions
+          domainQuestions[d] = parseQuestions(Array.isArray(qs) ? (qs as unknown[]) : [])
+        } else {
+          domainQuestions[d] = []
+        }
       } else {
         domainQuestions[d] = []
       }
@@ -48,6 +63,11 @@ export async function loadModelForUI(paths: ModelPaths): Promise<{
           ? ((baseDoc as Record<string, unknown>).questions as unknown[])
           : [])
       : []
+  
+  const baseDescription =
+    baseDoc && typeof baseDoc === 'object' && 'description' in (baseDoc as Record<string, unknown>) && typeof (baseDoc as Record<string, unknown>).description === 'string'
+      ? ((baseDoc as Record<string, unknown>).description as string).trim()
+      : undefined
 
   const triggersRaw =
     triggersDoc && typeof triggersDoc === 'object' && 'triggers' in (triggersDoc as Record<string, unknown>)
@@ -58,7 +78,9 @@ export async function loadModelForUI(paths: ModelPaths): Promise<{
 
   return {
     baseQuestions: parseQuestions(baseRaw),
+    baseDescription,
     domainQuestions,
+    domainDescriptions,
     triggers: parseTriggers(triggersRaw),
   }
 }

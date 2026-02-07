@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: ai
+description: Assesses AI/ML autonomy levels, model governance, and decision-making oversight requirements. Determines whether human-in-the-loop controls and AI governance processes are needed.
 questions:
   - id: ai_autonomy
     text: What is the AI autonomy level?

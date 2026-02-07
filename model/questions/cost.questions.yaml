@@ -1,5 +1,6 @@
 schema_version: 1.0
 scope: cost
+description: Evaluates financial commitment, vendor dependencies, and cost optimization opportunities. Helps identify when cost guardrails and financial approval controls should apply.
 questions:
   - id: cost_scaling_model
     text: Cost scaling model
