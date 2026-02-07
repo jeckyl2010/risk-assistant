@@ -1,7 +1,13 @@
 scope: system
 description: ''
 base:
-  affects_production: true
+  affects_production: false
+  external_access: false
+  uses_ai: false
+  handles_sensitive_data: false
+  integration_present: false
+  availability_critical: false
+  cost_commitment_level: low
 criticality:
   criticality_level: C2
   hard_wan_cloud_dependency: true

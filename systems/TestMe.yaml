@@ -28,7 +28,7 @@ security:
   interactive_users: true
 data:
   personal_data: true
-  data_subject_region: eu
+  data_subject_region: null
   data_leaves_manufacturing_zone: true
 ai:
   ai_autonomy: advisory
@@ -41,6 +41,23 @@ integration:
     - apis
     - commands
     - events
+    - files
+  _reasons:
+    integration_modes: |-
+      fdgdfgfdfdfdg
+
+      fd
+      gfd
+      g
+      fdg
+      fdg
+      fg
+      fd
+      gfd
+      **gfd**
+      gf
+      g
+      df
 operations:
   change_model: cicd
   deployment_scale: global

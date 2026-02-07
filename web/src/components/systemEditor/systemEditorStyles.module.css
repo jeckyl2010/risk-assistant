@@ -1,0 +1,79 @@
+@reference "tailwindcss";
+
+@custom-variant dark (&:where(:global(.dark), :global(.dark) *));
+
+.card {
+  @apply rounded-2xl border border-zinc-200/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80;
+}
+
+.sidebarCard {
+  @apply rounded-2xl border border-zinc-200/70 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80;
+}
+
+.sectionHeader {
+  @apply flex items-center justify-between gap-3 rounded-2xl border px-4 py-3;
+}
+
+.questionCard {
+  @apply rounded-2xl border border-zinc-200/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 border-t-4;
+}
+
+.questionTitle {
+  @apply text-sm font-semibold text-zinc-900 dark:text-zinc-50;
+}
+
+.questionDesc {
+  @apply mt-1 text-sm text-zinc-800 dark:text-zinc-300;
+}
+
+.answerPanel {
+  @apply mt-4 rounded-xl border p-3;
+}
+
+.answerRow {
+  @apply flex items-center justify-between gap-2;
+}
+
+.answerChip {
+  @apply inline-flex items-center gap-2 rounded-full border px-2 py-0.5 text-xs font-medium;
+}
+
+.answerDot {
+  @apply h-1.5 w-1.5 rounded-full;
+}
+
+.answerInput {
+  @apply h-11 w-full rounded-lg border border-zinc-200/70 bg-white px-3 text-sm text-zinc-900 outline-none dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50;
+}
+
+.setContainer {
+  @apply flex flex-wrap gap-3 rounded-lg border border-zinc-200/70 bg-white/80 p-3 dark:border-zinc-800/80 dark:bg-zinc-950/40;
+}
+
+.reasonLabel {
+  @apply text-xs font-medium text-zinc-800 dark:text-zinc-300;
+}
+
+.reasonTextArea {
+  @apply mt-1 w-full resize-none rounded-lg border border-zinc-200/70 bg-white px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-500 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50 dark:placeholder:text-zinc-500;
+}
+
+.topLink {
+  @apply text-sm text-zinc-800 hover:underline dark:text-zinc-300;
+}
+
+.kpiPill {
+  @apply hidden h-10 items-center rounded-lg border border-zinc-200/70 bg-white/70 px-3 text-sm text-zinc-700 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-200 sm:flex;
+}
+
+.primaryButton {
+  @apply h-10 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-white;
+}
+
+.secondaryButton {
+  @apply h-10 rounded-lg border border-zinc-200/70 bg-white/80 px-4 text-sm font-medium shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:hover:bg-zinc-900/60;
+}
+
+.smallButton {
+  @apply h-8 rounded-lg border border-zinc-200/70 bg-white/70 px-3 text-xs font-medium text-zinc-700 shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-200 dark:hover:bg-zinc-900/60;
+}
