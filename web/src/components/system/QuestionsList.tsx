@@ -40,7 +40,7 @@ export function QuestionsList({
       <Card className="border border-zinc-200/40 shadow-md dark:border-zinc-700/40">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{title}</CardTitle>
+            <CardTitle className="text-xl font-semibold">{title}</CardTitle>
             <Badge variant="secondary">
               {answeredCount}/{questions.length} answered
             </Badge>

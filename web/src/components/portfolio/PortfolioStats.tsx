@@ -141,7 +141,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           >
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-base">System Status</CardTitle>
+                <CardTitle className="text-lg font-semibold">System Status</CardTitle>
                 <CardDescription>Assessment completion by system</CardDescription>
               </CardHeader>
               <CardContent>
@@ -183,7 +183,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           >
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-base">Question Coverage</CardTitle>
+                <CardTitle className="text-lg font-semibold">Question Coverage</CardTitle>
                 <CardDescription>Portfolio-wide assessment progress</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -269,8 +269,8 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
         >
           <Card className="overflow-hidden shadow-lg">
             <CardHeader className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Network className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+                <Network className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Domain Coverage Matrix
                 <InfoTooltip content="Shows which risk domains (Security, Data, Integration, etc.) are relevant for each system. Domains are automatically activated based on your answers." />
               </CardTitle>

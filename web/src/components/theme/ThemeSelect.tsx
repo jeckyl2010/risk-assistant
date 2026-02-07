@@ -68,31 +68,30 @@ export function ThemeSelect() {
     { value: 'system', icon: Monitor, label: 'System' },
   ]
 
+  const currentThemeIndex = themes.findIndex(t => t.value === theme)
+  const currentTheme = themes[currentThemeIndex]
+  
+  const cycleTheme = () => {
+    const nextIndex = (currentThemeIndex + 1) % themes.length
+    setTheme(themes[nextIndex].value)
+  }
+
+  const Icon = currentTheme.icon
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
+    <motion.button
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-center gap-1 rounded-xl border border-zinc-200/50 bg-white/90 p-1 shadow-md backdrop-blur dark:border-zinc-700/50 dark:bg-zinc-900/90"
+      onClick={cycleTheme}
+      className="flex items-center gap-2 rounded-full border border-zinc-200/50 bg-white/90 px-3 py-2 shadow-lg backdrop-blur transition-all hover:scale-105 hover:shadow-xl active:scale-95 dark:border-zinc-700/50 dark:bg-zinc-900/90 opacity-70 hover:opacity-100"
+      aria-label={`Current theme: ${currentTheme.label}. Click to switch.`}
+      title={`Theme: ${currentTheme.label} (click to change)`}
     >
-      {themes.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          onClick={() => setTheme(value)}
-          className="relative rounded-lg p-2 text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          aria-label={label}
-          title={label}
-        >
-          {theme === value && (
-            <motion.div
-              layoutId="theme-indicator"
-              className="absolute inset-0 rounded-lg bg-zinc-100 dark:bg-zinc-800"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <Icon className="relative h-4 w-4" />
-        </button>
-      ))}
-    </motion.div>
+      <Icon className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hidden sm:inline">
+        {currentTheme.label}
+      </span>
+    </motion.button>
   )
 }
 

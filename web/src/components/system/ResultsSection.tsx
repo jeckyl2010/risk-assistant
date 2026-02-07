@@ -132,7 +132,7 @@ export function ResultsSection({
       {missingQuestions.length > 0 ? (
         <Card className="bg-gradient-to-br from-amber-50 to-orange-50 shadow-md dark:from-amber-950/30 dark:to-orange-950/30">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-amber-900 dark:text-amber-100">
               <AlertCircle className="h-5 w-5" />
               Missing Answers
             </CardTitle>
@@ -207,8 +207,8 @@ export function ResultsSection({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BarChart3 className="h-4 w-4" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <BarChart3 className="h-5 w-5" />
                   Enforcement Intent
                   <InfoTooltip content="How you can enforce this control: manual (human process), semi-automated (tools assist), or automated (fully automated enforcement)." />
                 </CardTitle>
@@ -248,8 +248,8 @@ export function ResultsSection({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <PieChartIcon className="h-4 w-4" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <PieChartIcon className="h-5 w-5" />
                   Activation Phase
                   <InfoTooltip content="When in your development lifecycle this control must be satisfied: Plan (design), Build (development), Deploy (release), Run (runtime), or Operate (ongoing)." />
                 </CardTitle>
@@ -282,8 +282,8 @@ export function ResultsSection({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Shield className="h-4 w-4" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <Shield className="h-5 w-5" />
                   Evidence Required
                   <InfoTooltip content="What type of proof is needed to demonstrate this control is working: logs, configurations, attestations, test results, documentation, or audit trails." />
                 </CardTitle>
@@ -316,8 +316,8 @@ export function ResultsSection({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BarChart3 className="h-4 w-4" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <BarChart3 className="h-5 w-5" />
                   Control Categories
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -346,8 +346,8 @@ export function ResultsSection({
       {/* Derived Controls */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+          <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
+            <Shield className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
             Derived Controls
             <InfoTooltip content="Security and compliance controls automatically determined based on your system's characteristics and answers. These help you understand what safeguards are needed." />
           </CardTitle>
@@ -448,7 +448,7 @@ export function ResultsSection({
                           transition={{ delay: Math.min(index * 0.03, 0.3) }}
                         >
                           <Card
-                            className="cursor-pointer shadow-sm transition-all hover:shadow-md"
+                            className="cursor-pointer border-2 border-transparent shadow-sm transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-lg dark:hover:border-indigo-700 dark:hover:bg-indigo-950/20"
                             onClick={() => toggleExpanded(control.id)}
                           >
                             <CardContent className="p-4">
@@ -459,7 +459,7 @@ export function ResultsSection({
                                     <Badge variant="outline" className="shrink-0 font-mono text-xs">
                                       {control.id}
                                     </Badge>
-                                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                                       {control.title}
                                     </h3>
                                   </div>

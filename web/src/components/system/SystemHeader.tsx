@@ -39,7 +39,7 @@ export function SystemHeader({
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
             {id}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-2">

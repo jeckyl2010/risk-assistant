@@ -18,8 +18,8 @@ export function DescriptionSection({ description, onChange }: DescriptionSection
     >
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+          <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+            <FileText className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
             Overview
           </CardTitle>
           <CardDescription>
