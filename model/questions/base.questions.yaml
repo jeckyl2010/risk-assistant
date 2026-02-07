@@ -1,0 +1,31 @@
+version: 1.0
+scope: base
+questions:
+  - id: affects_production
+    text: Does the solution affect production operations (availability/throughput/quality)?
+    type: bool
+
+  - id: external_access
+    text: Is any user or system access from outside the enterprise trusted network required?
+    type: bool
+
+  - id: uses_ai
+    text: Does the solution use ML/AI for inference, classification, prediction, or decision support?
+    type: bool
+
+  - id: handles_sensitive_data
+    text: Does the solution handle sensitive data (personal, confidential, regulated, trade secrets)?
+    type: bool
+
+  - id: integration_present
+    text: Does the solution integrate with other systems via APIs/events/files/commands?
+    type: bool
+
+  - id: availability_critical
+    text: Is the solution availability critical (e.g., 24/7, tight SLAs, production stop impact)?
+    type: bool
+
+  - id: cost_commitment_level
+    text: What is the economic commitment level (initial+run)?
+    type: enum
+    allowed: [low, medium, high]

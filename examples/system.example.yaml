@@ -1,0 +1,38 @@
+scope: system
+base:
+  affects_production: true
+  external_access: true
+  uses_ai: true
+  handles_sensitive_data: true
+  integration_present: true
+  availability_critical: true
+  cost_commitment_level: medium
+
+security:
+  user_population: partners
+  crosses_trust_boundary: true
+  privileged_access: true
+
+data:
+  personal_data: true
+  data_subject_region: eu
+  data_leaves_manufacturing_zone: true
+
+ai:
+  ai_autonomy: assisted
+  model_change: retrained
+  impacts_people_rights: false
+
+integration:
+  integration_modes: [events, apis]
+  commands_into_manufacturing: false
+  coupling: mixed
+
+operations:
+  environment: prod
+  deployment_scale: site
+  change_model: cicd
+
+cost:
+  cost_scaling_model: usage_based
+  vendor_lock_in: medium

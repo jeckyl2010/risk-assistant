@@ -1,0 +1,15 @@
+version: 1.0
+scope: data
+questions:
+  - id: personal_data
+    text: Does it process personal data?
+    type: bool
+
+  - id: data_subject_region
+    text: Primary data subject region
+    type: enum
+    allowed: [eu, non_eu, mixed]
+
+  - id: data_leaves_manufacturing_zone
+    text: Does data leave the manufacturing zone?
+    type: bool

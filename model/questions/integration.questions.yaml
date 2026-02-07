@@ -1,0 +1,16 @@
+version: 1.0
+scope: integration
+questions:
+  - id: integration_modes
+    text: Which interaction modes exist?
+    type: set
+    allowed: [events, apis, files, commands]
+
+  - id: commands_into_manufacturing
+    text: Are commands/control messages sent into manufacturing?
+    type: bool
+
+  - id: coupling
+    text: Primary coupling style
+    type: enum
+    allowed: [sync, async, mixed]

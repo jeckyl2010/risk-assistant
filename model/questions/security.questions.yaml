@@ -1,0 +1,15 @@
+version: 1.0
+scope: security
+questions:
+  - id: user_population
+    text: Who will access the solution?
+    type: enum
+    allowed: [internal, partners, public]
+
+  - id: crosses_trust_boundary
+    text: Does any data or access cross a trust boundary (e.g., IT<->OT, enterprise<->internet, site<->cloud)?
+    type: bool
+
+  - id: privileged_access
+    text: Is privileged/admin access required?
+    type: bool

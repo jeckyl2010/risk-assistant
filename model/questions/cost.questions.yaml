@@ -1,0 +1,12 @@
+version: 1.0
+scope: cost
+questions:
+  - id: cost_scaling_model
+    text: Cost scaling model
+    type: enum
+    allowed: [fixed, usage_based, growth_based]
+
+  - id: vendor_lock_in
+    text: Vendor lock-in level
+    type: enum
+    allowed: [low, medium, high]

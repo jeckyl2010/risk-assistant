@@ -1,0 +1,16 @@
+version: 1.0
+scope: ai
+questions:
+  - id: ai_autonomy
+    text: What is the AI autonomy level?
+    type: enum
+    allowed: [advisory, assisted, autonomous]
+
+  - id: model_change
+    text: Does the model change over time?
+    type: enum
+    allowed: [static, retrained]
+
+  - id: impacts_people_rights
+    text: Can outputs impact individuals' rights/opportunities/safety?
+    type: bool

@@ -1,0 +1,85 @@
+version: 1.0
+controls:
+  - id: IAM-STRONG-001
+    title: Strong identity for access
+    scope: system
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config, pipeline]
+
+  - id: SEC-LOG-001
+    title: Centralized security logging
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: runtime
+    evidence_type: [config, log]
+
+  - id: SEC-NET-001
+    title: Network trust termination at boundaries
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config]
+
+  - id: DATA-ENC-001
+    title: Encryption in transit and at rest for sensitive data
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config]
+
+  - id: OPS-OBS-001
+    title: Observability baseline (metrics/logs/alerts)
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: runtime
+    evidence_type: [config, log]
+
+  - id: OPS-DR-001
+    title: Recovery strategy defined and tested
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: pre_go_live
+    evidence_type: [document]
+
+  - id: INT-ISO-001
+    title: Integration isolation (timeouts/retries/buffering/backpressure)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: build
+    evidence_type: [document]
+
+  - id: OT-CMD-001
+    title: Command channel safeguards for manufacturing
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config, pipeline]
+
+  - id: AI-GOV-001
+    title: AI governance baseline (ownership, validation, monitoring)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: pre_go_live
+    evidence_type: [document]
+
+  - id: AI-HITL-001
+    title: Human oversight for higher autonomy
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: runtime
+    evidence_type: [document]
+
+  - id: COST-GUARD-001
+    title: Cost guardrails (budgets/alerts/quotas)
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: runtime
+    evidence_type: [config, log]
+
+  - id: GDPR-ART-32
+    title: GDPR Art. 32 appropriate security of processing
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: pre_go_live
+    evidence_type: [document]

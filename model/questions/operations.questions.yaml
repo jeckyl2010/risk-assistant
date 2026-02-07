@@ -1,0 +1,17 @@
+version: 1.0
+scope: operations
+questions:
+  - id: environment
+    text: Target environment stage
+    type: enum
+    allowed: [dev, test, prod]
+
+  - id: deployment_scale
+    text: Deployment scale
+    type: enum
+    allowed: [pilot, site, global]
+
+  - id: change_model
+    text: How are changes introduced?
+    type: enum
+    allowed: [cicd, manual, vendor_release_train]

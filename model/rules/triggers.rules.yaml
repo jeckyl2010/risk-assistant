@@ -1,0 +1,19 @@
+version: 1.0
+triggers:
+  - when: { uses_ai: true }
+    activate: [ai]
+
+  - when: { handles_sensitive_data: true }
+    activate: [data, security]
+
+  - when: { external_access: true }
+    activate: [security]
+
+  - when: { affects_production: true }
+    activate: [operations, integration]
+
+  - when: { integration_present: true }
+    activate: [integration]
+
+  - when: { cost_commitment_level: high }
+    activate: [cost]

@@ -1,0 +1,46 @@
+version: 1.0
+rules:
+  # Security exposure
+  - when: { external_access: true }
+    require: [IAM-STRONG-001, SEC-LOG-001]
+
+  - when: { security.user_population: public }
+    require: [SEC-NET-001, SEC-LOG-001]
+
+  - when: { security.crosses_trust_boundary: true }
+    require: [SEC-NET-001]
+
+  # Data handling
+  - when: { data.personal_data: true }
+    require: [GDPR-ART-32, DATA-ENC-001]
+
+  - when: { handles_sensitive_data: true }
+    require: [DATA-ENC-001]
+
+  # Operations
+  - when: { availability_critical: true }
+    require: [OPS-OBS-001, OPS-DR-001]
+
+  - when: { affects_production: true }
+    require: [OPS-OBS-001, INT-ISO-001]
+
+  # Integration
+  - when: { integration.integration_modes: commands }
+    require: [OT-CMD-001]
+
+  - when: { integration.commands_into_manufacturing: true }
+    require: [OT-CMD-001, SEC-NET-001]
+
+  # AI
+  - when: { uses_ai: true }
+    require: [AI-GOV-001]
+
+  - when: { ai.ai_autonomy: autonomous }
+    require: [AI-HITL-001]
+
+  # Cost
+  - when: { cost_commitment_level: high }
+    require: [COST-GUARD-001]
+
+  - when: { cost.cost_scaling_model: usage_based }
+    require: [COST-GUARD-001]
