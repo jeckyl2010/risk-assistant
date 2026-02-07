@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FileText, GitCompare, BarChart3 } from 'lucide-react'
 import type { Question, TriggerRule } from '@/lib/uiTypes'
 import { deepDelete, deepGet, deepSet, type Facts } from './facts'
@@ -13,32 +12,8 @@ import { DescriptionSection } from '../system/DescriptionSection'
 import { QuestionsList } from '../system/QuestionsList'
 import { ResultsSection } from '../system/ResultsSection'
 import { DiffSection } from '../system/DiffSection'
-
-type EvaluateResponse = {
-  modelDir: string
-  modelVersion: string
-  result: {
-    activated_domains: string[]
-    required_questions: { id: string; answered: boolean }[]
-    derived_controls: Array<{
-      id: string
-      title: string
-      scope: string
-      enforcement_intent: string
-      activation_phase: string
-      evidence_type: string[]
-      because: Record<string, unknown>[]
-    }>
-  }
-}
-
-type DiffResponse = {
-  old: { modelDir: string; modelVersion: string }
-  new: { modelDir: string; modelVersion: string }
-  controls: { added: string[]; removed: string[] }
-  questions: { newlyMissing: string[]; noLongerMissing: string[] }
-  activatedDomains: { old: string[]; new: string[] }
-}
+import { useSaveSystem, useEvaluateSystem, useDiffSystem } from '@/hooks/useSystemApi'
+import { SECTION_IDS } from '@/lib/constants'
 
 function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean {
   for (const [k, expected] of Object.entries(cond)) {
@@ -78,86 +53,78 @@ export function SystemEditor({
   domainQuestions: Record<string, Question[]>
   triggers: TriggerRule[]
 }) {
+  // Local state
   const [facts, setFacts] = useState<Facts>(() => ({ scope: 'system', base: {}, ...initialFacts }))
-  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [evalState, setEvalState] = useState<'idle' | 'running' | 'error'>('idle')
-  const [diffState, setDiffState] = useState<'idle' | 'running' | 'error'>('idle')
-  const [evaluateResult, setEvaluateResult] = useState<EvaluateResponse | null>(null)
-  const [diffResult, setDiffResult] = useState<DiffResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [activeSection, setActiveSection] = useState<string>('description')
+  const [activeSection, setActiveSection] = useState<string>(SECTION_IDS.DESCRIPTION)
 
-  const activatedDomains = useMemo(() => deriveActivatedDomainsFromTriggers(facts, triggers), [facts, triggers])
+  // API hooks
+  const { save, state: saveState, error: saveError } = useSaveSystem(id)
+  const { 
+    evaluate, 
+    result: evaluateResult, 
+    state: evalState, 
+    error: evalError 
+  } = useEvaluateSystem()
+  const { 
+    diff: runDiff, 
+    result: diffResult, 
+    state: diffState, 
+    error: diffError 
+  } = useDiffSystem()
 
-  async function save() {
-    setError(null)
-    setSaveState('saving')
-    try {
-      const res = await fetch(`/api/systems/${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ facts }),
-      })
-      if (!res.ok) throw new Error(`Save failed: ${res.status}`)
-      setSaveState('saved')
-      toast.success('System saved successfully')
-      setTimeout(() => setSaveState('idle'), 2000)
-    } catch (e: unknown) {
-      setSaveState('error')
-      const message = e instanceof Error ? e.message : 'Save failed'
-      setError(message)
-      toast.error(message)
+  // Combined error state
+  const error = saveError || evalError || diffError
+
+  // Map generic async states to component-specific states
+  const mappedSaveState: 'idle' | 'saving' | 'saved' | 'error' = 
+    saveState === 'loading' ? 'saving' :
+    saveState === 'success' ? 'saved' :
+    saveState as 'idle' | 'error'
+    
+  const mappedEvalState: 'idle' | 'running' | 'error' = 
+    evalState === 'loading' ? 'running' :
+    evalState === 'success' ? 'idle' :
+    evalState as 'idle' | 'error'
+
+  // Derive activated domains from triggers
+  const activatedDomains = useMemo(
+    () => deriveActivatedDomainsFromTriggers(facts, triggers),
+    [facts, triggers]
+  )
+
+  // Callbacks for API operations
+  const handleSave = useCallback(() => {
+    save(facts)
+  }, [save, facts])
+
+  const handleEvaluate = useCallback(async () => {
+    const result = await evaluate(facts, model.modelDir)
+    if (result) {
+      setActiveSection(SECTION_IDS.RESULTS)
     }
-  }
+  }, [evaluate, facts, model.modelDir])
 
-  async function runEvaluate() {
-    setError(null)
-    setEvalState('running')
-    try {
-      const res = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ facts, modelDir: model.modelDir }),
-      })
-      if (!res.ok) throw new Error(`Evaluate failed: ${res.status}`)
-      const json = (await res.json()) as EvaluateResponse
-      setEvaluateResult(json)
-      setEvalState('idle')
-      toast.success('Evaluation completed')
-      setActiveSection('results')
-    } catch (e: unknown) {
-      setEvalState('error')
-      const message = e instanceof Error ? e.message : 'Evaluate failed'
-      setError(message)
-      toast.error(message)
-    }
-  }
+  const handleDiff = useCallback(
+    async (oldModelDir: string, newModelDir: string) => {
+      await runDiff(facts, oldModelDir, newModelDir)
+    },
+    [runDiff, facts]
+  )
 
-  async function runDiff(oldModelDir: string, newModelDir: string) {
-    setError(null)
-    setDiffState('running')
-    try {
-      const res = await fetch('/api/diff', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ facts, oldModelDir, newModelDir }),
-      })
-      if (!res.ok) throw new Error(`Diff failed: ${res.status}`)
-      const json = (await res.json()) as DiffResponse
-      setDiffResult(json)
-      setDiffState('idle')
-      toast.success('Diff completed')
-    } catch (e: unknown) {
-      setDiffState('error')
-      const message = e instanceof Error ? e.message : 'Diff failed'
-      setError(message)
-      toast.error(message)
-    }
-  }
-
-  const questionSections: Array<{ key: string; title: string; questions: Question[]; prefix: string }> = useMemo(() => {
+  // Question sections derived from activated domains
+  const questionSections: Array<{ 
+    key: string
+    title: string
+    questions: Question[]
+    prefix: string 
+  }> = useMemo(() => {
     return [
-      { key: 'base', title: domainTitle('base'), questions: baseQuestions, prefix: 'base' },
+      { 
+        key: SECTION_IDS.BASE, 
+        title: domainTitle(SECTION_IDS.BASE), 
+        questions: baseQuestions, 
+        prefix: SECTION_IDS.BASE 
+      },
       ...activatedDomains.map((d) => ({ 
         key: d, 
         title: domainTitle(d), 
@@ -199,7 +166,7 @@ export function SystemEditor({
       variant?: 'default' | 'success' | 'warning'
     }> = [
       {
-        id: 'description',
+        id: SECTION_IDS.DESCRIPTION,
         label: 'Overview',
         icon: <FileText className="h-4 w-4" />,
       },
@@ -217,13 +184,13 @@ export function SystemEditor({
 
     items.push(
       {
-        id: 'results',
+        id: SECTION_IDS.RESULTS,
         label: 'Results',
         icon: <BarChart3 className="h-4 w-4" />,
         badge: evaluateResult ? evaluateResult.result.derived_controls.length : undefined,
       },
       {
-        id: 'diff',
+        id: SECTION_IDS.DIFF,
         label: 'Diff',
         icon: <GitCompare className="h-4 w-4" />,
       }
@@ -232,38 +199,54 @@ export function SystemEditor({
     return items
   }, [questionSections, questionProgress, evaluateResult])
 
+  // Ensure active section is still valid when domains change
   useEffect(() => {
-    if (activeSection === 'description' || activeSection === 'base' || activeSection === 'results' || activeSection === 'diff') return
+    // Special sections that don't depend on domain questions
+    if (
+      activeSection === SECTION_IDS.DESCRIPTION ||
+      activeSection === SECTION_IDS.BASE ||
+      activeSection === SECTION_IDS.RESULTS ||
+      activeSection === SECTION_IDS.DIFF
+    ) {
+      return
+    }
+    
+    // Check if activeSection is still a valid domain
     const stillValid = questionSections.some((s) => s.key === activeSection)
-    if (!stillValid) setActiveSection('base')
+    if (!stillValid) setActiveSection(SECTION_IDS.BASE)
   }, [activeSection, questionSections])
 
-  const getValue = (sectionKey: string, questionId: string) => {
+  // Question value accessors with useCallback
+  const getValue = useCallback((sectionKey: string, questionId: string) => {
     const section = questionSections.find(s => s.key === sectionKey)
     if (!section) return null
     return deepGet(facts, `${section.prefix}.${questionId}`)
-  }
+  }, [facts, questionSections])
 
-  const getReason = (sectionKey: string, questionId: string) => {
+  const getReason = useCallback((sectionKey: string, questionId: string) => {
     const section = questionSections.find(s => s.key === sectionKey)
     if (!section) return null
     return deepGet(facts, `${section.prefix}._reasons.${questionId}`)
-  }
+  }, [facts, questionSections])
 
-  const handleQuestionChange = (sectionKey: string, questionId: string, value: unknown) => {
+  const handleQuestionChange = useCallback((sectionKey: string, questionId: string, value: unknown) => {
     const section = questionSections.find(s => s.key === sectionKey)
     if (!section) return
     const path = `${section.prefix}.${questionId}`
     setFacts(prev => deepSet(prev, path, value))
-  }
+  }, [questionSections])
 
-  const handleReasonChange = (sectionKey: string, questionId: string, value: string) => {
+  const handleReasonChange = useCallback((sectionKey: string, questionId: string, value: string) => {
     const section = questionSections.find(s => s.key === sectionKey)
     if (!section) return
     const path = `${section.prefix}._reasons.${questionId}`
     const trimmed = value.trim()
     setFacts(prev => trimmed ? deepSet(prev, path, value) : deepDelete(prev, path))
-  }
+  }, [questionSections])
+
+  const handleDescriptionChange = useCallback((value: string) => {
+    setFacts(prev => deepSet(prev, 'description', value))
+  }, [])
 
   const currentSection = questionSections.find(s => s.key === activeSection)
 
@@ -273,10 +256,10 @@ export function SystemEditor({
         id={id}
         modelVersion={model.modelVersion}
         activatedDomains={activatedDomains}
-        onSave={save}
-        onEvaluate={runEvaluate}
-        saveState={saveState}
-        evalState={evalState}
+        onSave={handleSave}
+        onEvaluate={handleEvaluate}
+        saveState={mappedSaveState}
+        evalState={mappedEvalState}
         derivedControls={evaluateResult?.result.derived_controls.length}
         missingAnswers={evaluateResult?.result.required_questions.filter(q => !q.answered).length}
       />
@@ -293,10 +276,10 @@ export function SystemEditor({
         </aside>
 
         <main>
-          {activeSection === 'description' && (
+          {activeSection === SECTION_IDS.DESCRIPTION && (
             <DescriptionSection
               description={typeof facts.description === 'string' ? facts.description : ''}
-              onChange={(value) => setFacts(prev => deepSet(prev, 'description', value))}
+              onChange={handleDescriptionChange}
             />
           )}
 
@@ -313,7 +296,7 @@ export function SystemEditor({
             />
           )}
 
-          {activeSection === 'results' && evaluateResult && (
+          {activeSection === SECTION_IDS.RESULTS && evaluateResult && (
             <ResultsSection
               derivedControls={evaluateResult.result.derived_controls}
               requiredQuestions={evaluateResult.result.required_questions}
@@ -322,11 +305,11 @@ export function SystemEditor({
             />
           )}
 
-          {activeSection === 'diff' && (
+          {activeSection === SECTION_IDS.DIFF && (
             <DiffSection
-              onRunDiff={runDiff}
+              onRunDiff={handleDiff}
               diffResult={diffResult}
-              isRunning={diffState === 'running'}
+              isRunning={diffState === 'loading'}
             />
           )}
         </main>

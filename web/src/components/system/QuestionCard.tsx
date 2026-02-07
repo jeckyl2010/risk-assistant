@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { MarkdownViewer } from '@/components/ui/markdown-viewer'
 import { sectionAccent } from '../systemEditor/sectionAccent'
+import { SENTINEL_VALUES } from '@/lib/constants'
 
 interface QuestionCardProps {
   question: Question
@@ -72,28 +73,28 @@ export function QuestionCard({
               <Label>Answer</Label>
               {question.type === 'bool' ? (
                 <Select
-                  value={value === true ? 'true' : value === false ? 'false' : '__unset__'}
-                  onValueChange={(v) => onChange(v === '__unset__' ? null : v === 'true')}
+                  value={value === true ? 'true' : value === false ? 'false' : SENTINEL_VALUES.UNSET}
+                  onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v === 'true')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an answer" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__unset__">(unset)</SelectItem>
+                    <SelectItem value={SENTINEL_VALUES.UNSET}>(unset)</SelectItem>
                     <SelectItem value="true">true</SelectItem>
                     <SelectItem value="false">false</SelectItem>
                   </SelectContent>
                 </Select>
               ) : question.type === 'enum' && question.allowed ? (
                 <Select
-                  value={typeof value === 'string' ? value : '__unset__'}
-                  onValueChange={(v) => onChange(v === '__unset__' ? null : v)}
+                  value={typeof value === 'string' ? value : SENTINEL_VALUES.UNSET}
+                  onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an answer" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__unset__">(unset)</SelectItem>
+                    <SelectItem value={SENTINEL_VALUES.UNSET}>(unset)</SelectItem>
                     {question.allowed.map((v) => (
                       <SelectItem key={v} value={v}>
                         {v}

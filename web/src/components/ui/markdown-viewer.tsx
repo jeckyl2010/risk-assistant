@@ -58,8 +58,9 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
               {...props} 
             />
           ),
-          code: ({node, inline, ...props}) => 
-            inline ? (
+          code: ({node, ...props}) => {
+            const inline = 'inline' in props ? props.inline : false
+            return inline ? (
               <code 
                 style={{
                   backgroundColor: 'rgb(243 244 246)',
@@ -72,7 +73,8 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
               />
             ) : (
               <code {...props} />
-            ),
+            )
+          },
           a: ({node, ...props}) => (
             <a 
               style={{ color: 'rgb(79 70 229)', textDecoration: 'underline' }}
