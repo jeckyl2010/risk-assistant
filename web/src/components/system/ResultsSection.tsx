@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 interface DerivedControl {
   id: string
   title: string
+  description?: string
   scope: string
   enforcement_intent: string
   activation_phase: string
@@ -221,9 +222,16 @@ export function ResultsSection({
                   <Card className="shadow-md">
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between gap-4">
-                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                          {control.title}
-                        </h3>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                            {control.title}
+                          </h3>
+                          {control.description && (
+                            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                              {control.description}
+                            </p>
+                          )}
+                        </div>
                         <Badge variant="outline" className="shrink-0 font-mono text-xs">
                           {control.id}
                         </Badge>

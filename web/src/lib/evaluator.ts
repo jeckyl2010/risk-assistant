@@ -6,6 +6,7 @@ export type Facts = Record<string, unknown>
 export type ControlCatalogEntry = {
   id: string
   title?: string
+  description?: string
   scope?: string
   enforcement_intent?: string
   activation_phase?: string
@@ -191,6 +192,7 @@ export async function evaluateFacts(facts: Facts, paths: ModelPaths): Promise<Ev
       return {
         id,
         title: c?.title ?? '(missing from catalog)',
+        description: c?.description,
         scope: c?.scope ?? 'unknown',
         enforcement_intent: c?.enforcement_intent ?? 'unknown',
         activation_phase: c?.activation_phase ?? 'unknown',

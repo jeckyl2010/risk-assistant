@@ -2,6 +2,7 @@ schema_version: 1.0
 controls:
   - id: IAM-STRONG-001
     title: Strong identity for access
+    description: Ensures all access to the system uses strong, verifiable identities rather than shared credentials or anonymous access. This includes service-to-service authentication and user access.
     scope: system
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -9,6 +10,7 @@ controls:
 
   - id: SEC-LOG-001
     title: Centralized security logging
+    description: Security-relevant events (authentication, authorization, access violations, configuration changes) are captured and sent to a centralized logging system for monitoring, alerting, and forensic analysis.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: runtime
@@ -16,6 +18,7 @@ controls:
 
   - id: SEC-NET-001
     title: Network trust termination at boundaries
+    description: Network-level trust ends at deployment boundaries. All communication crossing trust boundaries requires authentication and authorization, implementing zero-trust principles.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -23,6 +26,7 @@ controls:
 
   - id: SEC-SBD-001
     title: Secure-by-design baseline (threat modeling, least privilege, secure defaults)
+    description: Security is built into the design from the start. Includes conducting threat modeling, applying least privilege principles, securing defaults, and documenting security architecture decisions.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -30,6 +34,7 @@ controls:
 
   - id: SEC-MFA-001
     title: MFA required for interactive and privileged access
+    description: Multi-factor authentication is mandatory for all human interactive access and any privileged operations. This reduces the risk of credential theft and unauthorized access.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -37,6 +42,7 @@ controls:
 
   - id: SEC-TLS-001
     title: Encrypt data in transit (TLS/mTLS) across boundaries
+    description: All data transmitted across network boundaries is encrypted using TLS 1.2 or higher. For service-to-service communication, mutual TLS (mTLS) should be used where applicable.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -44,6 +50,7 @@ controls:
 
   - id: SEC-SECRETS-001
     title: Secrets management baseline (no secrets in code; rotation; scoped access)
+    description: Secrets (passwords, API keys, certificates) are never stored in code or configuration files. They must be stored in a dedicated secrets management system with support for rotation, auditing, and scoped access.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -51,6 +58,7 @@ controls:
 
   - id: SEC-ACCESS-REV-001
     title: Periodic access review for user and privileged access
+    description: Regular reviews of user access rights and privileged accounts to ensure access remains appropriate. Reviews should identify and remove unnecessary privileges and dormant accounts.
     scope: system
     enforcement_intent: procedural
     activation_phase: post_go_live
@@ -58,6 +66,7 @@ controls:
 
   - id: SEC-WAF-001
     title: Internet-facing ingress protections (WAF/rate limiting/abuse controls)
+    description: Systems exposed to the internet must have protective layers including Web Application Firewall (WAF), rate limiting, DDoS protection, and abuse detection to defend against common attacks.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -65,6 +74,7 @@ controls:
 
   - id: DATA-ENC-001
     title: Encryption in transit and at rest for sensitive data
+    description: Sensitive data must be encrypted both when stored (at rest) and when transmitted (in transit). Encryption keys must be properly managed and rotated according to best practices.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -72,6 +82,7 @@ controls:
 
   - id: OPS-OBS-001
     title: Observability baseline (metrics/logs/alerts)
+    description: The system must expose comprehensive observability signals including metrics, structured logs, and distributed traces. Critical conditions must trigger alerts to enable rapid incident response.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: runtime
@@ -79,6 +90,7 @@ controls:
 
   - id: OPS-DR-001
     title: Recovery strategy defined and tested
+    description: A documented disaster recovery strategy must exist, including Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO). The strategy must be regularly tested to verify effectiveness.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -86,6 +98,7 @@ controls:
 
   - id: INT-ISO-001
     title: Integration isolation (timeouts/retries/buffering/backpressure)
+    description: System integrations must implement resilience patterns including timeouts, retries with exponential backoff, circuit breakers, buffering, and backpressure handling to prevent cascading failures.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -93,6 +106,7 @@ controls:
 
   - id: OT-CMD-001
     title: Command channel safeguards for manufacturing
+    description: Manufacturing/OT command channels require additional protections including command validation, authorization checks, audit logging, and emergency shutdown capabilities to prevent unauthorized or harmful operations.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: pre_go_live
@@ -100,6 +114,7 @@ controls:
 
   - id: AI-GOV-001
     title: AI governance baseline (ownership, validation, monitoring)
+    description: AI/ML components require clear ownership, validation of model outputs, ongoing monitoring for drift and bias, version control, and documented decision-making processes for model updates and rollbacks.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -107,6 +122,7 @@ controls:
 
   - id: AI-HITL-001
     title: Human oversight for higher autonomy
+    description: Higher-risk or higher-autonomy AI decisions require human-in-the-loop oversight. Critical actions should require human approval, and all AI decisions must be auditable and explainable.
     scope: system
     enforcement_intent: procedural
     activation_phase: runtime
@@ -114,6 +130,7 @@ controls:
 
   - id: COST-GUARD-001
     title: Cost guardrails (budgets/alerts/quotas)
+    description: Automated cost controls including budget limits, spending alerts, and resource quotas to prevent runaway costs. Critical systems should have mechanisms to prevent cost-based outages.
     scope: deployment
     enforcement_intent: automatic
     activation_phase: runtime
@@ -121,6 +138,7 @@ controls:
 
   - id: GDPR-ART-32
     title: GDPR Art. 32 appropriate security of processing
+    description: Compliance with GDPR Article 32 requirements for appropriate technical and organizational measures to ensure security appropriate to the risk of processing personal data.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -128,6 +146,7 @@ controls:
 
   - id: CRIT-DECL-001
     title: Declare manufacturing criticality level (C0-C4) with evidence
+    description: Systems supporting manufacturing must declare their criticality level based on the impact of failure. Levels range from C0 (production-critical) to C4 (non-critical support), with evidence supporting the classification.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -135,6 +154,7 @@ controls:
 
   - id: CRIT-CONN-001
     title: No hard dependency on WAN/cloud for production-critical operation
+    description: Production-critical systems (C0/C1) must be able to operate without continuous WAN or cloud connectivity. Essential functions must remain available during network outages to prevent production shutdowns.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
@@ -142,6 +162,7 @@ controls:
 
   - id: CRIT-ISO-001
     title: Demonstrate operability during site isolation/blackout (24-48h)
+    description: Critical systems must demonstrate they can continue operating during complete site isolation from external networks for 24-48 hours, including ability to maintain basic operations and local decision-making.
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
@@ -149,6 +170,7 @@ controls:
 
   - id: CRIT-AI-001
     title: For C0/C1, AI/ML must not be in the control path (safe fallback + override)
+    description: Production-critical systems (C0/C1) must not have AI/ML models in the control path for safety-critical decisions. If AI is used, there must be safe fallback mechanisms and human override capabilities.
     scope: system
     enforcement_intent: procedural
     activation_phase: design
