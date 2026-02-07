@@ -46,7 +46,7 @@ controls:
     title: Integration isolation (timeouts/retries/buffering/backpressure)
     scope: system
     enforcement_intent: procedural
-    activation_phase: build
+    activation_phase: design
     evidence_type: [document]
 
   - id: OT-CMD-001

@@ -7,10 +7,73 @@ risk-informed architecture guardrail model.
 
 NON-GOALS
 - Do NOT create traditional risk management frameworks
-- Do NOT introduce scoring
-- Do NOT require workshops or approvals
+- Do NOT introduce scoring (risk levels, heat maps, RAG status)
+- Do NOT require workshops, approvals, or compliance processes
+- Do NOT ask subjective or opinion-based questions
 
 CORE PRINCIPLES
-- The model is an enabler, not enforcement
-- Inputs are factual
-- Outputs are derived controls
+- The model is an enabler, not an enforcement mechanism
+- Inputs are factual characteristics of systems
+- Outputs are derived safeguards (controls)
+- Controls are derived, never asked for
+- Logic must be deterministic and explainable
+
+SCOPE MODEL
+The model applies across these hierarchy levels:
+- program
+- system / application
+- deployment / environment
+
+Controls may be inherited, refined, or specialized as maturity increases.
+
+DOMAIN CATEGORIES
+Use these high-level categories only:
+- business_criticality
+- security_exposure
+- ai_autonomy
+- data_handling
+- operational_lifecycle
+- integration_blast_radius
+- cost_commitment
+
+QUESTION MODEL
+- Start with a minimal base question set
+- Activate follow-up questions conditionally
+- Allow cross-domain activation
+- Cap depth to avoid framework creep
+- Ask only factual, verifiable questions
+
+CONTROL MODEL
+Each control must define:
+- scope (program | system | deployment)
+- enforcement_intent (automatic | procedural)
+- activation_phase (design | pre_go_live | runtime | post_go_live)
+- evidence_type (config | pipeline | log | document)
+- lifecycle_state (required | planned | satisfied | waived)
+
+Controls do not define implementation details.
+
+EXCEPTIONS
+- Exceptions are allowed
+- Require justification, owner, compensating controls, and expiry
+- Exceptions are explicit data, not implicit decisions
+
+REGULATION
+- Do NOT ask whether regulations apply
+- Derive regulatory controls from factual inputs
+- Treat regulations as control sources
+- Maintain traceability to regulation articles
+- Do NOT provide legal interpretation
+
+OUTPUT BEHAVIOR
+When analyzing or generating content:
+- Show which facts triggered which controls
+- Explain implications calmly and pragmatically
+- Avoid audit or compliance language
+- Prefer clarity over completeness
+
+TONE
+- Pragmatic
+- Senior-architect level
+- Engineering-first
+- Anti-overengineering

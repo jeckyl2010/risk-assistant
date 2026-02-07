@@ -13,6 +13,9 @@ TRIGGERS_FILE = RULES_DIR / "triggers.rules.yaml"
 CONTROLS_RULES_FILE = RULES_DIR / "controls.rules.yaml"
 CONTROLS_CATALOG_FILE = CONTROLS_DIR / "controls.catalog.yaml"
 
+ALLOWED_ACTIVATION_PHASES = {"design", "pre_go_live", "runtime", "post_go_live"}
+ALLOWED_EVIDENCE_TYPES = {"config", "pipeline", "log", "document"}
+
 
 def deep_get(d, path: str):
     cur = d
@@ -48,6 +51,68 @@ def matches_condition(facts: dict, cond: dict) -> bool:
 
 def load_yaml(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def warn(msg: str):
+    print(f"WARN: {msg}", file=sys.stderr)
+
+
+def validate_controls_catalog(catalog_doc: dict):
+    controls = catalog_doc.get("controls", [])
+    if not isinstance(controls, list):
+        warn("controls catalog: expected 'controls' to be a list")
+        return
+
+    for c in controls:
+        if not isinstance(c, dict):
+            warn("controls catalog: found non-object control entry")
+            continue
+
+        cid = c.get("id", "(missing id)")
+
+        phase = c.get("activation_phase")
+        if phase is not None and phase not in ALLOWED_ACTIVATION_PHASES:
+            warn(
+                f"controls catalog: {cid} has unknown activation_phase '{phase}' (allowed: {sorted(ALLOWED_ACTIVATION_PHASES)})"
+            )
+
+        evidence = c.get("evidence_type", [])
+        if isinstance(evidence, str):
+            evidence = [evidence]
+        if not isinstance(evidence, list):
+            warn(f"controls catalog: {cid} evidence_type should be a list")
+            continue
+
+        for e in evidence:
+            if e not in ALLOWED_EVIDENCE_TYPES:
+                warn(
+                    f"controls catalog: {cid} has unknown evidence_type '{e}' (allowed: {sorted(ALLOWED_EVIDENCE_TYPES)})"
+                )
+
+
+def validate_controls_rules(rules_doc: dict, catalog: dict[str, dict]):
+    rules = rules_doc.get("rules", [])
+    if not isinstance(rules, list):
+        warn("controls rules: expected 'rules' to be a list")
+        return
+
+    for idx, rule in enumerate(rules, start=1):
+        if not isinstance(rule, dict):
+            warn(f"controls rules: rule #{idx} is not an object")
+            continue
+
+        required = rule.get("require", [])
+        if isinstance(required, str):
+            required = [required]
+
+        if not isinstance(required, list):
+            warn(f"controls rules: rule #{idx} has non-list require")
+            continue
+
+        for cid in required:
+            if cid not in catalog:
+                cond = rule.get("when", {})
+                warn(f"controls rules: rule #{idx} references missing control '{cid}' (when: {cond})")
 
 
 def collect_base_question_ids() -> list[str]:
@@ -90,7 +155,10 @@ def derive_controls(facts: dict) -> tuple[dict, dict]:
     rules_doc = load_yaml(CONTROLS_RULES_FILE)
     catalog_doc = load_yaml(CONTROLS_CATALOG_FILE)
 
+    validate_controls_catalog(catalog_doc)
+
     catalog = {c["id"]: c for c in catalog_doc.get("controls", [])}
+    validate_controls_rules(rules_doc, catalog)
     derived: dict[str, list[dict]] = {}
 
     for rule in rules_doc.get("rules", []):
