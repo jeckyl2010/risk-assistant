@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, CheckCircle2, AlertCircle, TrendingUp, Network, CircleCheckBig, CircleAlert } from 'lucide-react'
+import { Tooltip as InfoTooltip } from '@/components/ui/tooltip'
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, RadialBarChart, RadialBar } from 'recharts'
 
 interface PortfolioStats {
@@ -271,6 +272,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
               <CardTitle className="flex items-center gap-2 text-base">
                 <Network className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 Domain Coverage Matrix
+                <InfoTooltip content="Shows which risk domains (Security, Data, Integration, etc.) are relevant for each system. Domains are automatically activated based on your answers." />
               </CardTitle>
               <CardDescription>Which domains are activated across your systems</CardDescription>
             </CardHeader>

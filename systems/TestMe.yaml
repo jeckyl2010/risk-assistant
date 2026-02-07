@@ -24,7 +24,10 @@ criticality:
   criticality_level: C0
   hard_wan_cloud_dependency: true
   _reasons:
-    hard_wan_cloud_dependency: '**Test**'
+    hard_wan_cloud_dependency: |-
+      **Test**
+
+      == teast==
 security:
   user_population: internal
   crosses_trust_boundary: true

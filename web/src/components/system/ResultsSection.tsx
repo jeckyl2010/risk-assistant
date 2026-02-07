@@ -6,6 +6,7 @@ import { CheckCircle2, AlertCircle, Shield, ArrowRight, BarChart3, PieChart as P
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Tooltip as InfoTooltip } from '@/components/ui/tooltip'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { 
   formatPhase, 
@@ -209,6 +210,7 @@ export function ResultsSection({
                 <CardTitle className="flex items-center gap-2 text-base">
                   <BarChart3 className="h-4 w-4" />
                   Enforcement Intent
+                  <InfoTooltip content="How you can enforce this control: manual (human process), semi-automated (tools assist), or automated (fully automated enforcement)." />
                 </CardTitle>
                 <CardDescription className="text-xs">
                   How controls can be enforced
@@ -249,6 +251,7 @@ export function ResultsSection({
                 <CardTitle className="flex items-center gap-2 text-base">
                   <PieChartIcon className="h-4 w-4" />
                   Activation Phase
+                  <InfoTooltip content="When in your development lifecycle this control must be satisfied: Plan (design), Build (development), Deploy (release), Run (runtime), or Operate (ongoing)." />
                 </CardTitle>
                 <CardDescription className="text-xs">
                   When controls must be satisfied
@@ -282,6 +285,7 @@ export function ResultsSection({
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Shield className="h-4 w-4" />
                   Evidence Required
+                  <InfoTooltip content="What type of proof is needed to demonstrate this control is working: logs, configurations, attestations, test results, documentation, or audit trails." />
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Verification methods needed
@@ -345,6 +349,7 @@ export function ResultsSection({
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
             Derived Controls
+            <InfoTooltip content="Security and compliance controls automatically determined based on your system's characteristics and answers. These help you understand what safeguards are needed." />
           </CardTitle>
           <CardDescription>
             {derivedControls.length} {derivedControls.length === 1 ? 'control has' : 'controls have'} been derived from your answers

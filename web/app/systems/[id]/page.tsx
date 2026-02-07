@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { Home, ChevronRight } from 'lucide-react'
 import { findRepoRoot } from '@/lib/repoRoot'
 import { modelPaths, getModelVersion } from '@/lib/model'
 import { getSystemFacts } from '@/lib/storage'
@@ -17,6 +19,19 @@ export default async function SystemPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-10">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <Link 
+          href="/" 
+          className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          Portfolio
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-zinc-900 dark:text-zinc-100 font-medium">{sys.id}</span>
+      </nav>
+
       <SystemEditor
         id={sys.id}
         initialFacts={sys.facts}

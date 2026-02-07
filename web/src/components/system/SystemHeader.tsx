@@ -1,8 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Save, Play, Loader2, CheckCircle2 } from 'lucide-react'
+import { Save, Play, Loader2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -40,29 +39,20 @@ export function SystemHeader({
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-3">
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back to Portfolio
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {id}
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Badge variant="secondary">Model {modelVersion}</Badge>
-              {activatedDomains.length > 0 ? (
-                activatedDomains.map((domain) => (
-                  <Badge key={domain} variant="outline">
-                    {domain}
-                  </Badge>
-                ))
-              ) : (
-                <Badge variant="outline">No domains activated</Badge>
-              )}
-            </div>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            {id}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">Model {modelVersion}</Badge>
+            {activatedDomains.length > 0 ? (
+              activatedDomains.map((domain) => (
+                <Badge key={domain} variant="outline">
+                  {domain}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline">No domains activated</Badge>
+            )}
           </div>
         </div>
 
