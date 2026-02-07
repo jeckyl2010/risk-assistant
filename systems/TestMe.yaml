@@ -8,7 +8,7 @@ base:
   availability_critical: true
   cost_commitment_level: medium
   _reasons:
-    affects_production: Because I had to
+    affects_production: Because I had to.
     external_access: 'What is this '
     uses_ai: www.dr.dk
     handles_sensitive_data: |-

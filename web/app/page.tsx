@@ -36,7 +36,10 @@ export default async function Home() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-zinc-100/50 last:border-b-0 dark:border-zinc-900/60">
+                  <tr
+                    key={r.id}
+                    className="border-b border-zinc-100/50 transition-colors last:border-b-0 hover:bg-white/60 dark:border-zinc-900/60 dark:hover:bg-zinc-950/30"
+                  >
                     <td className="px-5 py-3">
                       <Link
                         className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"

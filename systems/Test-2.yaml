@@ -1,0 +1,17 @@
+scope: system
+description: ''
+base:
+  affects_production: true
+criticality:
+  criticality_level: C2
+  hard_wan_cloud_dependency: true
+integration:
+  integration_modes:
+    - apis
+    - events
+  commands_into_manufacturing: false
+  coupling: mixed
+operations:
+  environment: prod
+  deployment_scale: site
+  change_model: cicd

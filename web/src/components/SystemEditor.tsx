@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Question, TriggerRule } from '@/lib/uiTypes'
 
 type Facts = Record<string, unknown>
@@ -30,6 +30,75 @@ type DiffResponse = {
   controls: { added: string[]; removed: string[] }
   questions: { newlyMissing: string[]; noLongerMissing: string[] }
   activatedDomains: { old: string[]; new: string[] }
+}
+
+function fmtValue(v: unknown): string {
+  if (v === null) return 'null'
+  if (v === undefined) return 'unset'
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  if (Array.isArray(v)) return `[${v.map((x) => fmtValue(x)).join(', ')}]`
+  try {
+    return JSON.stringify(v)
+  } catch {
+    return String(v)
+  }
+}
+
+function AutoGrowTextArea({
+  value,
+  onChange,
+  placeholder,
+  minRows,
+  className,
+}: {
+  value: string
+  onChange: (next: string) => void
+  placeholder?: string
+  minRows: number
+  className?: string
+}) {
+  const ref = useRef<HTMLTextAreaElement | null>(null)
+
+  const resize = () => {
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }
+
+  useEffect(() => {
+    resize()
+  }, [value])
+
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onInput={resize}
+      placeholder={placeholder}
+      rows={minRows}
+      className={className}
+    />
+  )
+}
+
+function ConditionLines({ because }: { because: Record<string, unknown> }) {
+  const entries = Object.entries(because)
+  if (entries.length === 0) return <div className="text-xs text-zinc-500 dark:text-zinc-400">(no details)</div>
+  return (
+    <ul className="mt-1 flex flex-col gap-1 text-xs text-zinc-600 dark:text-zinc-300">
+      {entries.map(([k, v]) => (
+        <li key={k} className="flex items-start gap-2">
+          <span className="shrink-0 rounded-md border border-zinc-200/70 bg-white/70 px-2 py-0.5 font-mono text-[11px] text-zinc-700 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-200">
+            {k}
+          </span>
+          <span className="font-mono text-[11px] text-zinc-600 dark:text-zinc-300">{fmtValue(v)}</span>
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 function deepGet(obj: unknown, dotted: string): unknown {
@@ -100,28 +169,71 @@ function deriveActivatedDomainsFromTriggers(facts: Facts, triggers: TriggerRule[
 }
 
 function QuestionField({
-  path,
   q,
   value,
   reason,
   onChange,
   onReasonChange,
+  accent,
 }: {
-  path: string
   q: Question
   value: unknown
   reason: unknown
   onChange: (next: unknown) => void
   onReasonChange: (next: string) => void
+  accent?: SectionAccent
 }) {
+  const isUnset = value === null
+  const a = accent ?? sectionAccent('base')
   return (
-    <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
-      <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{q.text}</div>
-      {q.description ? (
-        <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{q.description}</div>
-      ) : null}
-      <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{path}</div>
-      <div className="mt-2">
+    <div
+      className={
+        'rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/25 border-t-4 ' +
+        a.cardTop
+      }
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{q.text}</div>
+          {q.description ? (
+            <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{q.description}</div>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        className={
+          'mt-4 rounded-xl border p-3 ' +
+          (isUnset
+            ? 'border-dashed border-amber-200/80 bg-amber-50/60 dark:border-amber-900/50 dark:bg-amber-950/15'
+            : 'border-sky-200/80 bg-sky-50/60 dark:border-sky-900/50 dark:bg-sky-950/15')
+        }
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div
+            className={
+              'inline-flex items-center gap-2 rounded-full border px-2 py-0.5 text-xs font-medium ' +
+              (isUnset
+                ? 'border-amber-200/80 bg-amber-50 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100'
+                : 'border-sky-200/80 bg-sky-50 text-sky-900 dark:border-sky-900/50 dark:bg-sky-950/20 dark:text-sky-100')
+            }
+          >
+            <span
+              className={
+                'h-1.5 w-1.5 rounded-full ' +
+                (isUnset ? 'bg-amber-500 dark:bg-amber-300' : 'bg-sky-600 dark:bg-sky-300')
+              }
+            />
+            Answer
+          </div>
+          {isUnset ? (
+            <div className="text-xs text-amber-800 dark:text-amber-200">Not answered yet</div>
+          ) : (
+            <div className="text-xs text-sky-800 dark:text-sky-200">Answered</div>
+          )}
+        </div>
+
+        <div className="mt-2">
         {q.type === 'bool' ? (
           <select
             value={value === true ? 'true' : value === false ? 'false' : ''}
@@ -129,7 +241,7 @@ function QuestionField({
               const v = e.target.value
               onChange(v === '' ? null : v === 'true')
             }}
-            className="h-10 w-full rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
+            className="h-11 w-full rounded-lg border border-zinc-200/70 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
           >
             <option value="">(unset)</option>
             <option value="true">true</option>
@@ -142,7 +254,7 @@ function QuestionField({
             <select
               value={typeof value === 'string' ? value : ''}
               onChange={(e) => onChange(e.target.value || null)}
-              className="h-10 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
+              className="h-11 rounded-lg border border-zinc-200/70 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
             >
               <option value="">(unset)</option>
               {(q.allowed ?? []).map((a) => (
@@ -156,7 +268,7 @@ function QuestionField({
 
         {q.type === 'set' ? (
           <div className="flex flex-col gap-2">
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 rounded-lg border border-zinc-200/70 bg-white/80 p-3 dark:border-zinc-800/80 dark:bg-zinc-950/40">
               {(q.allowed ?? []).map((a) => {
                 const arr = Array.isArray(value) ? value : []
                 const checked = arr.includes(a)
@@ -180,20 +292,183 @@ function QuestionField({
             </div>
           </div>
         ) : null}
+        </div>
       </div>
 
       <div className="mt-3">
         <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Reason (optional)</label>
-        <textarea
+        <AutoGrowTextArea
           value={typeof reason === 'string' ? reason : ''}
-          onChange={(e) => onReasonChange(e.target.value)}
+          onChange={onReasonChange}
           placeholder="Why did you choose this answer? Link to docs, context, constraints, …"
-          rows={2}
-          className="mt-1 w-full resize-y rounded-lg border border-zinc-200/70 bg-white/80 px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          minRows={2}
+          className="mt-1 w-full resize-none rounded-lg border border-zinc-200/70 bg-white px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
         />
       </div>
     </div>
   )
+}
+
+function domainTitle(domain: string): string {
+  const map: Record<string, string> = {
+    base: 'System facts',
+    security: 'Security',
+    data: 'Data',
+    ai: 'AI',
+    integration: 'Integration',
+    operations: 'Operations',
+    cost: 'Cost',
+    criticality: 'Criticality',
+    exceptions: 'Exceptions',
+  }
+  return map[domain] ?? domain
+}
+type SectionAccent = {
+  bar: string
+  navActive: string
+  navIdle: string
+  headerWrap: string
+  headerChip: string
+  cardTop: string
+}
+
+function sectionAccent(key: string): SectionAccent {
+  const byKey: Record<string, SectionAccent> = {
+    overview: {
+      bar: 'bg-indigo-500/80 dark:bg-indigo-300/80',
+      navActive:
+        'border-indigo-200/70 bg-indigo-50/70 text-zinc-900 dark:border-indigo-900/50 dark:bg-indigo-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-indigo-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-indigo-950/15',
+      headerWrap:
+        'border-indigo-200/70 bg-indigo-50/60 dark:border-indigo-900/50 dark:bg-indigo-950/15',
+      headerChip:
+        'border-indigo-200/80 bg-indigo-50 text-indigo-900 dark:border-indigo-900/50 dark:bg-indigo-950/20 dark:text-indigo-100',
+      cardTop: 'border-t-indigo-400/80 dark:border-t-indigo-400/70',
+    },
+    base: {
+      bar: 'bg-zinc-500/70 dark:bg-zinc-300/60',
+      navActive:
+        'border-zinc-200/70 bg-zinc-50/90 text-zinc-900 dark:border-zinc-700/60 dark:bg-zinc-900/35 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-zinc-50/80 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-zinc-900/20',
+      headerWrap:
+        'border-zinc-200/70 bg-zinc-50/60 dark:border-zinc-800/70 dark:bg-zinc-900/20',
+      headerChip:
+        'border-zinc-200/80 bg-zinc-50 text-zinc-900 dark:border-zinc-800/70 dark:bg-zinc-950/20 dark:text-zinc-100',
+      cardTop: 'border-t-zinc-300/80 dark:border-t-zinc-700/70',
+    },
+    ai: {
+      bar: 'bg-violet-500/80 dark:bg-violet-300/80',
+      navActive:
+        'border-violet-200/70 bg-violet-50/70 text-zinc-900 dark:border-violet-900/50 dark:bg-violet-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-violet-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-violet-950/15',
+      headerWrap:
+        'border-violet-200/70 bg-violet-50/60 dark:border-violet-900/50 dark:bg-violet-950/15',
+      headerChip:
+        'border-violet-200/80 bg-violet-50 text-violet-900 dark:border-violet-900/50 dark:bg-violet-950/20 dark:text-violet-100',
+      cardTop: 'border-t-violet-400/80 dark:border-t-violet-400/70',
+    },
+    criticality: {
+      bar: 'bg-amber-500/80 dark:bg-amber-300/80',
+      navActive:
+        'border-amber-200/70 bg-amber-50/70 text-zinc-900 dark:border-amber-900/50 dark:bg-amber-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-amber-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-amber-950/15',
+      headerWrap:
+        'border-amber-200/70 bg-amber-50/60 dark:border-amber-900/50 dark:bg-amber-950/15',
+      headerChip:
+        'border-amber-200/80 bg-amber-50 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100',
+      cardTop: 'border-t-amber-400/80 dark:border-t-amber-400/70',
+    },
+    data: {
+      bar: 'bg-cyan-500/80 dark:bg-cyan-300/80',
+      navActive:
+        'border-cyan-200/70 bg-cyan-50/70 text-zinc-900 dark:border-cyan-900/50 dark:bg-cyan-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-cyan-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-cyan-950/15',
+      headerWrap:
+        'border-cyan-200/70 bg-cyan-50/60 dark:border-cyan-900/50 dark:bg-cyan-950/15',
+      headerChip:
+        'border-cyan-200/80 bg-cyan-50 text-cyan-900 dark:border-cyan-900/50 dark:bg-cyan-950/20 dark:text-cyan-100',
+      cardTop: 'border-t-cyan-400/80 dark:border-t-cyan-400/70',
+    },
+    integration: {
+      bar: 'bg-sky-500/80 dark:bg-sky-300/80',
+      navActive:
+        'border-sky-200/70 bg-sky-50/70 text-zinc-900 dark:border-sky-900/50 dark:bg-sky-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-sky-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-sky-950/15',
+      headerWrap:
+        'border-sky-200/70 bg-sky-50/60 dark:border-sky-900/50 dark:bg-sky-950/15',
+      headerChip:
+        'border-sky-200/80 bg-sky-50 text-sky-900 dark:border-sky-900/50 dark:bg-sky-950/20 dark:text-sky-100',
+      cardTop: 'border-t-sky-400/80 dark:border-t-sky-400/70',
+    },
+    operations: {
+      bar: 'bg-emerald-500/80 dark:bg-emerald-300/80',
+      navActive:
+        'border-emerald-200/70 bg-emerald-50/70 text-zinc-900 dark:border-emerald-900/50 dark:bg-emerald-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-emerald-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-emerald-950/15',
+      headerWrap:
+        'border-emerald-200/70 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/15',
+      headerChip:
+        'border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-100',
+      cardTop: 'border-t-emerald-400/80 dark:border-t-emerald-400/70',
+    },
+    security: {
+      bar: 'bg-rose-500/80 dark:bg-rose-300/80',
+      navActive:
+        'border-rose-200/70 bg-rose-50/70 text-zinc-900 dark:border-rose-900/50 dark:bg-rose-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-rose-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-rose-950/15',
+      headerWrap:
+        'border-rose-200/70 bg-rose-50/60 dark:border-rose-900/50 dark:bg-rose-950/15',
+      headerChip:
+        'border-rose-200/80 bg-rose-50 text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-100',
+      cardTop: 'border-t-rose-400/80 dark:border-t-rose-400/70',
+    },
+    cost: {
+      bar: 'bg-orange-500/80 dark:bg-orange-300/80',
+      navActive:
+        'border-orange-200/70 bg-orange-50/70 text-zinc-900 dark:border-orange-900/50 dark:bg-orange-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-orange-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-orange-950/15',
+      headerWrap:
+        'border-orange-200/70 bg-orange-50/60 dark:border-orange-900/50 dark:bg-orange-950/15',
+      headerChip:
+        'border-orange-200/80 bg-orange-50 text-orange-900 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-100',
+      cardTop: 'border-t-orange-400/80 dark:border-t-orange-400/70',
+    },
+    results: {
+      bar: 'bg-emerald-500/80 dark:bg-emerald-300/80',
+      navActive:
+        'border-emerald-200/70 bg-emerald-50/70 text-zinc-900 dark:border-emerald-900/50 dark:bg-emerald-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-emerald-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-emerald-950/15',
+      headerWrap:
+        'border-emerald-200/70 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/15',
+      headerChip:
+        'border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-100',
+      cardTop: 'border-t-emerald-400/80 dark:border-t-emerald-400/70',
+    },
+    diff: {
+      bar: 'bg-fuchsia-500/80 dark:bg-fuchsia-300/80',
+      navActive:
+        'border-fuchsia-200/70 bg-fuchsia-50/70 text-zinc-900 dark:border-fuchsia-900/50 dark:bg-fuchsia-950/15 dark:text-zinc-50',
+      navIdle:
+        'border-zinc-200/50 bg-zinc-50/40 text-zinc-700 hover:bg-fuchsia-50/40 dark:border-zinc-800/60 dark:bg-zinc-950/10 dark:text-zinc-300 dark:hover:bg-fuchsia-950/15',
+      headerWrap:
+        'border-fuchsia-200/70 bg-fuchsia-50/60 dark:border-fuchsia-900/50 dark:bg-fuchsia-950/15',
+      headerChip:
+        'border-fuchsia-200/80 bg-fuchsia-50 text-fuchsia-900 dark:border-fuchsia-900/50 dark:bg-fuchsia-950/20 dark:text-fuchsia-100',
+      cardTop: 'border-t-fuchsia-400/80 dark:border-t-fuchsia-400/70',
+    },
+  }
+
+  return byKey[key] ?? byKey.base
 }
 
 function SectionButton({
@@ -201,23 +476,24 @@ function SectionButton({
   title,
   subtitle,
   onClick,
+  accent,
 }: {
   active: boolean
   title: string
   subtitle?: string
   onClick: () => void
+  accent: SectionAccent
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={
-        'w-full rounded-xl border px-3 py-2 text-left text-sm shadow-sm transition-colors ' +
-        (active
-          ? 'border-zinc-200/70 bg-white/90 text-zinc-900 dark:border-zinc-700/60 dark:bg-zinc-950/60 dark:text-zinc-50'
-          : 'border-zinc-200/50 bg-white/50 text-zinc-700 hover:bg-white/80 dark:border-zinc-800/60 dark:bg-zinc-950/20 dark:text-zinc-300 dark:hover:bg-zinc-950/40')
+        'relative w-full overflow-hidden rounded-xl border py-2 pl-5 pr-3 text-left text-sm shadow-sm transition-colors ' +
+        (active ? accent.navActive : accent.navIdle)
       }
     >
+      <span className={'absolute left-0 top-0 h-full w-1 ' + accent.bar} />
       <div className="font-medium">{title}</div>
       {subtitle ? <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</div> : null}
     </button>
@@ -248,10 +524,16 @@ export function SystemEditor({
   const [oldModelDir, setOldModelDir] = useState('model')
   const [newModelDir, setNewModelDir] = useState('model')
   const [error, setError] = useState<string | null>(null)
-
   const [activeSection, setActiveSection] = useState<string>('description')
 
   const activatedDomains = useMemo(() => deriveActivatedDomainsFromTriggers(facts, triggers), [facts, triggers])
+
+  const activeAccent = useMemo(() => {
+    if (activeSection === 'description') return sectionAccent('overview')
+    if (activeSection === 'results') return sectionAccent('results')
+    if (activeSection === 'diff') return sectionAccent('diff')
+    return sectionAccent(activeSection)
+  }, [activeSection])
 
   async function save() {
     setError(null)
@@ -311,8 +593,8 @@ export function SystemEditor({
 
   const questionSections: Array<{ key: string; title: string; questions: Question[]; prefix: string }> = useMemo(() => {
     return [
-      { key: 'base', title: 'Base facts', questions: baseQuestions, prefix: 'base' },
-      ...activatedDomains.map((d) => ({ key: d, title: d, questions: domainQuestions[d] ?? [], prefix: d })),
+      { key: 'base', title: domainTitle('base'), questions: baseQuestions, prefix: 'base' },
+      ...activatedDomains.map((d) => ({ key: d, title: domainTitle(d), questions: domainQuestions[d] ?? [], prefix: d })),
     ]
   }, [activatedDomains, baseQuestions, domainQuestions])
 
@@ -325,6 +607,29 @@ export function SystemEditor({
     : null
 
   const derivedControlsCount = evaluateResult ? evaluateResult.result.derived_controls.length : null
+
+  const questionMetaByFullId = useMemo(() => {
+    const m = new Map<string, { sectionKey: string; sectionTitle: string; text: string }>()
+    for (const s of questionSections) {
+      for (const q of s.questions) {
+        m.set(`${s.prefix}.${q.id}`, { sectionKey: s.key, sectionTitle: s.title, text: q.text })
+      }
+    }
+    return m
+  }, [questionSections])
+
+  const questionProgress = useMemo(() => {
+    const out: Record<string, { answered: number; total: number }> = {}
+    for (const s of questionSections) {
+      let answered = 0
+      for (const q of s.questions) {
+        const v = deepGet(facts, `${s.prefix}.${q.id}`)
+        if (v !== null) answered++
+      }
+      out[s.key] = { answered, total: s.questions.length }
+    }
+    return out
+  }, [facts, questionSections])
 
   // If active section is a domain that becomes deactivated, fall back to base.
   if (activeSection !== 'description' && activeSection !== 'base' && activeSection !== 'results' && activeSection !== 'diff') {
@@ -359,6 +664,14 @@ export function SystemEditor({
             >
               {evalState === 'running' ? 'Evaluating…' : 'Evaluate'}
             </button>
+
+            {evaluateResult ? (
+              <div className="hidden h-10 items-center rounded-lg border border-zinc-200/70 bg-white/70 px-3 text-sm text-zinc-700 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-200 sm:flex">
+                Controls: <span className="ml-1 font-medium">{evaluateResult.result.derived_controls.length}</span>
+                <span className="mx-2 text-zinc-300 dark:text-zinc-700">•</span>
+                Missing: <span className="ml-1 font-medium">{requiredMissingCount ?? 0}</span>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -371,14 +684,15 @@ export function SystemEditor({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="flex flex-col gap-3">
-          <div className="rounded-2xl border border-zinc-200/70 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/30">
+          <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/20">
             <div className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Sections</div>
             <div className="mt-3 flex flex-col gap-2">
               <SectionButton
                 active={activeSection === 'description'}
-                title="Description"
-                subtitle="What is this assessment about?"
+                title="Overview"
+                subtitle="Context, scope, assumptions"
                 onClick={() => setActiveSection('description')}
+                accent={sectionAccent('overview')}
               />
 
               <div className="my-1 border-t border-zinc-200/70 dark:border-zinc-800/80" />
@@ -388,8 +702,13 @@ export function SystemEditor({
                   key={s.key}
                   active={activeSection === s.key}
                   title={s.title}
-                  subtitle={s.questions.length ? `${s.questions.length} questions` : 'No questions'}
+                  subtitle={
+                    s.questions.length
+                      ? `${questionProgress[s.key]?.answered ?? 0}/${questionProgress[s.key]?.total ?? s.questions.length} answered`
+                      : 'No questions'
+                  }
                   onClick={() => setActiveSection(s.key)}
+                  accent={sectionAccent(s.key)}
                 />
               ))}
 
@@ -404,12 +723,14 @@ export function SystemEditor({
                     : `Controls: ${derivedControlsCount ?? 0} · Missing: ${requiredMissingCount}`
                 }
                 onClick={() => setActiveSection('results')}
+                accent={sectionAccent('results')}
               />
               <SectionButton
                 active={activeSection === 'diff'}
                 title="Diff"
                 subtitle={diffResult ? 'Diff available' : 'Compare models'}
                 onClick={() => setActiveSection('diff')}
+                accent={sectionAccent('diff')}
               />
             </div>
           </div>
@@ -417,27 +738,42 @@ export function SystemEditor({
 
         <main className="flex flex-col gap-4">
           {activeSection === 'description' ? (
-            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Description</div>
+            <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/25">
+              <div className="flex items-center gap-3">
+                <div className={'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ' + sectionAccent('overview').headerChip}>
+                  Overview
+                </div>
+                <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Context</div>
+              </div>
               <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                 Add context about what this risk assessment covers, assumptions, scope, and links.
               </div>
 
-              <textarea
+              <AutoGrowTextArea
                 value={typeof facts.description === 'string' ? (facts.description as string) : ''}
-                onChange={(e) => setFacts((prev) => deepSet(prev, 'description', e.target.value))}
+                onChange={(next) => setFacts((prev) => deepSet(prev, 'description', next))}
                 placeholder="e.g. Risk assessment for the Shopfloor Analytics data pipeline handling production telemetry..."
-                rows={6}
-                className="mt-4 w-full resize-y rounded-xl border border-zinc-200/70 bg-white/80 px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+                minRows={6}
+                className="mt-4 w-full resize-none rounded-xl border border-zinc-200/70 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-50 dark:placeholder:text-zinc-500"
               />
             </div>
           ) : null}
 
           {isQuestionSection ? (
             <div className="flex flex-col gap-3">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{activeQuestionSection.title}</div>
+              <div className={'flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 ' + activeAccent.headerWrap}>
+                <div className="flex items-center gap-3">
+                  <div className={'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ' + activeAccent.headerChip}>
+                    {activeQuestionSection.title}
+                  </div>
+                  <div className="text-sm text-zinc-700 dark:text-zinc-200">
+                    {questionProgress[activeQuestionSection.key]?.answered ?? 0}/{questionProgress[activeQuestionSection.key]?.total ?? activeQuestionSection.questions.length}{' '}
+                    answered
+                  </div>
+                </div>
+              </div>
               {activeQuestionSection.questions.length === 0 ? (
-                <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-4 text-sm text-zinc-600 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-300">
+                <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-4 text-sm text-zinc-600 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/25 dark:text-zinc-300">
                   No questions.
                 </div>
               ) : (
@@ -450,10 +786,10 @@ export function SystemEditor({
                     return (
                       <QuestionField
                         key={path}
-                        path={path}
                         q={q}
                         value={value}
                         reason={reason}
+                        accent={activeAccent}
                         onChange={(next) => setFacts((prev) => deepSet(prev, path, next))}
                         onReasonChange={(next) => {
                           const trimmed = next.trim()
@@ -468,7 +804,7 @@ export function SystemEditor({
           ) : null}
 
           {activeSection === 'results' ? (
-            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
+            <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/25">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Results</div>
                 {requiredMissingCount !== null ? (
@@ -479,34 +815,122 @@ export function SystemEditor({
               </div>
 
               {evaluateResult ? (
-                <div className="mt-4 flex flex-col gap-3">
-                  <div className="text-sm text-zinc-600 dark:text-zinc-300">
-                    Derived controls: {evaluateResult.result.derived_controls.length}
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    {evaluateResult.result.derived_controls.map((c) => (
-                      <div key={c.id} className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
-                        <div className="flex flex-col gap-1">
-                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                            {c.id} · {c.title}
-                          </div>
-                          <div className="text-xs text-zinc-600 dark:text-zinc-300">
-                            scope: {c.scope} · intent: {c.enforcement_intent} · phase: {c.activation_phase}
-                          </div>
-                          {c.evidence_type?.length ? (
-                            <div className="text-xs text-zinc-600 dark:text-zinc-300">evidence: {c.evidence_type.join(', ')}</div>
-                          ) : null}
-                        </div>
-                        <div className="mt-3">
-                          <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Because</div>
-                          <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600 dark:text-zinc-300">
-                            {c.because.map((b, i) => (
-                              <li key={i}>{JSON.stringify(b)}</li>
-                            ))}
-                          </ul>
+                <div className="mt-4 flex flex-col gap-4">
+                  {evaluateResult.result.required_questions.filter((q) => !q.answered).length ? (
+                    <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Missing answers</div>
+                        <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                          {evaluateResult.result.required_questions.filter((q) => !q.answered).length}
                         </div>
                       </div>
-                    ))}
+
+                      <div className="mt-3 flex flex-col gap-3">
+                        {Array.from(
+                          evaluateResult.result.required_questions
+                            .filter((q) => !q.answered)
+                            .reduce(
+                              (acc, q) => {
+                                const meta = questionMetaByFullId.get(q.id)
+                                const sectionKey = meta?.sectionKey ?? 'base'
+                                const sectionTitle = meta?.sectionTitle ?? 'System facts'
+                                const text = meta?.text ?? q.id
+                                const existing = acc.get(sectionKey) ?? { sectionKey, sectionTitle, items: [] as string[] }
+                                existing.items.push(text)
+                                acc.set(sectionKey, existing)
+                                return acc
+                              },
+                              new Map<string, { sectionKey: string; sectionTitle: string; items: string[] }>(),
+                            ),
+                        ).map(([key, group]) => (
+                          <div
+                            key={key}
+                            className="rounded-xl border border-zinc-200/70 bg-white/60 px-4 py-3 dark:border-zinc-800/80 dark:bg-zinc-950/20"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">{group.sectionTitle}</div>
+                              <button
+                                type="button"
+                                onClick={() => setActiveSection(group.sectionKey)}
+                                className="h-8 rounded-lg border border-zinc-200/70 bg-white/70 px-3 text-xs font-medium text-zinc-700 shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-200 dark:hover:bg-zinc-900/60"
+                              >
+                                Open
+                              </button>
+                            </div>
+                            <ul className="mt-2 list-disc pl-5 text-sm text-zinc-700 dark:text-zinc-200">
+                              {group.items.map((t) => (
+                                <li key={t} className="mt-1">
+                                  {t}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 text-sm text-zinc-700 dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-200">
+                      All required questions are answered.
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2">
+                    <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                      Derived controls: {evaluateResult.result.derived_controls.length}
+                    </div>
+                    {evaluateResult.result.derived_controls.length === 0 ? (
+                      <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 text-sm text-zinc-600 dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-300">
+                        No controls are currently derived from the provided answers.
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        {evaluateResult.result.derived_controls.map((c) => (
+                          <div key={c.id} className="rounded-2xl border border-zinc-200/70 bg-white/60 p-5 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex flex-wrap items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <div className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{c.title}</div>
+                                </div>
+                                <div className="shrink-0 rounded-lg border border-zinc-200/70 bg-white/70 px-2 py-1 font-mono text-[11px] text-zinc-700 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-200">
+                                  {c.id}
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                                <span className="rounded-full border border-zinc-200/70 bg-white/70 px-2 py-0.5 dark:border-zinc-800/80 dark:bg-zinc-950/40">
+                                  scope: {c.scope}
+                                </span>
+                                <span className="rounded-full border border-zinc-200/70 bg-white/70 px-2 py-0.5 dark:border-zinc-800/80 dark:bg-zinc-950/40">
+                                  intent: {c.enforcement_intent}
+                                </span>
+                                <span className="rounded-full border border-zinc-200/70 bg-white/70 px-2 py-0.5 dark:border-zinc-800/80 dark:bg-zinc-950/40">
+                                  phase: {c.activation_phase}
+                                </span>
+                                {c.evidence_type?.length ? (
+                                  <span className="rounded-full border border-zinc-200/70 bg-white/70 px-2 py-0.5 dark:border-zinc-800/80 dark:bg-zinc-950/40">
+                                    evidence: {c.evidence_type.join(', ')}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            <div className="mt-4">
+                              <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Because</div>
+                              <div className="mt-2 flex flex-col gap-2">
+                                {c.because.map((b, i) => (
+                                  <div
+                                    key={i}
+                                    className="rounded-xl border border-zinc-200/70 bg-white/60 px-4 py-3 dark:border-zinc-800/80 dark:bg-zinc-950/20"
+                                  >
+                                    <ConditionLines because={b} />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : null}
@@ -514,7 +938,7 @@ export function SystemEditor({
           ) : null}
 
           {activeSection === 'diff' ? (
-            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
+            <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/25">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Diff models</div>
                 <button
