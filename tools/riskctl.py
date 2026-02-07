@@ -211,8 +211,14 @@ def validate_scope_facts(scope: str, facts_section, questions_index: dict[str, d
         warn(f"facts: '{scope}' section should be an object")
         return
 
+    reasons = None
+    if "_reasons" in facts_section:
+        reasons = facts_section.get("_reasons")
+
     # warn for unknown keys to avoid silent non-matches
     for k in facts_section.keys():
+        if k == "_reasons":
+            continue
         if k not in questions_index:
             warn(f"facts: unknown key {scope}.{k} (no matching question id)")
 
@@ -223,6 +229,21 @@ def validate_scope_facts(scope: str, facts_section, questions_index: dict[str, d
         if value is None:
             continue
         validate_value(scope, qid, q, value)
+
+    if reasons is None:
+        return
+
+    if not isinstance(reasons, dict):
+        warn(f"facts: {scope}._reasons should be an object")
+        return
+
+    for rk, rv in reasons.items():
+        if rk not in questions_index:
+            warn(f"facts: unknown key {scope}._reasons.{rk} (no matching question id)")
+        if rv is None:
+            continue
+        if not isinstance(rv, str):
+            warn(f"facts: {scope}._reasons.{rk} should be string, got {type(rv).__name__}")
 
 
 def validate_facts_against_schemas(
@@ -235,6 +256,10 @@ def validate_facts_against_schemas(
     if not isinstance(facts, dict):
         warn("facts: root should be an object")
         return
+
+    desc = facts.get("description")
+    if desc is not None and not isinstance(desc, str):
+        warn(f"facts: description should be string, got {type(desc).__name__}")
 
     base_index = load_questions_index(base_questions_file)
     validate_scope_facts("base", facts.get("base"), base_index)

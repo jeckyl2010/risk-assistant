@@ -3,6 +3,7 @@ export type QuestionType = 'bool' | 'enum' | 'set'
 export type Question = {
   id: string
   text: string
+  description?: string
   type: QuestionType
   allowed?: string[]
 }
@@ -19,6 +20,7 @@ export function parseQuestions(raw: unknown[]): Question[] {
     const rec = item as Record<string, unknown>
     const id = rec.id
     const text = rec.text
+    const description = rec.description
     const type = rec.type
     if (typeof id !== 'string' || typeof text !== 'string') continue
     if (type !== 'bool' && type !== 'enum' && type !== 'set') continue
@@ -26,7 +28,13 @@ export function parseQuestions(raw: unknown[]): Question[] {
     const allowedRaw = rec.allowed
     const allowed = Array.isArray(allowedRaw) ? allowedRaw.filter((x): x is string => typeof x === 'string') : undefined
 
-    out.push({ id, text, type, ...(allowed ? { allowed } : {}) })
+    out.push({
+      id,
+      text,
+      type,
+      ...(typeof description === 'string' && description.trim() ? { description: description.trim() } : {}),
+      ...(allowed ? { allowed } : {}),
+    })
   }
   return out
 }

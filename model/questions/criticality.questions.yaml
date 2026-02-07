@@ -1,0 +1,13 @@
+schema_version: 1.0
+scope: criticality
+questions:
+  - id: criticality_level
+    text: What is the manufacturing criticality level for this system?
+    description: "Classify by impact (safety, production continuity, quality/compliance, financial). If unsure, assume higher criticality and document evidence to downgrade."
+    type: enum
+    allowed: [C0, C1, C2, C3, C4]
+
+  - id: hard_wan_cloud_dependency
+    text: Would loss of WAN/cloud connectivity stop or materially constrain production?
+    description: "If WAN/cloud outage would stop production or make it unsafe to continue, answer true. Default stance: production-critical functions must not hard-depend on WAN/cloud."
+    type: bool

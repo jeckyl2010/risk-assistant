@@ -3,13 +3,16 @@ scope: data
 questions:
   - id: personal_data
     text: Does it process personal data?
+    description: "True if it processes data about an identifiable person (employees, contractors, visitors, customers), including identifiers, logs tied to a person, or HR/shift data." 
     type: bool
 
   - id: data_subject_region
     text: Primary data subject region
+    description: "Where the people the data relates to are primarily located. Use 'mixed' if both EU and non-EU are material." 
     type: enum
     allowed: [eu, non_eu, mixed]
 
   - id: data_leaves_manufacturing_zone
     text: Does data leave the manufacturing zone?
+    description: "True if any manufacturing data is sent to enterprise/cloud/third parties. Include telemetry exports, historian replication, and remote analytics." 
     type: bool

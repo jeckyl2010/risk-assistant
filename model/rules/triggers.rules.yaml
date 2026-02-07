@@ -10,7 +10,7 @@ triggers:
     activate: [security]
 
   - when: { affects_production: true }
-    activate: [operations, integration]
+    activate: [operations, integration, criticality]
 
   - when: { integration_present: true }
     activate: [integration]

@@ -64,6 +64,7 @@ export async function createSystem(id: string): Promise<{ id: string; factsPath:
   } catch {
     const facts: Facts = {
       scope: 'system',
+      description: '',
       base: {},
     }
     await fs.writeFile(yamlPath, dumpYaml(normalizeFactsForDump(facts)), 'utf-8')

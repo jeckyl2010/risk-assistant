@@ -3,13 +3,26 @@ scope: security
 questions:
   - id: user_population
     text: Who will access the solution?
+    description: "Pick the broadest user group that can access it (directly or via shared links). 'Public' includes anonymous or internet-facing access." 
     type: enum
     allowed: [internal, partners, public]
 
+  - id: interactive_users
+    text: Do humans log in interactively (as opposed to service-to-service only)?
+    description: "True if people authenticate via UI/CLI/SSO (sessions, tokens). False if only machine identities call it (service accounts, workload identities)." 
+    type: bool
+
+  - id: internet_facing
+    text: Is the solution directly reachable from the public internet?
+    description: "True if it has public ingress (even with auth). False if only reachable via private networks, VPN, or internal routing." 
+    type: bool
+
   - id: crosses_trust_boundary
     text: Does any data or access cross a trust boundary (e.g., IT<->OT, enterprise<->internet, site<->cloud)?
+    description: "True if any flow crosses a security zone boundary. Includes manufacturing-to-enterprise, site-to-cloud, or inbound enterprise access into manufacturing." 
     type: bool
 
   - id: privileged_access
     text: Is privileged/admin access required?
+    description: "True if admins/operators need elevated rights (e.g., manage config, deploy, access secrets, or perform break-glass operations)." 
     type: bool

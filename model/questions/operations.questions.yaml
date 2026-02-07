@@ -3,15 +3,18 @@ scope: operations
 questions:
   - id: environment
     text: Target environment stage
+    description: "Where this system runs for the assessed scope. Use 'prod' for anything supporting real production or real data." 
     type: enum
     allowed: [dev, test, prod]
 
   - id: deployment_scale
     text: Deployment scale
+    description: "Pilot = limited rollout. Site = one factory/site. Global = multiple sites or central shared service." 
     type: enum
     allowed: [pilot, site, global]
 
   - id: change_model
     text: How are changes introduced?
+    description: "CI/CD = automated pipelines. Manual = direct changes. Vendor release train = updates controlled by vendor schedule/process." 
     type: enum
     allowed: [cicd, manual, vendor_release_train]

@@ -10,6 +10,8 @@ base:
 
 security:
   user_population: partners
+  interactive_users: true
+  internet_facing: false
   crosses_trust_boundary: true
   privileged_access: true
 
@@ -32,6 +34,10 @@ operations:
   environment: prod
   deployment_scale: site
   change_model: cicd
+
+criticality:
+  criticality_level: C2
+  hard_wan_cloud_dependency: false
 
 cost:
   cost_scaling_model: usage_based

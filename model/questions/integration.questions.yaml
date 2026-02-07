@@ -3,14 +3,17 @@ scope: integration
 questions:
   - id: integration_modes
     text: Which interaction modes exist?
+    description: "Select all that apply. 'Commands' means sending control/actuation or state-changing instructions (not just queries)." 
     type: set
     allowed: [events, apis, files, commands]
 
   - id: commands_into_manufacturing
     text: Are commands/control messages sent into manufacturing?
+    description: "True if anything can change manufacturing behavior remotely (start/stop, setpoints, recipe changes), even if mediated through a gateway." 
     type: bool
 
   - id: coupling
     text: Primary coupling style
+    description: "Sync = request/response required for success. Async = queued/events with buffering/retry. Mixed = both exist." 
     type: enum
     allowed: [sync, async, mixed]

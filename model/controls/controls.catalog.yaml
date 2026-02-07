@@ -21,6 +21,48 @@ controls:
     activation_phase: pre_go_live
     evidence_type: [config]
 
+  - id: SEC-SBD-001
+    title: Secure-by-design baseline (threat modeling, least privilege, secure defaults)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: design
+    evidence_type: [document]
+
+  - id: SEC-MFA-001
+    title: MFA required for interactive and privileged access
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: pre_go_live
+    evidence_type: [document, config]
+
+  - id: SEC-TLS-001
+    title: Encrypt data in transit (TLS/mTLS) across boundaries
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config]
+
+  - id: SEC-SECRETS-001
+    title: Secrets management baseline (no secrets in code; rotation; scoped access)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: design
+    evidence_type: [document]
+
+  - id: SEC-ACCESS-REV-001
+    title: Periodic access review for user and privileged access
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: post_go_live
+    evidence_type: [document]
+
+  - id: SEC-WAF-001
+    title: Internet-facing ingress protections (WAF/rate limiting/abuse controls)
+    scope: deployment
+    enforcement_intent: automatic
+    activation_phase: pre_go_live
+    evidence_type: [config]
+
   - id: DATA-ENC-001
     title: Encryption in transit and at rest for sensitive data
     scope: deployment
@@ -82,4 +124,32 @@ controls:
     scope: system
     enforcement_intent: procedural
     activation_phase: pre_go_live
+    evidence_type: [document]
+
+  - id: CRIT-DECL-001
+    title: Declare manufacturing criticality level (C0-C4) with evidence
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: design
+    evidence_type: [document]
+
+  - id: CRIT-CONN-001
+    title: No hard dependency on WAN/cloud for production-critical operation
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: design
+    evidence_type: [document]
+
+  - id: CRIT-ISO-001
+    title: Demonstrate operability during site isolation/blackout (24-48h)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: pre_go_live
+    evidence_type: [document]
+
+  - id: CRIT-AI-001
+    title: For C0/C1, AI/ML must not be in the control path (safe fallback + override)
+    scope: system
+    enforcement_intent: procedural
+    activation_phase: design
     evidence_type: [document]

@@ -4,11 +4,29 @@ rules:
   - when: { external_access: true }
     require: [IAM-STRONG-001, SEC-LOG-001]
 
+  - when: { external_access: true }
+    require: [SEC-SBD-001, SEC-TLS-001]
+
+  - when: { handles_sensitive_data: true }
+    require: [SEC-SBD-001, SEC-SECRETS-001]
+
+  - when: { security.internet_facing: true }
+    require: [SEC-WAF-001]
+
+  - when: { security.interactive_users: true, external_access: true }
+    require: [SEC-MFA-001]
+
+  - when: { security.privileged_access: true }
+    require: [SEC-MFA-001, SEC-ACCESS-REV-001]
+
   - when: { security.user_population: public }
     require: [SEC-NET-001, SEC-LOG-001]
 
   - when: { security.crosses_trust_boundary: true }
     require: [SEC-NET-001]
+
+  - when: { security.crosses_trust_boundary: true }
+    require: [SEC-TLS-001]
 
   # Data handling
   - when: { data.personal_data: true }
@@ -23,6 +41,28 @@ rules:
 
   - when: { affects_production: true }
     require: [OPS-OBS-001, INT-ISO-001]
+
+  # Manufacturing criticality taxonomy
+  - when: { affects_production: true }
+    require: [CRIT-DECL-001]
+
+  - when: { criticality.hard_wan_cloud_dependency: true }
+    require: [CRIT-CONN-001]
+
+  - when: { criticality.criticality_level: C0 }
+    require: [CRIT-ISO-001]
+
+  - when: { criticality.criticality_level: C1 }
+    require: [CRIT-ISO-001]
+
+  - when: { criticality.criticality_level: C2 }
+    require: [CRIT-ISO-001]
+
+  - when: { criticality.criticality_level: C0, uses_ai: true }
+    require: [CRIT-AI-001]
+
+  - when: { criticality.criticality_level: C1, uses_ai: true }
+    require: [CRIT-AI-001]
 
   # Integration
   - when: { integration.integration_modes: commands }

@@ -58,6 +58,24 @@ function deepSet(obj: unknown, dotted: string, value: unknown): Facts {
   return out
 }
 
+function deepDelete(obj: unknown, dotted: string): Facts {
+  const parts = dotted.split('.')
+  const out: Facts = { ...((obj && typeof obj === 'object') ? (obj as Facts) : {}) }
+  let cur: Record<string, unknown> = out
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i]
+    const next = cur[p]
+    if (typeof next !== 'object' || next === null) {
+      return out
+    }
+    const nextObj = { ...(next as Record<string, unknown>) }
+    cur[p] = nextObj
+    cur = nextObj
+  }
+  delete cur[parts[parts.length - 1]]
+  return out
+}
+
 function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean {
   for (const [k, expected] of Object.entries(cond)) {
     const actual = k.includes('.') ? deepGet(facts, k) : deepGet(facts, `base.${k}`)
@@ -85,16 +103,23 @@ function QuestionField({
   path,
   q,
   value,
+  reason,
   onChange,
+  onReasonChange,
 }: {
   path: string
   q: Question
   value: unknown
+  reason: unknown
   onChange: (next: unknown) => void
+  onReasonChange: (next: string) => void
 }) {
   return (
     <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
       <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{q.text}</div>
+      {q.description ? (
+        <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{q.description}</div>
+      ) : null}
       <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{path}</div>
       <div className="mt-2">
         {q.type === 'bool' ? (
@@ -156,7 +181,46 @@ function QuestionField({
           </div>
         ) : null}
       </div>
+
+      <div className="mt-3">
+        <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Reason (optional)</label>
+        <textarea
+          value={typeof reason === 'string' ? reason : ''}
+          onChange={(e) => onReasonChange(e.target.value)}
+          placeholder="Why did you choose this answer? Link to docs, context, constraints, …"
+          rows={2}
+          className="mt-1 w-full resize-y rounded-lg border border-zinc-200/70 bg-white/80 px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+        />
+      </div>
     </div>
+  )
+}
+
+function SectionButton({
+  active,
+  title,
+  subtitle,
+  onClick,
+}: {
+  active: boolean
+  title: string
+  subtitle?: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        'w-full rounded-xl border px-3 py-2 text-left text-sm shadow-sm transition-colors ' +
+        (active
+          ? 'border-zinc-200/70 bg-white/90 text-zinc-900 dark:border-zinc-700/60 dark:bg-zinc-950/60 dark:text-zinc-50'
+          : 'border-zinc-200/50 bg-white/50 text-zinc-700 hover:bg-white/80 dark:border-zinc-800/60 dark:bg-zinc-950/20 dark:text-zinc-300 dark:hover:bg-zinc-950/40')
+      }
+    >
+      <div className="font-medium">{title}</div>
+      {subtitle ? <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</div> : null}
+    </button>
   )
 }
 
@@ -184,6 +248,8 @@ export function SystemEditor({
   const [oldModelDir, setOldModelDir] = useState('model')
   const [newModelDir, setNewModelDir] = useState('model')
   const [error, setError] = useState<string | null>(null)
+
+  const [activeSection, setActiveSection] = useState<string>('description')
 
   const activatedDomains = useMemo(() => deriveActivatedDomainsFromTriggers(facts, triggers), [facts, triggers])
 
@@ -243,186 +309,273 @@ export function SystemEditor({
     }
   }
 
-  const allQuestionBlocks: Array<{ title: string; questions: Question[]; prefix: string }> = [
-    { title: 'Base facts', questions: baseQuestions, prefix: 'base' },
-    ...activatedDomains.map((d) => ({ title: d, questions: domainQuestions[d] ?? [], prefix: d })),
-  ]
+  const questionSections: Array<{ key: string; title: string; questions: Question[]; prefix: string }> = useMemo(() => {
+    return [
+      { key: 'base', title: 'Base facts', questions: baseQuestions, prefix: 'base' },
+      ...activatedDomains.map((d) => ({ key: d, title: d, questions: domainQuestions[d] ?? [], prefix: d })),
+    ]
+  }, [activatedDomains, baseQuestions, domainQuestions])
+
+  const activeQuestionSection = questionSections.find((s) => s.key === activeSection) ?? questionSections[0]
+
+  const isQuestionSection = questionSections.some((s) => s.key === activeSection)
 
   const requiredMissingCount = evaluateResult
     ? evaluateResult.result.required_questions.filter((q) => !q.answered).length
     : null
 
+  const derivedControlsCount = evaluateResult ? evaluateResult.result.derived_controls.length : null
+
+  // If active section is a domain that becomes deactivated, fall back to base.
+  if (activeSection !== 'description' && activeSection !== 'base' && activeSection !== 'results' && activeSection !== 'diff') {
+    const stillValid = questionSections.some((s) => s.key === activeSection)
+    if (!stillValid) setActiveSection('base')
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <Link href="/" className="text-sm text-zinc-600 hover:underline dark:text-zinc-300">
-            ← Portfolio
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">{id}</h1>
-          <div className="text-sm text-zinc-600 dark:text-zinc-300">
-            Model: {model.modelVersion} · Activated domains: {activatedDomains.join(', ') || '(none)'}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <Link href="/" className="text-sm text-zinc-600 hover:underline dark:text-zinc-300">
+              ← Portfolio
+            </Link>
+            <h1 className="text-2xl font-semibold tracking-tight">{id}</h1>
+            <div className="text-sm text-zinc-600 dark:text-zinc-300">
+              Model: {model.modelVersion} · Activated domains: {activatedDomains.join(', ') || '(none)'}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={save}
+              className="h-10 rounded-lg border border-zinc-200/70 bg-white/80 px-4 text-sm font-medium shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:hover:bg-zinc-900/60"
+            >
+              {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved' : 'Save'}
+            </button>
+            <button
+              onClick={runEvaluate}
+              className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-white"
+            >
+              {evalState === 'running' ? 'Evaluating…' : 'Evaluate'}
+            </button>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={save}
-            className="h-10 rounded-lg border border-zinc-200/70 bg-white/80 px-4 text-sm font-medium shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:hover:bg-zinc-900/60"
-          >
-            {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved' : 'Save'}
-          </button>
-          <button
-            onClick={runEvaluate}
-            className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-white"
-          >
-            {evalState === 'running' ? 'Evaluating…' : 'Evaluate'}
-          </button>
-        </div>
+        {error ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+            {error}
+          </div>
+        ) : null}
       </div>
 
-      {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
+        <aside className="flex flex-col gap-3">
+          <div className="rounded-2xl border border-zinc-200/70 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/30">
+            <div className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Sections</div>
+            <div className="mt-3 flex flex-col gap-2">
+              <SectionButton
+                active={activeSection === 'description'}
+                title="Description"
+                subtitle="What is this assessment about?"
+                onClick={() => setActiveSection('description')}
+              />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-4">
-          {allQuestionBlocks.map((b) => (
-            <div key={b.title} className="flex flex-col gap-3">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{b.title}</div>
-              <div className="flex flex-col gap-3">
-                {b.questions.length === 0 ? (
-                  <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-4 text-sm text-zinc-600 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-300">
-                    No questions.
-                  </div>
-                ) : (
-                  b.questions.map((q) => {
-                    const path = `${b.prefix}.${q.id}`
+              <div className="my-1 border-t border-zinc-200/70 dark:border-zinc-800/80" />
+
+              {questionSections.map((s) => (
+                <SectionButton
+                  key={s.key}
+                  active={activeSection === s.key}
+                  title={s.title}
+                  subtitle={s.questions.length ? `${s.questions.length} questions` : 'No questions'}
+                  onClick={() => setActiveSection(s.key)}
+                />
+              ))}
+
+              <div className="my-1 border-t border-zinc-200/70 dark:border-zinc-800/80" />
+
+              <SectionButton
+                active={activeSection === 'results'}
+                title="Results"
+                subtitle={
+                  requiredMissingCount === null
+                    ? 'Run Evaluate'
+                    : `Controls: ${derivedControlsCount ?? 0} · Missing: ${requiredMissingCount}`
+                }
+                onClick={() => setActiveSection('results')}
+              />
+              <SectionButton
+                active={activeSection === 'diff'}
+                title="Diff"
+                subtitle={diffResult ? 'Diff available' : 'Compare models'}
+                onClick={() => setActiveSection('diff')}
+              />
+            </div>
+          </div>
+        </aside>
+
+        <main className="flex flex-col gap-4">
+          {activeSection === 'description' ? (
+            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
+              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Description</div>
+              <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                Add context about what this risk assessment covers, assumptions, scope, and links.
+              </div>
+
+              <textarea
+                value={typeof facts.description === 'string' ? (facts.description as string) : ''}
+                onChange={(e) => setFacts((prev) => deepSet(prev, 'description', e.target.value))}
+                placeholder="e.g. Risk assessment for the Shopfloor Analytics data pipeline handling production telemetry..."
+                rows={6}
+                className="mt-4 w-full resize-y rounded-xl border border-zinc-200/70 bg-white/80 px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+              />
+            </div>
+          ) : null}
+
+          {isQuestionSection ? (
+            <div className="flex flex-col gap-3">
+              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{activeQuestionSection.title}</div>
+              {activeQuestionSection.questions.length === 0 ? (
+                <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-4 text-sm text-zinc-600 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-300">
+                  No questions.
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {activeQuestionSection.questions.map((q) => {
+                    const path = `${activeQuestionSection.prefix}.${q.id}`
                     const value = deepGet(facts, path)
+                    const reasonPath = `${activeQuestionSection.prefix}._reasons.${q.id}`
+                    const reason = deepGet(facts, reasonPath)
                     return (
                       <QuestionField
                         key={path}
                         path={path}
                         q={q}
                         value={value}
+                        reason={reason}
                         onChange={(next) => setFacts((prev) => deepSet(prev, path, next))}
+                        onReasonChange={(next) => {
+                          const trimmed = next.trim()
+                          setFacts((prev) => (trimmed ? deepSet(prev, reasonPath, next) : deepDelete(prev, reasonPath)))
+                        }}
                       />
                     )
-                  })
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Results</div>
-              {requiredMissingCount !== null ? (
-                <div className="text-sm text-zinc-600 dark:text-zinc-300">Missing answers: {requiredMissingCount}</div>
-              ) : (
-                <div className="text-sm text-zinc-500 dark:text-zinc-400">Run Evaluate to see results</div>
+                  })}
+                </div>
               )}
             </div>
+          ) : null}
 
-            {evaluateResult ? (
-              <div className="mt-4 flex flex-col gap-3">
-                <div className="text-sm text-zinc-600 dark:text-zinc-300">
-                  Derived controls: {evaluateResult.result.derived_controls.length}
+          {activeSection === 'results' ? (
+            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Results</div>
+                {requiredMissingCount !== null ? (
+                  <div className="text-sm text-zinc-600 dark:text-zinc-300">Missing answers: {requiredMissingCount}</div>
+                ) : (
+                  <div className="text-sm text-zinc-500 dark:text-zinc-400">Run Evaluate to see results</div>
+                )}
+              </div>
+
+              {evaluateResult ? (
+                <div className="mt-4 flex flex-col gap-3">
+                  <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                    Derived controls: {evaluateResult.result.derived_controls.length}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {evaluateResult.result.derived_controls.map((c) => (
+                      <div key={c.id} className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                        <div className="flex flex-col gap-1">
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                            {c.id} · {c.title}
+                          </div>
+                          <div className="text-xs text-zinc-600 dark:text-zinc-300">
+                            scope: {c.scope} · intent: {c.enforcement_intent} · phase: {c.activation_phase}
+                          </div>
+                          {c.evidence_type?.length ? (
+                            <div className="text-xs text-zinc-600 dark:text-zinc-300">evidence: {c.evidence_type.join(', ')}</div>
+                          ) : null}
+                        </div>
+                        <div className="mt-3">
+                          <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Because</div>
+                          <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600 dark:text-zinc-300">
+                            {c.because.map((b, i) => (
+                              <li key={i}>{JSON.stringify(b)}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  {evaluateResult.result.derived_controls.map((c) => (
-                    <div key={c.id} className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
-                      <div className="flex flex-col gap-1">
-                        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                          {c.id} · {c.title}
-                        </div>
-                        <div className="text-xs text-zinc-600 dark:text-zinc-300">
-                          scope: {c.scope} · intent: {c.enforcement_intent} · phase: {c.activation_phase}
-                        </div>
-                        {c.evidence_type?.length ? (
-                          <div className="text-xs text-zinc-600 dark:text-zinc-300">evidence: {c.evidence_type.join(', ')}</div>
-                        ) : null}
-                      </div>
-                      <div className="mt-3">
-                        <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Because</div>
-                        <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600 dark:text-zinc-300">
-                          {c.because.map((b, i) => (
-                            <li key={i}>{JSON.stringify(b)}</li>
-                          ))}
-                        </ul>
-                      </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {activeSection === 'diff' ? (
+            <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Diff models</div>
+                <button
+                  onClick={runDiff}
+                  className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm font-medium shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:hover:bg-zinc-900/60"
+                >
+                  {diffState === 'running' ? 'Diffing…' : 'Diff'}
+                </button>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Old model dir</label>
+                  <input
+                    value={oldModelDir}
+                    onChange={(e) => setOldModelDir(e.target.value)}
+                    className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">New model dir</label>
+                  <input
+                    value={newModelDir}
+                    onChange={(e) => setNewModelDir(e.target.value)}
+                    className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
+                  />
+                </div>
+              </div>
+
+              {diffResult ? (
+                <div className="mt-4 flex flex-col gap-3 text-sm">
+                  <div className="text-zinc-700 dark:text-zinc-200">
+                    {diffResult.old.modelDir} ({diffResult.old.modelVersion}) → {diffResult.new.modelDir} ({diffResult.new.modelVersion})
+                  </div>
+
+                  <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                    <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Controls</div>
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Added: {diffResult.controls.added.join(', ') || '(none)'}</div>
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Removed: {diffResult.controls.removed.join(', ') || '(none)'}</div>
+                  </div>
+
+                  <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                    <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Missing required questions</div>
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
+                      Newly missing: {diffResult.questions.newlyMissing.join(', ') || '(none)'}
                     </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="rounded-2xl border border-zinc-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/40">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Diff models</div>
-              <button
-                onClick={runDiff}
-                className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm font-medium shadow-sm hover:bg-white dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50 dark:hover:bg-zinc-900/60"
-              >
-                {diffState === 'running' ? 'Diffing…' : 'Diff'}
-              </button>
-            </div>
-
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Old model dir</label>
-                <input
-                  value={oldModelDir}
-                  onChange={(e) => setOldModelDir(e.target.value)}
-                  className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-300">New model dir</label>
-                <input
-                  value={newModelDir}
-                  onChange={(e) => setNewModelDir(e.target.value)}
-                  className="h-9 rounded-lg border border-zinc-200/70 bg-white/80 px-3 text-sm outline-none focus:border-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-50"
-                />
-              </div>
-            </div>
-
-            {diffResult ? (
-              <div className="mt-4 flex flex-col gap-3 text-sm">
-                <div className="text-zinc-700 dark:text-zinc-200">
-                  {diffResult.old.modelDir} ({diffResult.old.modelVersion}) → {diffResult.new.modelDir} ({diffResult.new.modelVersion})
-                </div>
-
-                <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Controls</div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Added: {diffResult.controls.added.join(', ') || '(none)'}</div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Removed: {diffResult.controls.removed.join(', ') || '(none)'}</div>
-                </div>
-
-                <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Missing required questions</div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-                    Newly missing: {diffResult.questions.newlyMissing.join(', ') || '(none)'}
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
+                      No longer missing: {diffResult.questions.noLongerMissing.join(', ') || '(none)'}
+                    </div>
                   </div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-                    No longer missing: {diffResult.questions.noLongerMissing.join(', ') || '(none)'}
+
+                  <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
+                    <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Activated domains</div>
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Old: {diffResult.activatedDomains.old.join(', ') || '(none)'}</div>
+                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">New: {diffResult.activatedDomains.new.join(', ') || '(none)'}</div>
                   </div>
                 </div>
-
-                <div className="rounded-2xl border border-zinc-200/70 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/30">
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Activated domains</div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Old: {diffResult.activatedDomains.old.join(', ') || '(none)'}</div>
-                  <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">New: {diffResult.activatedDomains.new.join(', ') || '(none)'}</div>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
+              ) : null}
+            </div>
+          ) : null}
+        </main>
       </div>
     </div>
   )

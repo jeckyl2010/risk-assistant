@@ -3,10 +3,12 @@ scope: cost
 questions:
   - id: cost_scaling_model
     text: Cost scaling model
+    description: "Fixed = predictable baseline spend. Usage-based = scales with traffic/compute/storage. Growth-based = increases with sites/users/data volume." 
     type: enum
     allowed: [fixed, usage_based, growth_based]
 
   - id: vendor_lock_in
     text: Vendor lock-in level
+    description: "High if switching providers would be costly (proprietary tech, contracts, data gravity). Low if portable and easily replaceable." 
     type: enum
     allowed: [low, medium, high]

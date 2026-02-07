@@ -3,14 +3,17 @@ scope: ai
 questions:
   - id: ai_autonomy
     text: What is the AI autonomy level?
+    description: "Advisory = suggestions only. Assisted = human approves. Autonomous = system acts without human approval in the normal flow." 
     type: enum
     allowed: [advisory, assisted, autonomous]
 
   - id: model_change
     text: Does the model change over time?
+    description: "Static = fixed model/version until explicitly updated. Retrained = model is periodically retrained or updated based on new data." 
     type: enum
     allowed: [static, retrained]
 
   - id: impacts_people_rights
     text: Can outputs impact individuals' rights/opportunities/safety?
+    description: "True if outputs can affect hiring, access, discipline, safety decisions, or other meaningful outcomes for individuals." 
     type: bool

@@ -167,7 +167,7 @@ export async function requiredQuestionIds(paths: ModelPaths, activatedDomains: s
 
 export function normalizeFactsForDump(facts: Facts): Facts {
   // stable-ish ordering for diffs
-  const order = ['scope', 'model_version', 'base', 'security', 'data', 'ai', 'integration', 'operations', 'cost', 'exceptions']
+  const order = ['scope', 'model_version', 'description', 'base', 'criticality', 'security', 'data', 'ai', 'integration', 'operations', 'cost', 'exceptions']
   const out: Facts = {}
   for (const k of order) {
     if (k in facts) out[k] = facts[k]
