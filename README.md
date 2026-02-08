@@ -1,6 +1,6 @@
 # risk-assistant
 
-Lightweight, deterministic, facts-based “guardrail” engine:
+Lightweight, deterministic, facts-based "guardrail" engine:
 facts -> (conditional questions) -> derived controls.
 
 Non-goals: scoring, RAG, workshops, approvals.
@@ -36,22 +36,22 @@ This installs everything: uv, Bun, Python dependencies, and frontend packages.
    # Install all dependencies
    uv pip install -r requirements.txt
    uv pip install -r requirements-dev.txt
-   Maintenance
+   ```
 
-**Update all dependencies:**
-```powershell
-.\update.ps1
-```
+#### Frontend (Web)
 
-**Code quality:**
-```bash
-# Python (with venv activated)
-ruff check . --fix && ruff format .
+1. Install Bun:
+   ```powershell
+   powershell -c "irm bun.sh/install.ps1 | iex"
+   ```
 
-# Frontend
-cd web
-bun run check
-details>
+2. Install dependencies:
+   ```bash
+   cd web
+   bun install
+   ```
+
+</details>
 
 ### Run the Application
 
@@ -69,38 +69,55 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### Code Quality
+## VS Code Setup
 
-- **Python**: Use Ruff for linting and formatting (with venv activated)
-  ```bash
-  ruff check .        # Lint
-  ruff format .       # Format
-  ruff check . --fix  # Auto-fix issues
-  ```
+**Install recommended extensions:**
+```powershell
+.\install-extensions.ps1
+```
 
-- **TypeScript/React**: Use Biome (see web/ directory)
-  ```bash
-  cd web
-  bun run lint        # Lint
-  bun run format      # Format
-  bun run check       # Lint + format with auto-fix
-  ```
+This installs:
+- **Biome** - Frontend linting/formatting
+- **Ruff** - Python linting/formatting
+- **Tailwind CSS IntelliSense** - Tailwind autocomplete and IntelliSense
+- **Bun** - Bun runtime support
 
-Outputs:
-- derived controls
-- why each control was triggered
-- enforcement intent metadata (automatic vs procedural)
+Alternatively, VS Code will prompt you to install recommended extensions when you open the workspace.
 
-## Semantics
+## Maintenance
+
+**Update all dependencies:**
+```powershell
+.\update.ps1
+```
+
+**Code quality:**
+```bash
+# Python (with venv activated)
+ruff check . --fix && ruff format .
+
+# Frontend
+cd web
+bun run check
+```
+
+## Architecture
+
+**Outputs:**
+- Derived controls
+- Why each control was triggered
+- Enforcement intent metadata (automatic vs procedural)
+
+**Semantics:**
 - Facts are the source of truth; the engine is deterministic and explainable.
 - Domain activation (via `model/rules/triggers.rules.yaml`) is used for progressive disclosure of questions (what follow-ups are relevant).
 - Control derivation (via `model/rules/controls.rules.yaml`) evaluates directly against the facts provided; it is not gated by whether a domain was activated.
 
-## Validation
+**Validation:**
 - `riskctl.py` emits warning-only diagnostics (stderr) to catch model drift and input mistakes early.
 - It validates facts against the question schemas (types + allowed values) and warns on unknown keys that would otherwise silently not match any rules.
 - It also warns if rules reference control IDs missing from the control catalog, or if the control catalog contains unknown metadata values.
 
-## Versioning
+**Versioning:**
 - The model uses SemVer via `model/model.manifest.yaml` (`model_version`).
 - Individual YAML files under `model/questions`, `model/rules`, and `model/controls` use `schema_version` to describe file format (not release SemVer).
