@@ -93,7 +93,10 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {rows.map((r) => (
-            <tr key={r.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+            <tr
+              key={r.id}
+              className="group cursor-pointer border-l-4 border-l-transparent transition-all hover:border-l-indigo-500 hover:bg-indigo-50/50 dark:hover:border-l-indigo-400 dark:hover:bg-indigo-950/30"
+            >
               <td className="px-6 py-4">
                 <Link
                   className="font-semibold text-zinc-900 hover:text-indigo-600 dark:text-zinc-50 dark:hover:text-indigo-400 transition-colors"

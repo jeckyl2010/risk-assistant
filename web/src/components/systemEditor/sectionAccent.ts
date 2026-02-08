@@ -6,6 +6,9 @@ export type SectionAccent = {
   headerChip: string;
   cardTop: string;
   cardBg: string;
+  cardBorderIdle: string;
+  cardBorderHover: string;
+  cardHoverBg: string;
 };
 
 export function domainTitle(domain: string): string {
@@ -37,6 +40,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-indigo-400 bg-gradient-to-br from-indigo-200 to-purple-200 text-indigo-900 dark:border-indigo-600 dark:from-indigo-800/80 dark:to-purple-800/80 dark:text-indigo-100",
       cardTop: "border-t-indigo-500 dark:border-t-indigo-400",
       cardBg: "bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30",
+      cardBorderIdle: "border-l-indigo-500/50 dark:border-l-indigo-400/50",
+      cardBorderHover: "border-l-indigo-500 dark:border-l-indigo-400",
+      cardHoverBg: "bg-indigo-50/30 dark:bg-indigo-950/20",
     },
     base: {
       bar: "bg-slate-500/70 dark:bg-slate-300/60",
@@ -50,6 +56,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-slate-200/80 bg-gradient-to-br from-slate-100 to-zinc-100 text-slate-900 dark:border-slate-800/70 dark:from-slate-950/30 dark:to-zinc-950/30 dark:text-slate-100",
       cardTop: "border-t-slate-300/80 dark:border-t-slate-700/70",
       cardBg: "bg-gradient-to-br from-slate-50/70 to-zinc-50/70 dark:from-slate-900/25 dark:to-zinc-900/25",
+      cardBorderIdle: "border-l-slate-400/50 dark:border-l-slate-500/50",
+      cardBorderHover: "border-l-slate-500 dark:border-l-slate-400",
+      cardHoverBg: "bg-slate-50/30 dark:bg-slate-900/20",
     },
     ai: {
       bar: "bg-violet-600 dark:bg-violet-400",
@@ -63,6 +72,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-violet-400 bg-gradient-to-br from-violet-200 to-purple-200 text-violet-900 dark:border-violet-600 dark:from-violet-800/80 dark:to-purple-800/80 dark:text-violet-100",
       cardTop: "border-t-violet-500 dark:border-t-violet-400",
       cardBg: "bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30",
+      cardBorderIdle: "border-l-violet-500/50 dark:border-l-violet-400/50",
+      cardBorderHover: "border-l-violet-500 dark:border-l-violet-400",
+      cardHoverBg: "bg-violet-50/30 dark:bg-violet-950/20",
     },
     criticality: {
       bar: "bg-amber-600 dark:bg-amber-400",
@@ -76,6 +88,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-amber-400 bg-gradient-to-br from-amber-200 to-orange-200 text-amber-900 dark:border-amber-600 dark:from-amber-800/80 dark:to-orange-800/80 dark:text-amber-100",
       cardTop: "border-t-amber-500 dark:border-t-amber-400",
       cardBg: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
+      cardBorderIdle: "border-l-amber-500/50 dark:border-l-amber-400/50",
+      cardBorderHover: "border-l-amber-500 dark:border-l-amber-400",
+      cardHoverBg: "bg-amber-50/30 dark:bg-amber-950/20",
     },
     data: {
       bar: "bg-cyan-600 dark:bg-cyan-400",
@@ -89,6 +104,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-cyan-400 bg-gradient-to-br from-cyan-200 to-blue-200 text-cyan-900 dark:border-cyan-600 dark:from-cyan-800/80 dark:to-blue-800/80 dark:text-cyan-100",
       cardTop: "border-t-cyan-500 dark:border-t-cyan-400",
       cardBg: "bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30",
+      cardBorderIdle: "border-l-cyan-500/50 dark:border-l-cyan-400/50",
+      cardBorderHover: "border-l-cyan-500 dark:border-l-cyan-400",
+      cardHoverBg: "bg-cyan-50/30 dark:bg-cyan-950/20",
     },
     integration: {
       bar: "bg-sky-600 dark:bg-sky-400",
@@ -102,6 +120,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-sky-400 bg-gradient-to-br from-sky-200 to-blue-200 text-sky-900 dark:border-sky-600 dark:from-sky-800/80 dark:to-blue-800/80 dark:text-sky-100",
       cardTop: "border-t-sky-500 dark:border-t-sky-400",
       cardBg: "bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30",
+      cardBorderIdle: "border-l-sky-500/50 dark:border-l-sky-400/50",
+      cardBorderHover: "border-l-sky-500 dark:border-l-sky-400",
+      cardHoverBg: "bg-sky-50/30 dark:bg-sky-950/20",
     },
     operations: {
       bar: "bg-teal-600 dark:bg-teal-400",
@@ -115,6 +136,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-teal-400 bg-gradient-to-br from-teal-200 to-cyan-200 text-teal-900 dark:border-teal-600 dark:from-teal-800/80 dark:to-cyan-800/80 dark:text-teal-100",
       cardTop: "border-t-teal-500 dark:border-t-teal-400",
       cardBg: "bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30",
+      cardBorderIdle: "border-l-teal-500/50 dark:border-l-teal-400/50",
+      cardBorderHover: "border-l-teal-500 dark:border-l-teal-400",
+      cardHoverBg: "bg-teal-50/30 dark:bg-teal-950/20",
     },
     security: {
       bar: "bg-rose-600 dark:bg-rose-400",
@@ -128,6 +152,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-rose-400 bg-gradient-to-br from-rose-200 to-pink-200 text-rose-900 dark:border-rose-600 dark:from-rose-800/80 dark:to-pink-800/80 dark:text-rose-100",
       cardTop: "border-t-rose-500 dark:border-t-rose-400",
       cardBg: "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/30 dark:to-pink-950/30",
+      cardBorderIdle: "border-l-rose-500/50 dark:border-l-rose-400/50",
+      cardBorderHover: "border-l-rose-500 dark:border-l-rose-400",
+      cardHoverBg: "bg-rose-50/30 dark:bg-rose-950/20",
     },
     cost: {
       bar: "bg-lime-600 dark:bg-lime-400",
@@ -141,6 +168,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-lime-400 bg-gradient-to-br from-lime-200 to-green-200 text-lime-900 dark:border-lime-600 dark:from-lime-800/80 dark:to-green-800/80 dark:text-lime-100",
       cardTop: "border-t-lime-500 dark:border-t-lime-400",
       cardBg: "bg-gradient-to-br from-lime-50 to-green-50 dark:from-lime-950/30 dark:to-green-950/30",
+      cardBorderIdle: "border-l-lime-500/50 dark:border-l-lime-400/50",
+      cardBorderHover: "border-l-lime-500 dark:border-l-lime-400",
+      cardHoverBg: "bg-lime-50/30 dark:bg-lime-950/20",
     },
     results: {
       bar: "bg-emerald-600 dark:bg-emerald-400",
@@ -154,6 +184,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-emerald-400 bg-gradient-to-br from-emerald-200 to-teal-200 text-emerald-900 dark:border-emerald-600 dark:from-emerald-800/80 dark:to-teal-800/80 dark:text-emerald-100",
       cardTop: "border-t-emerald-500 dark:border-t-emerald-400",
       cardBg: "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30",
+      cardBorderIdle: "border-l-emerald-500/50 dark:border-l-emerald-400/50",
+      cardBorderHover: "border-l-emerald-500 dark:border-l-emerald-400",
+      cardHoverBg: "bg-emerald-50/30 dark:bg-emerald-950/20",
     },
     diff: {
       bar: "bg-fuchsia-600 dark:bg-fuchsia-400",
@@ -167,6 +200,9 @@ export function sectionAccent(key: string): SectionAccent {
         "border-fuchsia-400 bg-gradient-to-br from-fuchsia-200 to-pink-200 text-fuchsia-900 dark:border-fuchsia-600 dark:from-fuchsia-800/80 dark:to-pink-800/80 dark:text-fuchsia-100",
       cardTop: "border-t-fuchsia-500 dark:border-t-fuchsia-400",
       cardBg: "bg-gradient-to-br from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/30 dark:to-pink-950/30",
+      cardBorderIdle: "border-l-fuchsia-500/50 dark:border-l-fuchsia-400/50",
+      cardBorderHover: "border-l-fuchsia-500 dark:border-l-fuchsia-400",
+      cardHoverBg: "bg-fuchsia-50/30 dark:bg-fuchsia-950/20",
     },
   };
 

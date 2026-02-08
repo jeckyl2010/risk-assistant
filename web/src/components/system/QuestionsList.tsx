@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import type { Question } from "@/lib/uiTypes";
 import { QuestionCard } from "./QuestionCard";
 
@@ -33,17 +32,16 @@ export function QuestionsList({
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-      <Card className="border border-zinc-200/40 shadow-md dark:border-zinc-700/40">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-            <Badge variant="secondary">
-              {answeredCount}/{questions.length} answered
-            </Badge>
-          </div>
-          {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-      </Card>
+      {/* Section Header */}
+      <div className="flex items-baseline justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{title}</h2>
+          {description && <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{description}</p>}
+        </div>
+        <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          {answeredCount}/{questions.length} answered
+        </span>
+      </div>
 
       {questions.length === 0 ? (
         <Card>

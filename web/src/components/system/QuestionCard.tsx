@@ -1,10 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Circle, Edit3, Eye, Sparkles } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { MarkdownViewer } from "@/components/ui/markdown-viewer";
@@ -13,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { SENTINEL_VALUES } from "@/lib/constants";
 import { formatIdentifier } from "@/lib/formatting";
 import type { Question } from "@/lib/uiTypes";
-import { sectionAccent } from "../systemEditor/sectionAccent";
 
 interface QuestionCardProps {
   question: Question;
@@ -28,101 +25,97 @@ interface QuestionCardProps {
 export function QuestionCard({ question, value, reason, onChange, onReasonChange, index, domain = "base" }: QuestionCardProps) {
   const isAnswered = value !== null;
   const [isEditingReason, setIsEditingReason] = useState(false);
-  const [justAnswered, setJustAnswered] = useState(false);
   const hasReason = typeof reason === "string" && reason.trim().length > 0;
-  const accent = sectionAccent(domain);
 
-  const handleChange = (newValue: unknown) => {
-    const wasUnanswered = value === null;
-    onChange(newValue);
-    if (wasUnanswered && newValue !== null) {
-      setJustAnswered(true);
-      setTimeout(() => setJustAnswered(false), 1000);
-    }
+  // Domain-specific color mappings
+  const domainColors = {
+    base: {
+      answered:
+        "border-l-slate-400/50 hover:border-l-slate-500 hover:bg-slate-50/30 dark:border-l-slate-500/50 dark:hover:border-l-slate-400 dark:hover:bg-slate-900/20",
+      unanswered:
+        "border-l-transparent hover:border-l-slate-500 hover:bg-slate-50/30 dark:hover:border-l-slate-400 dark:hover:bg-slate-900/20",
+    },
+    ai: {
+      answered:
+        "border-l-violet-500/50 hover:border-l-violet-500 hover:bg-violet-50/30 dark:border-l-violet-400/50 dark:hover:border-l-violet-400 dark:hover:bg-violet-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-violet-500 hover:bg-violet-50/30 dark:hover:border-l-violet-400 dark:hover:bg-violet-950/20",
+    },
+    cost: {
+      answered:
+        "border-l-lime-500/50 hover:border-l-lime-500 hover:bg-lime-50/30 dark:border-l-lime-400/50 dark:hover:border-l-lime-400 dark:hover:bg-lime-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-lime-500 hover:bg-lime-50/30 dark:hover:border-l-lime-400 dark:hover:bg-lime-950/20",
+    },
+    criticality: {
+      answered:
+        "border-l-amber-500/50 hover:border-l-amber-500 hover:bg-amber-50/30 dark:border-l-amber-400/50 dark:hover:border-l-amber-400 dark:hover:bg-amber-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-amber-500 hover:bg-amber-50/30 dark:hover:border-l-amber-400 dark:hover:bg-amber-950/20",
+    },
+    data: {
+      answered:
+        "border-l-cyan-500/50 hover:border-l-cyan-500 hover:bg-cyan-50/30 dark:border-l-cyan-400/50 dark:hover:border-l-cyan-400 dark:hover:bg-cyan-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-cyan-500 hover:bg-cyan-50/30 dark:hover:border-l-cyan-400 dark:hover:bg-cyan-950/20",
+    },
+    integration: {
+      answered:
+        "border-l-sky-500/50 hover:border-l-sky-500 hover:bg-sky-50/30 dark:border-l-sky-400/50 dark:hover:border-l-sky-400 dark:hover:bg-sky-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-sky-500 hover:bg-sky-50/30 dark:hover:border-l-sky-400 dark:hover:bg-sky-950/20",
+    },
+    operations: {
+      answered:
+        "border-l-teal-500/50 hover:border-l-teal-500 hover:bg-teal-50/30 dark:border-l-teal-400/50 dark:hover:border-l-teal-400 dark:hover:bg-teal-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-teal-500 hover:bg-teal-50/30 dark:hover:border-l-teal-400 dark:hover:bg-teal-950/20",
+    },
+    security: {
+      answered:
+        "border-l-rose-500/50 hover:border-l-rose-500 hover:bg-rose-50/30 dark:border-l-rose-400/50 dark:hover:border-l-rose-400 dark:hover:bg-rose-950/20",
+      unanswered:
+        "border-l-transparent hover:border-l-rose-500 hover:bg-rose-50/30 dark:hover:border-l-rose-400 dark:hover:bg-rose-950/20",
+    },
   };
 
+  const colors = domainColors[domain as keyof typeof domainColors] || domainColors.base;
+
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} layout>
-      <motion.div
-        whileHover={{ scale: 1.01, y: -2 }}
-        whileTap={{ scale: 0.99 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+      <Card
+        className={`group border-l-4 transition-all hover:shadow-md ${
+          isAnswered
+            ? `${colors.answered} border-zinc-300 bg-zinc-50/50 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/50`
+            : `${colors.unanswered} border-amber-200 bg-amber-50/20 dark:border-amber-900/50 dark:bg-amber-950/10`
+        }`}
       >
-        <Card
-          className={`group relative overflow-hidden transition-all duration-300 ${
-            isAnswered
-              ? `${accent.cardBg} shadow-lg ring-1 ring-offset-2 ring-zinc-200 dark:ring-zinc-700 ring-offset-white dark:ring-offset-zinc-950`
-              : "border-zinc-200/40 bg-white/70 dark:border-zinc-700/40 dark:bg-zinc-900/70 shadow-sm hover:shadow-md"
-          }`}
-        >
-          {/* Answered celebration effect */}
-          <AnimatePresence>
-            {justAnswered && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute top-4 right-4 z-10"
-              >
-                <Sparkles className="h-6 w-6 text-yellow-500" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Progress indicator bar */}
-          {isAnswered && (
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              className={`absolute top-0 left-0 right-0 h-1 ${accent.bar} origin-left`}
-            />
-          )}
-
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 space-y-1">
-                <div className="flex items-start gap-2">
-                  <motion.div
-                    animate={{
-                      scale: isAnswered ? [1, 1.2, 1] : 1,
-                      rotate: isAnswered ? [0, 5, -5, 0] : 0,
-                    }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    {isAnswered ? (
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                      <Circle className="h-5 w-5 mt-0.5 shrink-0 text-zinc-400 dark:text-zinc-600" />
-                    )}
-                  </motion.div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-50 group-hover:text-zinc-950 dark:group-hover:text-zinc-100 transition-colors">
-                      {question.text}
-                    </h3>
-                    {question.description && (
-                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{question.description}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <motion.div
-                animate={{
-                  scale: isAnswered ? 1 : 0.95,
-                }}
-              >
-                <Badge variant={isAnswered ? "success" : "warning"} className="shadow-sm">
-                  {isAnswered ? "Answered" : "Pending"}
-                </Badge>
-              </motion.div>
+        <CardContent className="p-5">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 shrink-0">
+              {isAnswered ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Circle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+              )}
             </div>
 
-            <div className="mt-4 space-y-3">
+            <div className="flex-1 space-y-4">
+              {/* Question */}
+              <div>
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">{question.text}</h3>
+                {question.description && (
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{question.description}</p>
+                )}
+              </div>
+
+              {/* Answer Input */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Answer</Label>
                 {question.type === "bool" ? (
                   <Select
                     value={value === true ? "true" : value === false ? "false" : SENTINEL_VALUES.UNSET}
-                    onValueChange={(v) => handleChange(v === SENTINEL_VALUES.UNSET ? null : v === "true")}
+                    onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v === "true")}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an answer" />
@@ -136,7 +129,7 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
                 ) : question.type === "enum" && question.allowed ? (
                   <Select
                     value={typeof value === "string" ? value : SENTINEL_VALUES.UNSET}
-                    onValueChange={(v) => handleChange(v === SENTINEL_VALUES.UNSET ? null : v)}
+                    onValueChange={(v) => onChange(v === SENTINEL_VALUES.UNSET ? null : v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an answer" />
@@ -171,9 +164,9 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
                                 newSet.delete(option);
                               }
                               const newArr = Array.from(newSet).sort();
-                              handleChange(newArr.length > 0 ? newArr : null);
+                              onChange(newArr.length > 0 ? newArr : null);
                             }}
-                            className="h-4 w-4 rounded border-zinc-300 bg-white text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:focus:ring-zinc-50"
+                            className="h-4 w-4 rounded border-zinc-300 bg-white text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-indigo-400 dark:focus:ring-indigo-400"
                           />
                           <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                             {formatIdentifier(option)}
@@ -185,50 +178,42 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
                 ) : null}
               </div>
 
-              <AnimatePresence mode="wait">
+              {/* Reason Field - Show when answered */}
+              <AnimatePresence>
                 {isAnswered && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
+                    className="space-y-2"
                   >
-                    <div className="flex items-center justify-between">
-                      <Label>
-                        Reason (optional)
-                        <span className="text-xs text-zinc-500 ml-1">• Markdown supported</span>
-                      </Label>
-                      {hasReason && (
-                        <Button
+                    <Label className="text-sm font-medium">
+                      Reason (optional)
+                      {!isEditingReason && hasReason && (
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setIsEditingReason(!isEditingReason)}
-                          className="h-7 px-2 gap-1.5"
+                          onClick={() => setIsEditingReason(true)}
+                          className="ml-2 text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
-                          {isEditingReason ? (
-                            <>
-                              <Eye className="h-3.5 w-3.5" />
-                              Preview
-                            </>
-                          ) : (
-                            <>
-                              <Edit3 className="h-3.5 w-3.5" />
-                              Edit
-                            </>
-                          )}
-                        </Button>
+                          Edit
+                        </button>
                       )}
-                    </div>
+                    </Label>
                     {!hasReason || isEditingReason ? (
-                      <Textarea
-                        value={typeof reason === "string" ? reason : ""}
-                        onChange={(e) => onReasonChange(e.target.value)}
-                        placeholder="Explain why this answer was chosen... (Markdown supported: **bold**, *italic*, `code`, lists, links, etc.)"
-                        className="min-h-[100px] resize-none font-mono text-xs"
-                      />
+                      <div className="space-y-2">
+                        <Textarea
+                          value={typeof reason === "string" ? reason : ""}
+                          onChange={(e) => onReasonChange(e.target.value)}
+                          onBlur={() => setIsEditingReason(false)}
+                          placeholder="Explain why this answer was chosen... (Markdown supported)"
+                          className="min-h-[80px] resize-none text-sm"
+                          autoFocus={isEditingReason}
+                        />
+                        <p className="text-xs text-zinc-500">Supports Markdown: **bold**, *italic*, `code`, links, lists</p>
+                      </div>
                     ) : (
-                      <div className="rounded-lg border border-zinc-200/50 bg-gradient-to-br from-zinc-50/70 to-white p-4 shadow-sm backdrop-blur dark:border-zinc-700/50 dark:from-zinc-900/70 dark:to-zinc-950">
+                      <div className="rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-4 dark:border-zinc-700/50 dark:bg-zinc-900/50">
                         <MarkdownViewer content={typeof reason === "string" ? reason : ""} />
                       </div>
                     )}
@@ -236,9 +221,9 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
                 )}
               </AnimatePresence>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
