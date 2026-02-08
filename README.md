@@ -7,7 +7,20 @@ Non-goals: scoring, RAG, workshops, approvals.
 
 ## Quick Start
 
-### Backend (Python)
+### One-Command Setup
+
+```powershell
+.\setup.ps1
+```
+
+This installs everything: uv, Bun, Python dependencies, and frontend packages.
+
+### Manual Setup
+
+<details>
+<summary>Click to expand manual installation steps</summary>
+
+#### Backend (Python)
 
 1. Install uv (fast Python package manager):
    ```powershell
@@ -20,21 +33,41 @@ Non-goals: scoring, RAG, workshops, approvals.
    .venv\Scripts\activate  # Windows
    # source .venv/bin/activate  # Linux/Mac
    
-   # Install runtime dependencies
+   # Install all dependencies
    uv pip install -r requirements.txt
-   
-   # Install development tools (Ruff)
    uv pip install -r requirements-dev.txt
-   ```
+   Maintenance
 
-3. Run the evaluation engine:
-   ```bash
-   python tools/riskctl.py evaluate examples/system.example.yaml
-   ```
+**Update all dependencies:**
+```powershell
+.\update.ps1
+```
 
-### Frontend (Web)
+**Code quality:**
+```bash
+# Python (with venv activated)
+ruff check . --fix && ruff format .
 
-See [web/README.md](web/README.md) for Next.js frontend setup.
+# Frontend
+cd web
+bun run check
+details>
+
+### Run the Application
+
+**Backend:**
+```bash
+.venv\Scripts\activate
+python tools/riskctl.py evaluate examples/system.example.yaml
+```
+
+**Frontend:**
+```bash
+cd web
+bun run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ### Code Quality
 
