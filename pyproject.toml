@@ -28,18 +28,21 @@ exclude = [
 [tool.ruff.lint]
 # Enable pycodestyle (E), Pyflakes (F), isort (I), and other recommended rules
 select = [
-    "E",   # pycodestyle errors
-    "F",   # Pyflakes
-    "I",   # isort
-    "N",   # pep8-naming
-    "UP",  # pyupgrade
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "SIM", # flake8-simplify
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "ANN",  # flake8-annotations (type hints)
 ]
 
 # Ignore specific rules if needed
-ignore = []
+ignore = [
+    "ANN401",  # Allow typing.Any for dynamic YAML processing
+]
 
 [tool.ruff.lint.isort]
 # Organize imports

@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
 import argparse
+import logging
 import sys
 from pathlib import Path
+from typing import Any
 
+import structlog
 import yaml
+from pydantic import BaseModel, Field, field_validator
+
+# Configure structured logging
+logger = structlog.get_logger()
+structlog.configure(
+    processors=[
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.dev.ConsoleRenderer(),
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+    cache_logger_on_first_use=False,
+)
 
 DEFAULT_MODEL_DIR = Path("model")
 MODEL_MANIFEST_CANDIDATES = ("model.manifest.yaml", "manifest.yaml")
@@ -12,6 +30,67 @@ MODEL_COMPONENT_DIRS = ("questions", "rules", "controls")
 ALLOWED_ACTIVATION_PHASES = {"design", "pre_go_live", "runtime", "post_go_live"}
 ALLOWED_EVIDENCE_TYPES = {"config", "pipeline", "log", "document"}
 ALLOWED_QUESTION_TYPES = {"bool", "enum", "set"}
+
+
+# Pydantic Models
+class Question(BaseModel):
+    """Question schema definition"""
+
+    id: str
+    type: str
+    prompt: str
+    allowed: list[str] = Field(default_factory=list)
+
+    @field_validator("type")
+    @classmethod
+    def validate_type(cls, v: str) -> str:
+        if v not in ALLOWED_QUESTION_TYPES:
+            raise ValueError(f"type must be one of {ALLOWED_QUESTION_TYPES}")
+        return v
+
+
+class Control(BaseModel):
+    """Control catalog entry"""
+
+    id: str
+    title: str
+    scope: str = "unknown"
+    enforcement_intent: str = "unknown"
+    activation_phase: str | None = None
+    evidence_type: list[str] = Field(default_factory=list)
+
+    @field_validator("activation_phase")
+    @classmethod
+    def validate_activation_phase(cls, v: str | None) -> str | None:
+        if v is not None and v not in ALLOWED_ACTIVATION_PHASES:
+            logger.warning(
+                "invalid_activation_phase", phase=v, allowed=sorted(ALLOWED_ACTIVATION_PHASES)
+            )
+        return v
+
+    @field_validator("evidence_type")
+    @classmethod
+    def validate_evidence_type(cls, v: list[str]) -> list[str]:
+        for evidence in v:
+            if evidence not in ALLOWED_EVIDENCE_TYPES:
+                logger.warning(
+                    "invalid_evidence_type", evidence=evidence, allowed=sorted(ALLOWED_EVIDENCE_TYPES)
+                )
+        return v
+
+
+class Rule(BaseModel):
+    """Control derivation rule"""
+
+    when: dict[str, Any]
+    require: list[str]
+
+
+class Trigger(BaseModel):
+    """Domain activation trigger"""
+
+    when: dict[str, Any]
+    activate: list[str]
 
 
 def model_paths(model_dir: Path) -> dict[str, Path]:
@@ -31,7 +110,8 @@ def model_paths(model_dir: Path) -> dict[str, Path]:
     }
 
 
-def deep_get(d, path: str):
+def deep_get(d: dict[str, Any], path: str) -> Any:
+    """Get nested dictionary value by dot-separated path"""
     cur = d
     for p in path.split("."):
         if not isinstance(cur, dict) or p not in cur:
@@ -40,7 +120,7 @@ def deep_get(d, path: str):
     return cur
 
 
-def matches_condition(facts: dict, cond: dict) -> bool:
+def matches_condition(facts: dict[str, Any], cond: dict[str, Any]) -> bool:
     """
     Condition keys can be:
       - "base_key"  (shorthand for base.base_key)
@@ -60,25 +140,30 @@ def matches_condition(facts: dict, cond: dict) -> bool:
     return True
 
 
-def load_yaml(path: Path) -> dict:
+def load_yaml(path: Path) -> dict[str, Any]:
+    """Load and parse YAML file"""
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def warn(msg: str):
+def warn(msg: str) -> None:
+    """Log warning message (wrapper for backward compatibility)"""
+    logger.warning("validation_warning", message=msg)
     print(f"WARN: {msg}", file=sys.stderr)
 
 
-def info(msg: str):
+def info(msg: str) -> None:
+    """Log info message (wrapper for backward compatibility)"""
+    logger.info("info", message=msg)
     print(msg)
 
 
-def read_model_manifest(model_dir: Path) -> dict:
+def read_model_manifest(model_dir: Path) -> dict[str, Any]:
     for name in MODEL_MANIFEST_CANDIDATES:
         p = model_dir / name
         if p.exists():
             doc = load_yaml(p)
             if not isinstance(doc, dict):
-                warn(f"model manifest: expected object in {p}")
+                logger.warning("model_manifest_not_object", file=str(p))
                 return {}
             return doc
     return {}
@@ -92,7 +177,7 @@ def get_model_version(model_dir: Path) -> str:
     return "(unknown)"
 
 
-def validate_model_component_headers(model_dir: Path):
+def validate_model_component_headers(model_dir: Path) -> None:
     """Validate that model component YAMLs use schema_version (not version).
 
     This is intentionally warning-only to keep the tool lightweight and non-blocking.
@@ -126,13 +211,14 @@ def validate_model_component_headers(model_dir: Path):
                     warn(f"model: {p} schema_version should be number or string")
 
 
-def load_questions_index(path: Path) -> dict[str, dict]:
+def load_questions_index(path: Path) -> dict[str, dict[str, Any]]:
+    """Load questions from a YAML file and index by question ID"""
     if not path.exists():
         return {}
     doc = load_yaml(path)
     questions = doc.get("questions", [])
     if not isinstance(questions, list):
-        warn(f"questions schema: expected 'questions' list in {path}")
+        logger.warning("questions_schema_invalid", file=str(path), reason="expected 'questions' list")
         return {}
 
     index: dict[str, dict] = {}
@@ -176,7 +262,7 @@ def list_available_domain_question_files(
     return out
 
 
-def validate_value(scope: str, qid: str, q: dict, value):
+def validate_value(scope: str, qid: str, q: dict[str, Any], value: Any) -> None:
     qtype = q.get("type")
     if qtype not in ALLOWED_QUESTION_TYPES:
         warn(f"questions schema: {scope}.{qid} has unknown type '{qtype}'")
@@ -206,7 +292,7 @@ def validate_value(scope: str, qid: str, q: dict, value):
                 warn(f"facts: {scope}.{qid} contains invalid item '{item}' (allowed: {allowed})")
 
 
-def validate_scope_facts(scope: str, facts_section, questions_index: dict[str, dict]):
+def validate_scope_facts(scope: str, facts_section: dict[str, Any] | None, questions_index: dict[str, dict[str, Any]]) -> None:
     if facts_section is None:
         return
     if not isinstance(facts_section, dict):
@@ -249,12 +335,12 @@ def validate_scope_facts(scope: str, facts_section, questions_index: dict[str, d
 
 
 def validate_facts_against_schemas(
-    facts: dict,
+    facts: dict[str, Any],
     activated_domains: list[str],
     *,
     questions_dir: Path,
     base_questions_file: Path,
-):
+) -> None:
     if not isinstance(facts, dict):
         warn("facts: root should be an object")
         return
@@ -279,7 +365,7 @@ def validate_facts_against_schemas(
             warn(f"facts: activated domain '{domain}' is missing its section")
 
 
-def validate_controls_catalog(catalog_doc: dict):
+def validate_controls_catalog(catalog_doc: dict[str, Any]) -> None:
     controls = catalog_doc.get("controls", [])
     if not isinstance(controls, list):
         warn("controls catalog: expected 'controls' to be a list")
@@ -312,7 +398,7 @@ def validate_controls_catalog(catalog_doc: dict):
                 )
 
 
-def validate_controls_rules(rules_doc: dict, catalog: dict[str, dict]):
+def validate_controls_rules(rules_doc: dict[str, Any], catalog: dict[str, dict[str, Any]]) -> None:
     rules = rules_doc.get("rules", [])
     if not isinstance(rules, list):
         warn("controls rules: expected 'rules' to be a list")
@@ -344,7 +430,8 @@ def collect_base_question_ids(base_questions_file: Path) -> list[str]:
     return [q["id"] for q in doc.get("questions", [])]
 
 
-def derive_activated_domains(facts: dict, triggers_file: Path) -> list[str]:
+def derive_activated_domains(facts: dict[str, Any], triggers_file: Path) -> list[str]:
+    """Determine which domains are activated based on facts and triggers"""
     doc = load_yaml(triggers_file)
     activated = set()
 
@@ -371,12 +458,14 @@ def list_domain_questions(questions_dir: Path, domain: str) -> list[dict]:
 
 
 def derive_controls(
-    facts: dict, *, controls_rules_file: Path, controls_catalog_file: Path
-) -> tuple[dict, dict]:
+    facts: dict[str, Any], *, controls_rules_file: Path, controls_catalog_file: Path
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]]]:
     """
+    Derive which controls apply based on facts and rules.
+    
     Returns:
-      derived: control_id -> list[cond] (why)
-      catalog: control_id -> control metadata
+        derived: control_id -> list[condition] (why this control was triggered)
+        catalog: control_id -> control metadata
     """
     rules_doc = load_yaml(controls_rules_file)
     catalog_doc = load_yaml(controls_catalog_file)
@@ -397,8 +486,8 @@ def derive_controls(
 
 
 def print_required_questions(
-    base_ids: list[str], activated_domains: list[str], facts: dict, *, questions_dir: Path
-):
+    base_ids: list[str], activated_domains: list[str], facts: dict[str, Any], *, questions_dir: Path
+) -> None:
     print("Required questions (progressive disclosure):")
     print("- base:")
     for qid in base_ids:
@@ -422,7 +511,7 @@ def print_required_questions(
     print()
 
 
-def print_activated_domains(activated_domains: list[str]):
+def print_activated_domains(activated_domains: list[str]) -> None:
     print("Activated domains:")
     if not activated_domains:
         print("- (none)")
@@ -432,7 +521,7 @@ def print_activated_domains(activated_domains: list[str]):
     print()
 
 
-def print_activated_domains_with_paths(activated_domains: list[str], questions_dir: Path):
+def print_activated_domains_with_paths(activated_domains: list[str], questions_dir: Path) -> None:
     print("Activated domains:")
     if not activated_domains:
         print("- (none)")
@@ -464,8 +553,10 @@ def missing_required_questions(required: list[str], facts: dict) -> list[str]:
     return missing
 
 
-def evaluate(facts_path: Path, model_dir: Path):
+def evaluate(facts_path: Path, model_dir: Path) -> int:
+    """Evaluate a facts file against a model, deriving controls and validating completeness"""
     if not facts_path.exists():
+        logger.error("facts_file_not_found", path=str(facts_path))
         print(f"Facts file not found: {facts_path}")
         return 2
 
@@ -476,14 +567,21 @@ def evaluate(facts_path: Path, model_dir: Path):
 
     paths = model_paths(model_dir)
     model_version = get_model_version(model_dir)
-    info(f"Model version: {model_version}")
+    logger.info("model_loaded", version=model_version, model_dir=str(model_dir))
+    print(f"Model version: {model_version}")
 
     validate_model_component_headers(model_dir)
 
     pinned = facts.get("model_version")
     if isinstance(pinned, str) and pinned.strip() and pinned.strip() != model_version:
-        warn(
-            f"facts: model_version '{pinned.strip()}' does not match loaded model '{model_version}'"
+        logger.warning(
+            "model_version_mismatch",
+            facts_version=pinned.strip(),
+            loaded_version=model_version,
+        )
+        print(
+            f"WARN: facts model_version '{pinned.strip()}' does not match loaded model '{model_version}'",
+            file=sys.stderr,
         )
 
     # 1) Base + triggers => activated domains
@@ -512,7 +610,7 @@ def evaluate(facts_path: Path, model_dir: Path):
     return 0
 
 
-def diff_models(facts_path: Path, old_model_dir: Path, new_model_dir: Path):
+def diff_models(facts_path: Path, old_model_dir: Path, new_model_dir: Path) -> int:
     if not facts_path.exists():
         print(f"Facts file not found: {facts_path}")
         return 2
@@ -595,7 +693,7 @@ def diff_models(facts_path: Path, old_model_dir: Path, new_model_dir: Path):
     return 0
 
 
-def print_controls(derived: dict, catalog: dict):
+def print_controls(derived: dict[str, list[dict[str, Any]]], catalog: dict[str, dict[str, Any]]) -> None:
     print("Derived controls:")
     if not derived:
         print("- (none)")
@@ -621,7 +719,7 @@ def print_controls(derived: dict, catalog: dict):
     print()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(prog="riskctl.py", add_help=True)
     sub = parser.add_subparsers(dest="cmd", required=True)
 
