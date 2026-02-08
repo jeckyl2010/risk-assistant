@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Loader2, Play, Save } from "lucide-react";
+import { CheckCircle2, Loader2, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +13,6 @@ interface SystemHeaderProps {
   modelVersion: string;
   activatedDomains: string[];
   onSave: () => void;
-  onEvaluate: () => void;
   saveState: SaveState;
   evalState: EvalState;
   derivedControls?: number;
@@ -25,7 +24,6 @@ export function SystemHeader({
   modelVersion,
   activatedDomains,
   onSave,
-  onEvaluate,
   saveState,
   evalState,
   derivedControls,
@@ -57,11 +55,16 @@ export function SystemHeader({
 
           <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-2">
-              <Button onClick={onSave} variant="outline" size="sm" disabled={saveState === "saving"}>
+              <Button onClick={onSave} size="sm" disabled={saveState === "saving" || evalState === "running"}>
                 {saveState === "saving" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Saving…
+                  </>
+                ) : evalState === "running" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Evaluating…
                   </>
                 ) : saveState === "saved" ? (
                   <>
@@ -72,20 +75,6 @@ export function SystemHeader({
                   <>
                     <Save className="h-4 w-4" />
                     Save
-                  </>
-                )}
-              </Button>
-
-              <Button onClick={onEvaluate} size="sm" disabled={evalState === "running"}>
-                {evalState === "running" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Evaluating…
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" />
-                    Evaluate
                   </>
                 )}
               </Button>

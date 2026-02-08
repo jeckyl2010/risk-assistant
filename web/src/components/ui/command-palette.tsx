@@ -2,25 +2,18 @@
 
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
-import { BarChart3, FileText, GitCompare, Home, Play, Save, Search, Shield, Sparkles } from "lucide-react";
+import { BarChart3, FileText, GitCompare, Home, Save, Search, Shield, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 interface CommandPaletteProps {
   systemId?: string;
   onSave?: () => void;
-  onEvaluate?: () => void;
   onNavigate?: (section: string) => void;
   questionSections?: Array<{ key: string; title: string }>;
 }
 
-export function CommandPalette({
-  systemId: _systemId,
-  onSave,
-  onEvaluate,
-  onNavigate,
-  questionSections = [],
-}: CommandPaletteProps) {
+export function CommandPalette({ systemId: _systemId, onSave, onNavigate, questionSections = [] }: CommandPaletteProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -134,32 +127,18 @@ export function CommandPalette({
                 )}
 
                 {/* Actions */}
-                {(onSave || onEvaluate) && (
+                {onSave && (
                   <Command.Group heading="Actions" className="text-xs font-medium text-zinc-500 px-3 py-2">
-                    {onSave && (
-                      <Command.Item
-                        onSelect={() => handleSelect(onSave)}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-green-500 aria-selected:text-white cursor-pointer"
-                      >
-                        <Save className="h-4 w-4" />
-                        <span>Save System</span>
-                        <kbd className="ml-auto rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                          ⌘S
-                        </kbd>
-                      </Command.Item>
-                    )}
-                    {onEvaluate && (
-                      <Command.Item
-                        onSelect={() => handleSelect(onEvaluate)}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-purple-500 aria-selected:text-white cursor-pointer"
-                      >
-                        <Play className="h-4 w-4" />
-                        <span>Run Evaluation</span>
-                        <kbd className="ml-auto rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                          ⌘E
-                        </kbd>
-                      </Command.Item>
-                    )}
+                    <Command.Item
+                      onSelect={() => handleSelect(onSave)}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-green-500 aria-selected:text-white cursor-pointer"
+                    >
+                      <Save className="h-4 w-4" />
+                      <span>Save System</span>
+                      <kbd className="ml-auto rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                        ⌘S
+                      </kbd>
+                    </Command.Item>
                   </Command.Group>
                 )}
               </Command.List>

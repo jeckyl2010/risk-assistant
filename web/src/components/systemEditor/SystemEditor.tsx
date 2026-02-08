@@ -103,16 +103,11 @@ export function SystemEditor({
   const activatedDomains = useMemo(() => deriveActivatedDomainsFromTriggers(facts, triggers), [facts, triggers]);
 
   // Callbacks for API operations
-  const handleSave = useCallback(() => {
-    save(facts);
-  }, [save, facts]);
-
-  const handleEvaluate = useCallback(async () => {
-    const result = await evaluate(facts, model.modelDir);
-    if (result) {
-      setActiveSection(SECTION_IDS.RESULTS);
-    }
-  }, [evaluate, facts, model.modelDir]);
+  const handleSave = useCallback(async () => {
+    await save(facts);
+    // Auto-evaluate after save
+    await evaluate(facts, model.modelDir);
+  }, [save, evaluate, facts, model.modelDir]);
 
   const handleDiff = useCallback(
     async (oldModelDir: string, newModelDir: string) => {
@@ -282,39 +277,28 @@ export function SystemEditor({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      <CommandPalette
-        systemId={id}
-        onSave={handleSave}
-        onEvaluate={handleEvaluate}
-        onNavigate={setActiveSection}
-        questionSections={questionSections}
-      />;
-
+      // Save: Cmd/Ctrl + S (also triggers auto-evaluate)
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
         handleSave();
-      }
-      // Evaluate: Cmd/Ctrl + E
-      if ((e.metaKey || e.ctrlKey) && e.key === "e") {
-        e.preventDefault();
-        handleEvaluate();
       }
     };
 
     document.addEventListener("keydown", handleKeyPress);
     return () => document.removeEventListener("keydown", handleKeyPress);
-  }, [handleSave, handleEvaluate, id, questionSections]);
+  }, [handleSave]);
 
   const currentSection = questionSections.find((s) => s.key === activeSection);
 
   return (
     <div className="flex flex-col gap-6">
+      <CommandPalette systemId={id} onSave={handleSave} onNavigate={setActiveSection} questionSections={questionSections} />
+
       <SystemHeader
         id={id}
         modelVersion={model.modelVersion}
         activatedDomains={activatedDomains}
         onSave={handleSave}
-        onEvaluate={handleEvaluate}
         saveState={mappedSaveState}
         evalState={mappedEvalState}
         derivedControls={evaluateResult?.result.derived_controls.length}
@@ -333,6 +317,16 @@ export function SystemEditor({
             <DescriptionSection
               description={typeof facts.description === "string" ? facts.description : ""}
               onChange={handleDescriptionChange}
+              stats={{
+                totalQuestions: questionSections.reduce((sum, s) => sum + s.questions.length, 0),
+                answeredQuestions: Object.values(questionProgress).reduce((sum, p) => sum + p.answered, 0),
+                derivedControls: evaluateResult?.result.derived_controls.length,
+                domainProgress: questionSections.map((s) => ({
+                  domain: s.title,
+                  answered: questionProgress[s.key]?.answered ?? 0,
+                  total: questionProgress[s.key]?.total ?? 0,
+                })),
+              }}
             />
           )}
 
