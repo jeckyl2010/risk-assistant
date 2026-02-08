@@ -55,6 +55,13 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 - Use Tailwind utilities over custom CSS
 - Follow established typography hierarchy (text-5xl → text-3xl → text-2xl → text-xl → text-lg → base)
 
+## Automation Preferences
+
+- **Automate repetitive tasks** — write scripts instead of documenting manual steps
+- **One command per task** — setup, update, install should each be a single script
+- **PowerShell for tooling** — project uses `.ps1` scripts for cross-platform Windows/Linux/Mac support
+- **Hide complexity** — manual steps go in collapsible sections, automation goes first
+
 ## When Making Suggestions
 
 - Assume the maintainer knows what they're doing, but might miss edge cases
