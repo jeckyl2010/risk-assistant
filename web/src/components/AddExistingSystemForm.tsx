@@ -6,51 +6,48 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { motion } from 'framer-motion'
-import { Plus, Loader2 } from 'lucide-react'
+import { FolderPlus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const formSchema = z.object({
-  id: z.string()
-    .min(1, 'System ID is required')
-    .regex(/^[a-zA-Z0-9-_]+$/, 'Only letters, numbers, dashes, and underscores allowed'),
-  path: z.string().optional()
+  path: z.string().min(1, 'File path is required')
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export function NewSystemForm() {
-  const [isCreating, setIsCreating] = useState(false)
+export function AddExistingSystemForm() {
+  const [isAdding, setIsAdding] = useState(false)
   const router = useRouter()
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      path: ''
-    }
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(formSchema)
   })
-  
-  const systemId = watch('id')
-  const defaultPath = systemId ? `./systems/${systemId}.yaml` : './systems/[SystemID].yaml'
 
   async function onSubmit(data: FormData) {
-    setIsCreating(true)
+    setIsAdding(true)
     try {
-      const res = await fetch('/api/systems', {
+      const res = await fetch('/api/systems/add', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(data),
       })
-      if (!res.ok) throw new Error(`Failed: ${res.status}`)
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || `Failed: ${res.status}`)
+      }
+      
       const json = (await res.json()) as { id: string }
-      toast.success('System created successfully!')
+      toast.success('System added to portfolio!')
+      router.refresh()
       router.push(`/systems/${encodeURIComponent(json.id)}`)
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : 'Failed to create system')
+      toast.error(e instanceof Error ? e.message : 'Failed to add system')
     } finally {
-      setIsCreating(false)
+      setIsAdding(false)
     }
   }
 
@@ -63,55 +60,46 @@ export function NewSystemForm() {
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
-          <Label htmlFor="system-id">System ID</Label>
+          <Label htmlFor="system-path">
+            Existing System File Path
+          </Label>
           <Input
-            id="system-id"
-            {...register('id')}
-            placeholder="e.g. shopfloor-analytics"
-            disabled={isCreating}
+            id="system-path"
+            {...register('path')}
+            placeholder="./systems/MySystem.yaml or C:\Repos\team-systems\MySystem.yaml"
+            disabled={isAdding}
           />
-          {errors.id && (
+          {errors.path && (
             <motion.p
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-sm text-red-600 dark:text-red-400"
             >
-              {errors.id.message}
+              {errors.path.message}
             </motion.p>
           )}
-        </div>
-        
-        <div className="flex flex-1 flex-col gap-2">
-          <Label htmlFor="system-path">
-            File Path <span className="text-sm font-normal text-gray-500">(optional)</span>
-          </Label>
-          <Input
-            id="system-path"
-            {...register('path')}
-            placeholder={defaultPath}
-            disabled={isCreating}
-          />
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            Relative (./systems/...) or absolute (C:\Repos\...). Defaults to ./systems/{'{SystemID}'}.yaml
+            Path to an existing system YAML file. Relative or absolute paths supported.
           </p>
         </div>
       </div>
       
       <Button
         type="submit"
-        disabled={isCreating}
+        disabled={isAdding}
+        variant="outline"
         className="self-start"
         size="default"
       >
-        {isCreating ? (
+        {isAdding ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Creating…
+            Adding…
           </>
         ) : (
           <>
-            <Plus className="h-4 w-4" />
-            Create System
+            <FolderPlus className="h-4 w-4" />
+            Add to Portfolio
           </>
         )}
       </Button>

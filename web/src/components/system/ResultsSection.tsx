@@ -44,6 +44,32 @@ interface ResultsSectionProps {
   onNavigateToSection: (sectionKey: string) => void
 }
 
+// Helper to determine control status and semantic colors
+function getControlStatus(control: DerivedControl) {
+  const requiresEvidence = control.evidence_type && control.evidence_type.length > 0
+  const hasEvidenceProvided = control.references && control.references.length > 0
+  const isMandatory = control.enforcement_intent === 'mandatory' || control.enforcement_intent === 'required'
+  const isRecommended = control.enforcement_intent === 'recommended' || control.enforcement_intent === 'suggested'
+  
+  // Control requires evidence but none provided yet
+  if (requiresEvidence && !hasEvidenceProvided) {
+    return {
+      status: 'Pending Evidence',
+      statusColor: 'border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:bg-amber-950/50',
+      borderColor: isMandatory ? 'border-red-300 dark:border-red-700' : isRecommended ? 'border-amber-300 dark:border-amber-700' : 'border-blue-300 dark:border-blue-700'
+    }
+  }
+  
+  // Control has evidence provided or doesn't require evidence
+  return {
+    status: 'Active',
+    statusColor: 'border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/50',
+    borderColor: requiresEvidence && hasEvidenceProvided 
+      ? 'border-green-300 dark:border-green-700'  // Evidence provided = green
+      : isMandatory ? 'border-red-300 dark:border-red-700' : 'border-green-300 dark:border-green-700'
+  }
+}
+
 export function ResultsSection({
   derivedControls,
   requiredQuestions,
@@ -130,7 +156,7 @@ export function ResultsSection({
     >
       {/* Missing Questions */}
       {missingQuestions.length > 0 ? (
-        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 shadow-md dark:from-amber-950/30 dark:to-orange-950/30">
+        <Card className="border-amber-300 bg-amber-50 shadow-md dark:border-amber-700 dark:bg-amber-950/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl font-semibold text-amber-900 dark:text-amber-100">
               <AlertCircle className="h-5 w-5" />
@@ -186,7 +212,7 @@ export function ResultsSection({
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 shadow-md dark:from-emerald-950/30 dark:to-teal-950/30">
+        <Card className="border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/30">
           <CardContent className="flex items-center gap-3 p-4">
             <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
             <span className="font-medium text-green-900 dark:text-green-100">
@@ -438,6 +464,7 @@ export function ResultsSection({
                   <div className="space-y-2">
                     {filteredControls.map((control, index) => {
                       const isExpanded = expandedControls.includes(control.id)
+                      const { status, statusColor, borderColor } = getControlStatus(control)
                       return (
                         <motion.div
                           key={control.id}
@@ -448,17 +475,28 @@ export function ResultsSection({
                           transition={{ delay: Math.min(index * 0.03, 0.3) }}
                         >
                           <Card
-                            className="cursor-pointer border-2 border-transparent shadow-sm transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-lg dark:hover:border-indigo-700 dark:hover:bg-indigo-950/20"
+                            className={`cursor-pointer border-2 shadow-sm transition-all duration-200 ${borderColor} hover:scale-[1.02] hover:shadow-2xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:-translate-y-0.5`}
                             onClick={() => toggleExpanded(control.id)}
                           >
                             <CardContent className="p-4">
                               {/* Compact Header */}
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <Badge variant="outline" className="shrink-0 font-mono text-xs">
                                       {control.id}
                                     </Badge>
+                                    {status === 'Pending Evidence' ? (
+                                      <InfoTooltip content="This control requires evidence (logs, configs, test results, etc.). Add Implementation references below with links to where your evidence lives (Azure DevOps work items, Confluence docs, CI/CD reports, etc.).">
+                                        <Badge className={`shrink-0 text-xs ${statusColor}`}>
+                                          {status}
+                                        </Badge>
+                                      </InfoTooltip>
+                                    ) : (
+                                      <Badge className={`shrink-0 text-xs ${statusColor}`}>
+                                        {status}
+                                      </Badge>
+                                    )}
                                     <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                                       {control.title}
                                     </h3>
@@ -513,6 +551,23 @@ export function ResultsSection({
                                         )}
                                       </div>
 
+                                      {/* Helper callout for controls needing evidence but missing references */}
+                                      {control.evidence_type && control.evidence_type.length > 0 && (!control.references || control.references.length === 0) && (
+                                        <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/50">
+                                          <div className="flex items-start gap-2">
+                                            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                                            <div className="text-xs">
+                                              <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">Evidence Required</p>
+                                              <p className="text-amber-800 dark:text-amber-200">
+                                                This control needs <span className="font-semibold">{control.evidence_type.map(formatEvidenceType).join(', ')}</span>. 
+                                                Edit the system YAML file to add <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">references</code> linking to where your evidence lives 
+                                                (Azure DevOps work items, Confluence docs, CI/CD test reports, config repos, etc.).
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
                                       {control.because && control.because.length > 0 && (
                                         <div>
                                           <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
@@ -527,7 +582,7 @@ export function ResultsSection({
                                               {control.because.map((fact, i) => (
                                                 <div key={i} className="flex items-center">
                                                   <div className="group relative">
-                                                    <div className="rounded-lg border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:from-indigo-950/50 dark:to-blue-950/50">
+                                                    <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:bg-indigo-950/50">
                                                       {Object.entries(fact).map(([key, val], idx) => (
                                                         <div key={idx} className="flex items-center gap-1.5 text-xs">
                                                           <span className="font-semibold text-indigo-700 dark:text-indigo-300">
@@ -556,7 +611,7 @@ export function ResultsSection({
                                               </div>
                                               
                                               {/* Control Node */}
-                                              <div className="rounded-lg border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:from-emerald-950/50 dark:to-teal-950/50">
+                                              <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:bg-emerald-950/50">
                                                 <div className="flex items-center gap-2">
                                                   <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                                   <span className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">
@@ -572,8 +627,9 @@ export function ResultsSection({
                                       {/* Implementation References */}
                                       {control.references && control.references.length > 0 && (
                                         <div>
-                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2">
-                                            Implementation
+                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2 flex items-center gap-2">
+                                            Implementation & Evidence
+                                            <InfoTooltip content="Link to requirements, work items, test results, documentation, and other evidence that demonstrates this control is implemented and working." />
                                           </div>
                                           <div className="space-y-1.5">
                                             {control.references.map((ref, i) => {
@@ -584,14 +640,12 @@ export function ResultsSection({
                                               const typeColors: Record<string, string> = {
                                                 requirement: 'border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30',
                                                 work_item: 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30',
-                                                test: 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/30',
                                                 documentation: 'border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30',
                                               }
                                               
                                               const typeBadgeColors: Record<string, string> = {
                                                 requirement: 'border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300',
                                                 work_item: 'border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300',
-                                                test: 'border-emerald-300 text-emerald-700 dark:border-emerald-600 dark:text-emerald-300',
                                                 documentation: 'border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300',
                                               }
                                               

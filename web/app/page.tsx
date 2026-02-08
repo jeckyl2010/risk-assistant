@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { buildPortfolio } from '@/lib/portfolio'
 import { NewSystemForm } from '@/components/NewSystemForm'
+import { AddExistingSystemForm } from '@/components/AddExistingSystemForm'
 import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
 import { PortfolioTable } from '@/components/portfolio/PortfolioTable'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Shield, FileCheck, Activity } from 'lucide-react'
+import { Shield, FileCheck, Activity, FolderPlus } from 'lucide-react'
 import { NoSystemsEmpty } from '@/components/ui/empty-state'
 
 export default async function Home() {
@@ -70,7 +71,7 @@ export default async function Home() {
       </div>
 
       {/* Create New System Card */}
-      <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20">
+      <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl font-semibold text-indigo-900 dark:text-indigo-100">
             <FileCheck className="h-6 w-6" />
@@ -85,9 +86,25 @@ export default async function Home() {
         </CardContent>
       </Card>
 
+      {/* Add Existing System Card */}
+      <Card className="border-2 border-dashed border-purple-200 dark:border-purple-900">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl font-semibold text-purple-900 dark:text-purple-100">
+            <FolderPlus className="h-6 w-6" />
+            Add Existing System
+          </CardTitle>
+          <CardDescription>
+            Add a system file that already exists on your filesystem to the portfolio
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AddExistingSystemForm />
+        </CardContent>
+      </Card>
+
       {/* Portfolio Table */}
       <Card className="overflow-hidden shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+        <CardHeader className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
           <CardTitle className="flex items-center gap-2 text-xl font-semibold">
             <Activity className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             Portfolio

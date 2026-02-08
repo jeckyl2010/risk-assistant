@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, Trash2 } from 'lucide-react'
+import { Trash2, FolderMinus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 type PortfolioRow = {
@@ -18,9 +18,36 @@ type PortfolioRow = {
 export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [removingId, setRemovingId] = useState<string | null>(null)
+
+  const handleRemove = async (id: string) => {
+    if (!confirm(`Remove "${id}" from portfolio? The system file will not be deleted.`)) {
+      return
+    }
+
+    setRemovingId(id)
+    try {
+      const res = await fetch('/api/systems/remove', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to remove system from portfolio')
+      }
+
+      router.refresh()
+    } catch (error) {
+      console.error('Remove error:', error)
+      alert('Failed to remove system from portfolio. Please try again.')
+      setRemovingId(null)
+    }
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(`Are you sure you want to delete "${id}"? This action cannot be undone.`)) {
+    const msg = `Delete "${id}"? This will DELETE THE FILE and remove it from the portfolio. This action cannot be undone.`
+    if (!confirm(msg)) {
       return
     }
 
@@ -92,20 +119,23 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                 {r.activatedDomains || '—'}
               </td>
               <td className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-2 opacity-0 transition-all group-hover:opacity-100">
-                  <Link
-                    href={`/systems/${encodeURIComponent(r.id)}`}
-                    className="inline-flex items-center gap-1 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleRemove(r.id)}
+                    disabled={removingId === r.id || deletingId === r.id}
+                    className="h-8 gap-1.5 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30 dark:hover:text-amber-300"
                   >
-                    Open
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                    <FolderMinus className="h-3.5 w-3.5" />
+                    {removingId === r.id ? 'Removing...' : 'Remove'}
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(r.id)}
-                    disabled={deletingId === r.id}
-                    className="h-8 gap-1 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
+                    disabled={deletingId === r.id || removingId === r.id}
+                    className="h-8 gap-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     {deletingId === r.id ? 'Deleting...' : 'Delete'}

@@ -7,8 +7,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => ({}))) as { id?: string }
+  const body = (await request.json().catch(() => ({}))) as { id?: string; path?: string }
   const id = sanitizeSystemId(body.id ?? 'system')
-  const created = await createSystem(id)
+  const created = await createSystem(id, body.path)
   return NextResponse.json({ id: created.id })
 }

@@ -39,7 +39,7 @@ function StatsCard({ title, value, description, icon, trend, delay }: StatsCardP
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
     >
-      <Card className="overflow-hidden border-zinc-200/60 bg-gradient-to-br from-white to-zinc-50 dark:border-zinc-800/60 dark:from-zinc-900 dark:to-zinc-950 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <Card className="overflow-hidden border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-md hover:shadow-xl transition-shadow duration-300">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -54,7 +54,7 @@ function StatsCard({ title, value, description, icon, trend, delay }: StatsCardP
               </div>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">{description}</p>
             </div>
-            <div className="rounded-lg bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 p-3 shadow-inner">
+            <div className="rounded-lg bg-zinc-100 dark:bg-zinc-800 p-3 shadow-inner">
               <div className="text-zinc-600 dark:text-zinc-400">
                 {icon}
               </div>
@@ -268,7 +268,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           transition={{ delay: 0.6 }}
         >
           <Card className="overflow-hidden shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+            <CardHeader className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                 <Network className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Domain Coverage Matrix

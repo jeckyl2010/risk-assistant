@@ -1,6 +1,7 @@
 schema_version: 1.0
 # Optional linking of controls to implementation artifacts
 # Links are loose references - can point to local files, URLs, or work items
+# These links serve as evidence that controls are implemented and working
 links:
   # Example: Linking a security control to implementation artifacts
   - control_id: SEC-SBD-001
@@ -12,6 +13,10 @@ links:
       - type: work_item
         ref: "https://dev.azure.com/yourorg/project/_workitems/edit/12345"
         description: "Implement threat modeling review process"
+        
+      - type: documentation
+        ref: "https://confluence.example.com/display/SEC/Threat+Model+2024"
+        description: "Completed threat model with mitigation strategies"
 
   # Example: Linking IAM control
   - control_id: IAM-STRONG-001
@@ -25,5 +30,111 @@ links:
         description: "Configure service principal authentication"
         
       - type: documentation
-        ref: "docs/operations/entra-id-setup.md"
+        ref: "https://confluence.example.com/display/OPS/Entra-ID-Setup"
         description: "Operations guide for Entra ID configuration"
+
+  # AI Governance Control - showing document evidence
+  - control_id: AI-GOV-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/AI/ML+Governance+Framework"
+        description: "AI/ML governance framework covering ownership, validation procedures, and monitoring approach"
+        
+      - type: work_item
+        ref: "https://dev.azure.com/manufacturing/ai-platform/_workitems/edit/45678"
+        description: "Implement AI model registry and approval workflow"
+        
+      - type: requirement
+        ref: "https://dev.azure.com/manufacturing/ai-platform/_git/ai-governance/pullrequest/234"
+        description: "AI governance policy as code (approved and merged)"
+
+  # Human-in-the-Loop Control - document evidence
+  - control_id: AI-HITL-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/AI/HITL+Process+Guide"
+        description: "Human oversight procedures for AI-driven decisions affecting people's rights"
+        
+      - type: requirement
+        ref: "docs/requirements/ai-oversight-requirements.md"
+        description: "Requirements for human review checkpoints and override mechanisms"
+
+  # Cost Guardrails - config and log evidence
+  - control_id: COST-GUARD-001
+    references:
+      - type: work_item
+        ref: "https://dev.azure.com/manufacturing/platform/_workitems/edit/67890"
+        description: "Deploy cost monitoring dashboards and alerts"
+        
+      - type: documentation
+        ref: "https://confluence.example.com/display/FINOPS/Azure+Cost+Guardrails"
+        description: "FinOps documentation covering budgets, quotas, and escalation procedures"
+
+  # Criticality Controls - document evidence for compliance
+  - control_id: CRIT-AI-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/ARCH/C0-AI-Safe-Fallback-Design"
+        description: "Architecture decision record documenting AI fallback mechanisms and manual override capability"
+        
+      - type: requirement
+        ref: "docs/architecture/criticality-ai-requirements.md"
+        description: "Requirements ensuring AI/ML is not in control path for C0 systems"
+
+  - control_id: CRIT-CONN-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/ARCH/WAN-Independence-Design"
+        description: "System architecture showing local operation capability without WAN/cloud connectivity"
+        
+      - type: requirement
+        ref: "docs/architecture/network-independence-requirements.md"
+        description: "Requirements for offline operation during WAN/cloud outages"
+
+  - control_id: CRIT-DECL-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/CRIT/Criticality-Classification-Guide"
+        description: "Manufacturing criticality classification with evidence of C0 designation"
+        
+      - type: requirement
+        ref: "docs/governance/criticality-assessment-2024.pdf"
+        description: "Formal criticality assessment report with business impact analysis"
+
+  # Observability Control - config and log evidence
+  - control_id: OPS-OBS-001
+    references:
+      - type: documentation
+        ref: "https://grafana.example.com/d/ops-dashboard/production-observability"
+        description: "Production observability dashboard (metrics, logs, traces)"
+        
+      - type: work_item
+        ref: "https://dev.azure.com/manufacturing/platform/_workitems/edit/34567"
+        description: "Configure alerting for critical service SLOs"
+
+  # Data Encryption Control - config evidence
+  - control_id: DATA-ENC-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/SEC/Encryption+Standards"
+        description: "Encryption standards and key management procedures"
+        
+      - type: work_item
+        ref: "https://dev.azure.com/manufacturing/security/_workitems/edit/23456"
+        description: "Enable TDE on SQL databases and configure Key Vault integration"
+
+  # Disaster Recovery Control - document evidence
+  - control_id: OPS-DR-001
+    references:
+      - type: documentation
+        ref: "https://confluence.example.com/display/OPS/DR+Plan+2024"
+        description: "Disaster recovery plan with RTO/RPO definitions and runbook procedures"
+        
+      - type: requirement
+        ref: "docs/operations/dr-requirements.md"
+        description: "DR requirements including backup frequency and recovery procedures"
+        
+      - type: work_item
+        ref: "https://dev.azure.com/manufacturing/ops/_workitems/edit/56789"
+        description: "Automate DR failover testing in staging environment"
+
