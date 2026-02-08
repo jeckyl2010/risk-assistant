@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import yaml from "js-yaml";
 
 export async function loadYamlFile<T = unknown>(filePath: string): Promise<T> {

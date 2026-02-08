@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export function AutoGrowTextArea({
   value,
@@ -17,16 +17,17 @@ export function AutoGrowTextArea({
 }) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
-  const resize = () => {
+  const resize = useCallback(() => {
     const el = ref.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
-  };
+  }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to resize when value changes externally
   useEffect(() => {
     resize();
-  }, [value]);
+  }, [resize, value]);
 
   return (
     <textarea

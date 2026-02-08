@@ -53,6 +53,7 @@ export function KeyboardShortcutHint() {
             <div className="absolute inset-0 bg-grid-white/10" />
 
             <button
+              type="button"
               onClick={handleDismiss}
               className="absolute top-2 right-2 rounded-full p-1 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             >
@@ -66,11 +67,8 @@ export function KeyboardShortcutHint() {
               <div>
                 <div className="font-semibold text-sm">Pro tip!</div>
                 <div className="text-xs text-indigo-100">
-                  Press{" "}
-                  <kbd className="mx-1 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs backdrop-blur">
-                    ⌘K
-                  </kbd>{" "}
-                  for quick actions
+                  Press <kbd className="mx-1 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs backdrop-blur">⌘K</kbd> for
+                  quick actions
                 </div>
               </div>
             </div>

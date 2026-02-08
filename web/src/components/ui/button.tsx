@@ -10,14 +10,12 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-zinc-900 text-zinc-50 shadow hover:bg-zinc-800 hover:shadow-md active:scale-[0.98] dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-white",
-        destructive:
-          "bg-red-600 text-white shadow hover:bg-red-700 hover:shadow-md active:scale-[0.98]",
+        destructive: "bg-red-600 text-white shadow hover:bg-red-700 hover:shadow-md active:scale-[0.98]",
         outline:
           "border border-zinc-200/60 bg-white shadow-sm hover:bg-zinc-50 hover:border-zinc-300/80 hover:shadow-md active:scale-[0.98] dark:border-zinc-700/60 dark:bg-zinc-950 dark:hover:bg-zinc-900 dark:hover:border-zinc-600",
         secondary:
           "bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200 active:scale-[0.98] dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
-        ghost:
-          "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+        ghost: "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
         link: "text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-50",
       },
       size: {
@@ -34,18 +32,14 @@ const buttonVariants = cva(
   },
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
-    );
+    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
   },
 );
 Button.displayName = "Button";

@@ -28,11 +28,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
   const [newModelDir, setNewModelDir] = useState("model");
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -45,11 +41,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
                 Compare how different model versions affect controls and questions
               </CardDescription>
             </div>
-            <Button
-              onClick={() => onRunDiff(oldModelDir, newModelDir)}
-              disabled={isRunning}
-              size="sm"
-            >
+            <Button onClick={() => onRunDiff(oldModelDir, newModelDir)} disabled={isRunning} size="sm">
               {isRunning ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -67,37 +59,23 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="old-model">Old model directory</Label>
-            <Input
-              id="old-model"
-              value={oldModelDir}
-              onChange={(e) => setOldModelDir(e.target.value)}
-              placeholder="model"
-            />
+            <Input id="old-model" value={oldModelDir} onChange={(e) => setOldModelDir(e.target.value)} placeholder="model" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-model">New model directory</Label>
-            <Input
-              id="new-model"
-              value={newModelDir}
-              onChange={(e) => setNewModelDir(e.target.value)}
-              placeholder="model"
-            />
+            <Input id="new-model" value={newModelDir} onChange={(e) => setNewModelDir(e.target.value)} placeholder="model" />
           </div>
         </CardContent>
       </Card>
 
       {diffResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-base">Version Comparison</CardTitle>
               <CardDescription>
-                {diffResult.old.modelDir} ({diffResult.old.modelVersion}) →{" "}
-                {diffResult.new.modelDir} ({diffResult.new.modelVersion})
+                {diffResult.old.modelDir} ({diffResult.old.modelVersion}) → {diffResult.new.modelDir} (
+                {diffResult.new.modelVersion})
               </CardDescription>
             </CardHeader>
           </Card>
@@ -108,9 +86,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  Added Controls
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Added Controls</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.controls.added.length > 0 ? (
                     diffResult.controls.added.map((id) => (
@@ -124,9 +100,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
                 </div>
               </div>
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  Removed Controls
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Removed Controls</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.controls.removed.length > 0 ? (
                     diffResult.controls.removed.map((id) => (
@@ -148,13 +122,11 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  Newly Missing
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Newly Missing</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.questions.newlyMissing.length > 0 ? (
-                    diffResult.questions.newlyMissing.map((id, i) => (
-                      <Badge key={i} variant="warning">
+                    diffResult.questions.newlyMissing.map((id) => (
+                      <Badge key={id} variant="warning">
                         {id}
                       </Badge>
                     ))
@@ -164,13 +136,11 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
                 </div>
               </div>
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  No Longer Missing
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">No Longer Missing</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.questions.noLongerMissing.length > 0 ? (
-                    diffResult.questions.noLongerMissing.map((id, i) => (
-                      <Badge key={i} variant="success">
+                    diffResult.questions.noLongerMissing.map((id) => (
+                      <Badge key={id} variant="success">
                         {id}
                       </Badge>
                     ))
@@ -188,9 +158,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  Old
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Old</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.activatedDomains.old.length > 0 ? (
                     diffResult.activatedDomains.old.map((d) => (
@@ -204,9 +172,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
                 </div>
               </div>
               <div>
-                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  New
-                </Label>
+                <Label className="text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">New</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {diffResult.activatedDomains.new.length > 0 ? (
                     diffResult.activatedDomains.new.map((d) => (

@@ -1,7 +1,7 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { NextResponse } from "next/server";
-import os from "os";
-import path from "path";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,8 +19,7 @@ export async function GET(request: Request) {
         const isDirectory = entry.isDirectory();
 
         // For YAML files, include them; for directories, always include
-        const isYaml =
-          !isDirectory && (entry.name.endsWith(".yaml") || entry.name.endsWith(".yml"));
+        const isYaml = !isDirectory && (entry.name.endsWith(".yaml") || entry.name.endsWith(".yml"));
 
         if (!isDirectory && !isYaml) {
           return null;
@@ -37,9 +36,9 @@ export async function GET(request: Request) {
 
     // Filter out nulls and sort: directories first, then files
     const filtered = items.filter(Boolean).sort((a, b) => {
-      if (a!.isDirectory && !b!.isDirectory) return -1;
-      if (!a!.isDirectory && b!.isDirectory) return 1;
-      return a!.name.localeCompare(b!.name);
+      if (a?.isDirectory && !b?.isDirectory) return -1;
+      if (!a?.isDirectory && b?.isDirectory) return 1;
+      return a?.name.localeCompare(b?.name);
     });
 
     // Get parent directory

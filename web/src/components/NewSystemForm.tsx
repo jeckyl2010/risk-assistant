@@ -47,10 +47,7 @@ export function NewSystemForm() {
   const handleDirectorySelect = (dirPath: string) => {
     // Construct full path with system ID
     const fileName = systemId ? `${systemId}.yaml` : "system.yaml";
-    const fullPath =
-      dirPath.endsWith("\\") || dirPath.endsWith("/")
-        ? `${dirPath}${fileName}`
-        : `${dirPath}\\${fileName}`;
+    const fullPath = dirPath.endsWith("\\") || dirPath.endsWith("/") ? `${dirPath}${fileName}` : `${dirPath}\\${fileName}`;
     setValue("path", fullPath);
   };
 
@@ -83,12 +80,7 @@ export function NewSystemForm() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
           <Label htmlFor="system-id">System ID</Label>
-          <Input
-            id="system-id"
-            {...register("id")}
-            placeholder="e.g. shopfloor-analytics"
-            disabled={isCreating}
-          />
+          <Input id="system-id" {...register("id")} placeholder="e.g. shopfloor-analytics" disabled={isCreating} />
           {errors.id && (
             <motion.p
               initial={{ opacity: 0, y: -5 }}
@@ -105,13 +97,7 @@ export function NewSystemForm() {
             File Path <span className="text-sm font-normal text-gray-500">(optional)</span>
           </Label>
           <div className="flex gap-2">
-            <Input
-              id="system-path"
-              {...register("path")}
-              placeholder={defaultPath}
-              disabled={isCreating}
-              className="flex-1"
-            />
+            <Input id="system-path" {...register("path")} placeholder={defaultPath} disabled={isCreating} className="flex-1" />
             <Button
               type="button"
               variant="outline"

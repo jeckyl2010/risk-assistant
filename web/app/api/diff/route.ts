@@ -35,10 +35,7 @@ export async function POST(request: Request) {
     const validatedData = DiffRequestSchema.safeParse(body);
 
     if (!validatedData.success) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: validatedData.error.format() },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid request body", details: validatedData.error.format() }, { status: 400 });
     }
 
     const { facts, oldModelDir, newModelDir } = validatedData.data;
@@ -78,9 +75,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Diff API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
   }
 }

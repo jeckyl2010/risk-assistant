@@ -23,10 +23,7 @@ interface ApiClientOptions {
 /**
  * Makes a typed API request with consistent error handling
  */
-export async function apiRequest<TResponse>(
-  endpoint: string,
-  options: ApiClientOptions = {},
-): Promise<TResponse> {
+export async function apiRequest<TResponse>(endpoint: string, options: ApiClientOptions = {}): Promise<TResponse> {
   const { method = "GET", body, headers = {} } = options;
 
   try {
@@ -63,11 +60,7 @@ export async function apiRequest<TResponse>(
     }
 
     // Network errors or other unexpected errors
-    throw new ApiError(
-      error instanceof Error ? error.message : "An unexpected error occurred",
-      0,
-      endpoint,
-    );
+    throw new ApiError(error instanceof Error ? error.message : "An unexpected error occurred", 0, endpoint);
   }
 }
 

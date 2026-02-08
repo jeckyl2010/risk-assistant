@@ -36,8 +36,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-indigo-400 bg-gradient-to-br from-indigo-200 to-purple-200 text-indigo-900 dark:border-indigo-600 dark:from-indigo-800/80 dark:to-purple-800/80 dark:text-indigo-100",
       cardTop: "border-t-indigo-500 dark:border-t-indigo-400",
-      cardBg:
-        "bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30",
+      cardBg: "bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30",
     },
     base: {
       bar: "bg-slate-500/70 dark:bg-slate-300/60",
@@ -50,8 +49,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-slate-200/80 bg-gradient-to-br from-slate-100 to-zinc-100 text-slate-900 dark:border-slate-800/70 dark:from-slate-950/30 dark:to-zinc-950/30 dark:text-slate-100",
       cardTop: "border-t-slate-300/80 dark:border-t-slate-700/70",
-      cardBg:
-        "bg-gradient-to-br from-slate-50/70 to-zinc-50/70 dark:from-slate-900/25 dark:to-zinc-900/25",
+      cardBg: "bg-gradient-to-br from-slate-50/70 to-zinc-50/70 dark:from-slate-900/25 dark:to-zinc-900/25",
     },
     ai: {
       bar: "bg-violet-600 dark:bg-violet-400",
@@ -64,8 +62,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-violet-400 bg-gradient-to-br from-violet-200 to-purple-200 text-violet-900 dark:border-violet-600 dark:from-violet-800/80 dark:to-purple-800/80 dark:text-violet-100",
       cardTop: "border-t-violet-500 dark:border-t-violet-400",
-      cardBg:
-        "bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30",
+      cardBg: "bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30",
     },
     criticality: {
       bar: "bg-amber-600 dark:bg-amber-400",
@@ -78,8 +75,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-amber-400 bg-gradient-to-br from-amber-200 to-orange-200 text-amber-900 dark:border-amber-600 dark:from-amber-800/80 dark:to-orange-800/80 dark:text-amber-100",
       cardTop: "border-t-amber-500 dark:border-t-amber-400",
-      cardBg:
-        "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
+      cardBg: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
     },
     data: {
       bar: "bg-cyan-600 dark:bg-cyan-400",
@@ -144,8 +140,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-lime-400 bg-gradient-to-br from-lime-200 to-green-200 text-lime-900 dark:border-lime-600 dark:from-lime-800/80 dark:to-green-800/80 dark:text-lime-100",
       cardTop: "border-t-lime-500 dark:border-t-lime-400",
-      cardBg:
-        "bg-gradient-to-br from-lime-50 to-green-50 dark:from-lime-950/30 dark:to-green-950/30",
+      cardBg: "bg-gradient-to-br from-lime-50 to-green-50 dark:from-lime-950/30 dark:to-green-950/30",
     },
     results: {
       bar: "bg-emerald-600 dark:bg-emerald-400",
@@ -158,8 +153,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-emerald-400 bg-gradient-to-br from-emerald-200 to-teal-200 text-emerald-900 dark:border-emerald-600 dark:from-emerald-800/80 dark:to-teal-800/80 dark:text-emerald-100",
       cardTop: "border-t-emerald-500 dark:border-t-emerald-400",
-      cardBg:
-        "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30",
+      cardBg: "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30",
     },
     diff: {
       bar: "bg-fuchsia-600 dark:bg-fuchsia-400",
@@ -172,8 +166,7 @@ export function sectionAccent(key: string): SectionAccent {
       headerChip:
         "border-fuchsia-400 bg-gradient-to-br from-fuchsia-200 to-pink-200 text-fuchsia-900 dark:border-fuchsia-600 dark:from-fuchsia-800/80 dark:to-pink-800/80 dark:text-fuchsia-100",
       cardTop: "border-t-fuchsia-500 dark:border-t-fuchsia-400",
-      cardBg:
-        "bg-gradient-to-br from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/30 dark:to-pink-950/30",
+      cardBg: "bg-gradient-to-br from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/30 dark:to-pink-950/30",
     },
   };
 

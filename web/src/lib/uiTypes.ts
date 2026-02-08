@@ -26,17 +26,13 @@ export function parseQuestions(raw: unknown[]): Question[] {
     if (type !== "bool" && type !== "enum" && type !== "set") continue;
 
     const allowedRaw = rec.allowed;
-    const allowed = Array.isArray(allowedRaw)
-      ? allowedRaw.filter((x): x is string => typeof x === "string")
-      : undefined;
+    const allowed = Array.isArray(allowedRaw) ? allowedRaw.filter((x): x is string => typeof x === "string") : undefined;
 
     out.push({
       id,
       text,
       type,
-      ...(typeof description === "string" && description.trim()
-        ? { description: description.trim() }
-        : {}),
+      ...(typeof description === "string" && description.trim() ? { description: description.trim() } : {}),
       ...(allowed ? { allowed } : {}),
     });
   }

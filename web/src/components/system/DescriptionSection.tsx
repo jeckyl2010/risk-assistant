@@ -19,9 +19,7 @@ export function DescriptionSection({ description, onChange }: DescriptionSection
             <FileText className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
             Overview
           </CardTitle>
-          <CardDescription>
-            Add context about what this risk assessment covers, assumptions, scope, and links
-          </CardDescription>
+          <CardDescription>Add context about what this risk assessment covers, assumptions, scope, and links</CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea

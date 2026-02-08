@@ -1,5 +1,4 @@
 import { Activity, Shield } from "lucide-react";
-import Link from "next/link";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 import { PortfolioTable } from "@/components/portfolio/PortfolioTable";
 import { SystemManagement } from "@/components/SystemManagement";
@@ -20,14 +19,11 @@ export default async function Home() {
   const avgQuestionsPerSystem = 15; // rough estimate
   const totalPossibleAnswers = rows.length * avgQuestionsPerSystem;
   const answeredQuestions = totalPossibleAnswers - totalMissing;
-  const completionRate =
-    totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0;
+  const completionRate = totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0;
 
   // System status - how many systems are complete vs need work
   const systemsComplete = rows.filter((r) => r.missingAnswers === 0).length;
-  const systemsInProgress = rows.filter(
-    (r) => r.missingAnswers > 0 && r.missingAnswers <= 5,
-  ).length;
+  const systemsInProgress = rows.filter((r) => r.missingAnswers > 0 && r.missingAnswers <= 5).length;
   const systemsNeedWork = rows.filter((r) => r.missingAnswers > 5).length;
 
   const systemStatus = {
@@ -58,9 +54,7 @@ export default async function Home() {
               <Shield className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                Risk Assistant
-              </h1>
+              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Risk Assistant</h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
                 Smart questions. Clear controls. No scores, no guesswork.
               </p>
@@ -75,12 +69,8 @@ export default async function Home() {
       {/* System Management */}
       <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-indigo-900 dark:text-indigo-100">
-            Add System to Portfolio
-          </CardTitle>
-          <CardDescription>
-            Create a new risk assessment or add an existing system file
-          </CardDescription>
+          <CardTitle className="text-xl font-semibold text-indigo-900 dark:text-indigo-100">Add System to Portfolio</CardTitle>
+          <CardDescription>Create a new risk assessment or add an existing system file</CardDescription>
         </CardHeader>
         <CardContent>
           <SystemManagement />
@@ -97,11 +87,7 @@ export default async function Home() {
           <CardDescription>All risk assessment systems in your portfolio</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          {rows.length === 0 ? (
-            <NoSystemsEmpty onCreateSystem={() => {}} />
-          ) : (
-            <PortfolioTable rows={rows} />
-          )}
+          {rows.length === 0 ? <NoSystemsEmpty onCreateSystem={() => {}} /> : <PortfolioTable rows={rows} />}
         </CardContent>
       </Card>
 

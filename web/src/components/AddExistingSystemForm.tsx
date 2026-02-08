@@ -107,13 +107,7 @@ export function AddExistingSystemForm() {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        disabled={isAdding}
-        variant="outline"
-        className="self-start"
-        size="default"
-      >
+      <Button type="submit" disabled={isAdding} variant="outline" className="self-start" size="default">
         {isAdding ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />

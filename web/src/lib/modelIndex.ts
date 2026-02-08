@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import type { ModelPaths } from "./model";
 import { parseQuestions, parseTriggers, type Question, type TriggerRule } from "./uiTypes";
 import { loadYamlFile } from "./yaml";
@@ -73,9 +73,7 @@ export async function loadModelForUI(paths: ModelPaths): Promise<{
       : undefined;
 
   const triggersRaw =
-    triggersDoc &&
-    typeof triggersDoc === "object" &&
-    "triggers" in (triggersDoc as Record<string, unknown>)
+    triggersDoc && typeof triggersDoc === "object" && "triggers" in (triggersDoc as Record<string, unknown>)
       ? Array.isArray((triggersDoc as Record<string, unknown>).triggers)
         ? ((triggersDoc as Record<string, unknown>).triggers as unknown[])
         : []

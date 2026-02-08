@@ -1,6 +1,6 @@
 "use client";
 
-import { formatBoolean, formatIdentifier } from "@/lib/formatting";
+import { formatIdentifier } from "@/lib/formatting";
 import type { Question } from "@/lib/uiTypes";
 import { AutoGrowTextArea } from "./AutoGrowTextArea";
 import type { SectionAccent } from "./sectionAccent";
@@ -54,11 +54,7 @@ export function QuestionField({
             }
           >
             <span
-              className={
-                styles.answerDot +
-                " " +
-                (isUnset ? "bg-amber-500 dark:bg-amber-300" : "bg-sky-600 dark:bg-sky-300")
-              }
+              className={`${styles.answerDot} ${isUnset ? "bg-amber-500 dark:bg-amber-300" : "bg-sky-600 dark:bg-sky-300"}`}
             />
             Answer
           </div>
@@ -115,10 +111,7 @@ export function QuestionField({
                   const arr = Array.isArray(value) ? value : [];
                   const checked = arr.includes(a);
                   return (
-                    <label
-                      key={a}
-                      className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200"
-                    >
+                    <label key={a} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
                       <input
                         type="checkbox"
                         checked={checked}
@@ -141,17 +134,20 @@ export function QuestionField({
       </div>
 
       <div className="mt-3">
-        <label className={styles.reasonLabel}>Reason (optional)</label>
-        <AutoGrowTextArea
-          value={typeof reason === "string" ? reason : ""}
-          onChange={onReasonChange}
-          placeholder="Why did you choose this answer? Link to docs, context, constraints, …"
-          minRows={2}
-          className={
-            styles.reasonTextArea +
-            " [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
-          }
-        />
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: AutoGrowTextArea renders a textarea element */}
+        <label className={styles.reasonLabel}>
+          Reason (optional)
+          <AutoGrowTextArea
+            value={typeof reason === "string" ? reason : ""}
+            onChange={onReasonChange}
+            placeholder="Why did you choose this answer? Link to docs, context, constraints, …"
+            minRows={2}
+            className={
+              styles.reasonTextArea +
+              " [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
+            }
+          />
+        </label>
       </div>
     </div>
   );

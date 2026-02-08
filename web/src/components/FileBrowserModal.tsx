@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronUp, FileText, Folder, Loader2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 
@@ -28,13 +28,7 @@ type FileBrowserModalProps = {
   title?: string;
 };
 
-export function FileBrowserModal({
-  isOpen,
-  onClose,
-  onSelect,
-  mode,
-  title,
-}: FileBrowserModalProps) {
+export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: FileBrowserModalProps) {
   const [currentPath, setCurrentPath] = useState<string>("");
   const [parent, setParent] = useState<string | null>(null);
   const [items, setItems] = useState<BrowseItem[]>([]);
@@ -47,7 +41,7 @@ export function FileBrowserModal({
     return () => setMounted(false);
   }, []);
 
-  const fetchDirectory = async (path?: string) => {
+  const fetchDirectory = useCallback(async (path?: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -68,7 +62,7 @@ export function FileBrowserModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -96,7 +90,7 @@ export function FileBrowserModal({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, fetchDirectory]);
 
   const handleItemClick = (item: BrowseItem) => {
     if (item.isDirectory) {
@@ -119,10 +113,9 @@ export function FileBrowserModal({
 
   return createPortal(
     <AnimatePresence>
-      <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
-        onClick={onClose}
-      >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop click-to-close is valid UX, close button is keyboard accessible */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop click-to-close is valid UX, close button is keyboard accessible */}
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -146,12 +139,7 @@ export function FileBrowserModal({
               <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Path:</span>
               <code className="flex-1 text-xs text-zinc-700 dark:text-zinc-300">{currentPath}</code>
               {parent && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fetchDirectory(parent)}
-                  className="h-7 gap-1"
-                >
+                <Button variant="outline" size="sm" onClick={() => fetchDirectory(parent)} className="h-7 gap-1">
                   <ChevronUp className="h-3 w-3" />
                   Up
                 </Button>
@@ -166,9 +154,7 @@ export function FileBrowserModal({
                 <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
               </div>
             ) : error ? (
-              <div className="flex h-full items-center justify-center text-sm text-red-600 dark:text-red-400">
-                {error}
-              </div>
+              <div className="flex h-full items-center justify-center text-sm text-red-600 dark:text-red-400">{error}</div>
             ) : items.length === 0 ? (
               <div className="flex h-full items-center justify-center text-sm text-zinc-500">
                 No folders or YAML files found
@@ -177,6 +163,7 @@ export function FileBrowserModal({
               <div className="space-y-1">
                 {items.map((item) => (
                   <button
+                    type="button"
                     key={item.path}
                     onClick={() => handleItemClick(item)}
                     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
@@ -186,9 +173,7 @@ export function FileBrowserModal({
                     ) : (
                       <FileText className="h-4 w-4 text-indigo-500" />
                     )}
-                    <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
-                      {item.name}
-                    </span>
+                    <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">{item.name}</span>
                   </button>
                 ))}
               </div>
@@ -198,9 +183,7 @@ export function FileBrowserModal({
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-zinc-200 p-4 dark:border-zinc-800">
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {mode === "file"
-                ? "Click a .yaml file to select"
-                : "Select current directory or navigate to choose location"}
+              {mode === "file" ? "Click a .yaml file to select" : "Select current directory or navigate to choose location"}
             </p>
             <div className="flex gap-2">
               {mode === "directory" && (

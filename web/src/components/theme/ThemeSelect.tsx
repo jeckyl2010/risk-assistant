@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Monitor, Moon, Sun } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { applyTheme } from "./theme";
 import { THEME_STORAGE_KEY, type ThemeMode } from "./themeInit";
 
@@ -88,9 +88,7 @@ export function ThemeSelect() {
       title={`Theme: ${currentTheme.label} (click to change)`}
     >
       <Icon className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
-      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hidden sm:inline">
-        {currentTheme.label}
-      </span>
+      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hidden sm:inline">{currentTheme.label}</span>
     </motion.button>
   );
 }

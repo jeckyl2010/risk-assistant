@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { evaluateFacts } from "@/lib/evaluator";
 import { getModelVersion, modelPaths } from "@/lib/model";
 import { findRepoRoot } from "@/lib/repoRoot";
@@ -12,10 +11,7 @@ export async function POST(request: Request) {
     const validatedData = EvaluateRequestSchema.safeParse(body);
 
     if (!validatedData.success) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: validatedData.error.format() },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid request body", details: validatedData.error.format() }, { status: 400 });
     }
 
     const { facts, modelDir } = validatedData.data;
@@ -28,9 +24,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ modelDir, modelVersion, result });
   } catch (error) {
     console.error("Evaluate API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
   }
 }

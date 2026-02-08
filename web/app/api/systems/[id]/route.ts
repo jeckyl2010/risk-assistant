@@ -14,10 +14,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ id: sys.id, facts: sys.facts });
   } catch (error) {
     console.error("Get system error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
   }
 }
 
@@ -30,20 +27,14 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const validatedData = SaveSystemRequestSchema.safeParse(body);
 
     if (!validatedData.success) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: validatedData.error.format() },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid request body", details: validatedData.error.format() }, { status: 400 });
     }
 
     await saveSystemFacts(id, validatedData.data.facts as Record<string, unknown>);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Save system error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
   }
 }
 
@@ -59,9 +50,6 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Delete system error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
   }
 }

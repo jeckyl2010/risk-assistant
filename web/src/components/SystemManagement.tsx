@@ -60,10 +60,7 @@ export function SystemManagement() {
 
   const handleDirectorySelect = (dirPath: string) => {
     const fileName = systemId ? `${systemId}.yaml` : "system.yaml";
-    const fullPath =
-      dirPath.endsWith("\\") || dirPath.endsWith("/")
-        ? `${dirPath}${fileName}`
-        : `${dirPath}\\${fileName}`;
+    const fullPath = dirPath.endsWith("\\") || dirPath.endsWith("/") ? `${dirPath}${fileName}` : `${dirPath}\\${fileName}`;
     setValue("path", fullPath);
   };
 
@@ -111,19 +108,13 @@ export function SystemManagement() {
     }
   };
 
-  const displayPath =
-    customPath || (systemId ? `./systems/${systemId}.yaml` : "./systems/[SystemID].yaml");
+  const displayPath = customPath || (systemId ? `./systems/${systemId}.yaml` : "./systems/[SystemID].yaml");
 
   return (
     <div className="space-y-4">
       {/* Action Buttons */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Button
-          size="lg"
-          onClick={handleCreateClick}
-          disabled={isAdding}
-          className="h-auto flex-col gap-2 py-6"
-        >
+        <Button size="lg" onClick={handleCreateClick} disabled={isAdding} className="h-auto flex-col gap-2 py-6">
           <Plus className="h-6 w-6" />
           <div className="flex flex-col gap-1">
             <span className="font-semibold">Create New System</span>
@@ -179,9 +170,7 @@ export function SystemManagement() {
                     disabled={isCreating}
                     autoFocus
                   />
-                  {errors.id && (
-                    <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>
-                  )}
+                  {errors.id && <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>}
                 </div>
 
                 <div className="flex flex-col gap-2 sm:w-auto">
@@ -247,11 +236,7 @@ export function SystemManagement() {
         onClose={() => setShowBrowser(false)}
         onSelect={browserMode === "file" ? handleFileSelect : handleDirectorySelect}
         mode={browserMode}
-        title={
-          browserMode === "file"
-            ? "Select Existing System File"
-            : "Select Directory for System File"
-        }
+        title={browserMode === "file" ? "Select Existing System File" : "Select Directory for System File"}
       />
     </div>
   );

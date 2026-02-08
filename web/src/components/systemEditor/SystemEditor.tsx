@@ -13,7 +13,6 @@ import { ResultsSection } from "../system/ResultsSection";
 import { SystemHeader } from "../system/SystemHeader";
 import { SystemSidebar } from "../system/SystemSidebar";
 import { CommandPalette } from "../ui/command-palette";
-import { KeyboardShortcutHint } from "../ui/keyboard-shortcut-hint";
 import { deepDelete, deepGet, deepSet, type Facts } from "./facts";
 import { domainTitle } from "./sectionAccent";
 
@@ -65,12 +64,7 @@ export function SystemEditor({
 
   // API hooks
   const { save, state: saveState, error: saveError } = useSaveSystem(id);
-  const {
-    evaluate,
-    result: evaluateResult,
-    state: evalState,
-    error: evalError,
-  } = useEvaluateSystem();
+  const { evaluate, result: evaluateResult, state: evalState, error: evalError } = useEvaluateSystem();
   const { diff: runDiff, result: diffResult, state: diffState, error: diffError } = useDiffSystem();
 
   // Combined error state
@@ -78,24 +72,13 @@ export function SystemEditor({
 
   // Map generic async states to component-specific states
   const mappedSaveState: "idle" | "saving" | "saved" | "error" =
-    saveState === "loading"
-      ? "saving"
-      : saveState === "success"
-        ? "saved"
-        : (saveState as "idle" | "error");
+    saveState === "loading" ? "saving" : saveState === "success" ? "saved" : (saveState as "idle" | "error");
 
   const mappedEvalState: "idle" | "running" | "error" =
-    evalState === "loading"
-      ? "running"
-      : evalState === "success"
-        ? "idle"
-        : (evalState as "idle" | "error");
+    evalState === "loading" ? "running" : evalState === "success" ? "idle" : (evalState as "idle" | "error");
 
   // Derive activated domains from triggers
-  const activatedDomains = useMemo(
-    () => deriveActivatedDomainsFromTriggers(facts, triggers),
-    [facts, triggers],
-  );
+  const activatedDomains = useMemo(() => deriveActivatedDomainsFromTriggers(facts, triggers), [facts, triggers]);
 
   // Callbacks for API operations
   const handleSave = useCallback(() => {
@@ -297,7 +280,7 @@ export function SystemEditor({
 
     document.addEventListener("keydown", handleKeyPress);
     return () => document.removeEventListener("keydown", handleKeyPress);
-  }, [handleSave, handleEvaluate]);
+  }, [handleSave, handleEvaluate, id, questionSections]);
 
   const currentSection = questionSections.find((s) => s.key === activeSection);
 
@@ -319,11 +302,7 @@ export function SystemEditor({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="lg:sticky lg:top-6 lg:self-start">
-          <SystemSidebar
-            items={sidebarItems}
-            activeId={activeSection}
-            onNavigate={setActiveSection}
-          />
+          <SystemSidebar items={sidebarItems} activeId={activeSection} onNavigate={setActiveSection} />
         </aside>
 
         <main>
@@ -358,11 +337,7 @@ export function SystemEditor({
           )}
 
           {activeSection === SECTION_IDS.DIFF && (
-            <DiffSection
-              onRunDiff={handleDiff}
-              diffResult={diffResult}
-              isRunning={diffState === "loading"}
-            />
+            <DiffSection onRunDiff={handleDiff} diffResult={diffResult} isRunning={diffState === "loading"} />
           )}
         </main>
       </div>

@@ -31,11 +31,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-br from-indigo-100/60 via-purple-100/50 to-pink-100/60 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 text-foreground antialiased font-sans`}
       >
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
-        />
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script must run before hydration */}
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
 
         <div className="fixed bottom-4 right-4 z-50">
           <ThemeSelect />

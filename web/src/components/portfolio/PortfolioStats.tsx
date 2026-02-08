@@ -1,30 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  AlertCircle,
-  CheckCircle2,
-  CircleAlert,
-  CircleCheckBig,
-  Network,
-  Shield,
-  TrendingUp,
-} from "lucide-react";
+import { CheckCircle2, Network, Shield, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import {
-  Bar,
-  BarChart,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  RadialBar,
-  RadialBarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip as InfoTooltip } from "@/components/ui/tooltip";
 
@@ -55,11 +34,7 @@ interface StatsCardProps {
 
 function StatsCard({ title, value, description, icon, trend, delay }: StatsCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
       <Card className="overflow-hidden border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-md hover:shadow-xl transition-shadow duration-300">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
@@ -103,17 +78,16 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
   const totalPossibleQuestions = stats.totalSystems * avgQuestionsPerSystem;
   const answeredQuestions = totalPossibleQuestions - stats.totalMissing;
 
-  const questionData = [
+  const _questionData = [
     { name: "Answered", value: answeredQuestions, fill: "#10b981" },
     { name: "Missing", value: stats.totalMissing, fill: "#f59e0b" },
   ];
 
-  const radialData = [
+  const _radialData = [
     {
       name: "Completion",
       value: stats.completionRate,
-      fill:
-        stats.completionRate >= 80 ? "#10b981" : stats.completionRate >= 50 ? "#f59e0b" : "#ef4444",
+      fill: stats.completionRate >= 80 ? "#10b981" : stats.completionRate >= 50 ? "#f59e0b" : "#ef4444",
     },
   ];
 
@@ -145,7 +119,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
         />
         <StatsCard
           title="Systems Complete"
-          value={stats.systemStatus["Complete"] || 0}
+          value={stats.systemStatus.Complete || 0}
           description="Fully assessed systems"
           icon={<CheckCircle2 className="h-5 w-5" />}
           delay={0.3}
@@ -156,11 +130,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
       {stats.totalSystems > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
           {/* System Status */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
             <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">System Status</CardTitle>
@@ -175,34 +145,26 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, value, percent }) =>
-                          `${name}: ${value} (${((percent ?? 0) * 100).toFixed(0)}%)`
-                        }
+                        label={({ name, value, percent }) => `${name}: ${value} (${((percent ?? 0) * 100).toFixed(0)}%)`}
                         outerRadius={80}
                         dataKey="value"
                       >
-                        {statusData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        {statusData.map((entry) => (
+                          <Cell key={entry.name} fill={entry.fill} />
                         ))}
                       </Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-60 items-center justify-center text-sm text-zinc-500">
-                    No systems yet
-                  </div>
+                  <div className="flex h-60 items-center justify-center text-sm text-zinc-500">No systems yet</div>
                 )}
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Completion Status */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
             <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Question Coverage</CardTitle>
@@ -217,18 +179,12 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                         Overall Progress
                       </div>
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
-                          {answeredQuestions}
-                        </span>
-                        <span className="text-lg text-zinc-500 dark:text-zinc-400">
-                          / {totalPossibleQuestions}
-                        </span>
+                        <span className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">{answeredQuestions}</span>
+                        <span className="text-lg text-zinc-500 dark:text-zinc-400">/ {totalPossibleQuestions}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-                        {stats.completionRate}%
-                      </div>
+                      <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{stats.completionRate}%</div>
                       <div className="text-xs text-zinc-500 dark:text-zinc-400">complete</div>
                     </div>
                   </div>
@@ -247,28 +203,18 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-gradient-to-br from-green-500 to-emerald-500" />
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                        Answered
-                      </span>
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Answered</span>
                     </div>
-                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-                      {answeredQuestions}
-                    </div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {stats.completionRate}% of total
-                    </div>
+                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{answeredQuestions}</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400">{stats.completionRate}% of total</div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-gradient-to-br from-amber-500 to-orange-500" />
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                        Missing
-                      </span>
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Missing</span>
                     </div>
-                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-                      {stats.totalMissing}
-                    </div>
+                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{stats.totalMissing}</div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400">
                       {Math.round((stats.totalMissing / totalPossibleQuestions) * 100)}% remaining
                     </div>
@@ -282,11 +228,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
 
       {/* Domain Coverage Heatmap */}
       {stats.portfolioRows.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <Card className="overflow-hidden shadow-lg">
             <CardHeader className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold">
@@ -299,15 +241,11 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
             <CardContent className="p-0">
               {(() => {
                 // Get all unique domains across all systems
-                const allDomains = Array.from(
-                  new Set(stats.portfolioRows.flatMap((r) => r.domains)),
-                ).sort();
+                const allDomains = Array.from(new Set(stats.portfolioRows.flatMap((r) => r.domains))).sort();
 
                 if (allDomains.length === 0) {
                   return (
-                    <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
-                      No domains activated yet
-                    </div>
+                    <div className="flex h-40 items-center justify-center text-sm text-zinc-500">No domains activated yet</div>
                   );
                 }
 
@@ -331,10 +269,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                       </thead>
                       <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                         {stats.portfolioRows.map((row) => (
-                          <tr
-                            key={row.id}
-                            className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
-                          >
+                          <tr key={row.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
                             <td className="px-6 py-4 sticky left-0 bg-white dark:bg-zinc-950 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/50">
                               <Link
                                 className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
@@ -357,15 +292,9 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                                             : "bg-zinc-100 dark:bg-zinc-800"
                                         }
                                       `}
-                                      title={
-                                        isActivated
-                                          ? `${domain} activated`
-                                          : `${domain} not activated`
-                                      }
+                                      title={isActivated ? `${domain} activated` : `${domain} not activated`}
                                     >
-                                      {isActivated && (
-                                        <CheckCircle2 className="h-4 w-4 text-white" />
-                                      )}
+                                      {isActivated && <CheckCircle2 className="h-4 w-4 text-white" />}
                                     </div>
                                   </div>
                                 </td>

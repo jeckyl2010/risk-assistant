@@ -11,9 +11,7 @@ export type PortfolioRow = {
   domains: string[]; // List of activated domain names
 };
 
-export async function buildPortfolio(
-  modelDir: string = "model",
-): Promise<{ modelVersion: string; rows: PortfolioRow[] }> {
+export async function buildPortfolio(modelDir: string = "model"): Promise<{ modelVersion: string; rows: PortfolioRow[] }> {
   const repoRoot = findRepoRoot(process.cwd());
   const paths = modelPaths(repoRoot, modelDir);
   const modelVersion = await getModelVersion(repoRoot, modelDir);

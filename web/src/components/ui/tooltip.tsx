@@ -10,10 +10,10 @@ interface TooltipProps {
   icon?: boolean;
 }
 
-export function Tooltip({ content, children, icon = false }: TooltipProps) {
+export function Tooltip({ content, children, icon: _icon = false }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [tooltipRef, setTooltipRef] = useState<HTMLSpanElement | null>(null);
+  const [_tooltipRef, setTooltipRef] = useState<HTMLSpanElement | null>(null);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLSpanElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -30,6 +30,7 @@ export function Tooltip({ content, children, icon = false }: TooltipProps) {
 
   return (
     <>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Tooltip trigger with hover is standard accessible pattern */}
       <span
         ref={setTooltipRef}
         onMouseEnter={handleMouseEnter}

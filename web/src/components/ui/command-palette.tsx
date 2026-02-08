@@ -2,17 +2,7 @@
 
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BarChart3,
-  FileText,
-  GitCompare,
-  Home,
-  Play,
-  Save,
-  Search,
-  Shield,
-  Sparkles,
-} from "lucide-react";
+import { BarChart3, FileText, GitCompare, Home, Play, Save, Search, Shield, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -25,7 +15,7 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({
-  systemId,
+  systemId: _systemId,
   onSave,
   onEvaluate,
   onNavigate,
@@ -92,10 +82,7 @@ export function CommandPalette({
                 </Command.Empty>
 
                 {/* Navigation */}
-                <Command.Group
-                  heading="Navigation"
-                  className="text-xs font-medium text-zinc-500 px-3 py-2"
-                >
+                <Command.Group heading="Navigation" className="text-xs font-medium text-zinc-500 px-3 py-2">
                   <Command.Item
                     onSelect={() => handleSelect(() => router.push("/"))}
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-indigo-500 aria-selected:text-white cursor-pointer"
@@ -132,10 +119,7 @@ export function CommandPalette({
 
                 {/* Question Sections */}
                 {questionSections.length > 0 && (
-                  <Command.Group
-                    heading="Question Sections"
-                    className="text-xs font-medium text-zinc-500 px-3 py-2"
-                  >
+                  <Command.Group heading="Question Sections" className="text-xs font-medium text-zinc-500 px-3 py-2">
                     {questionSections.map((section) => (
                       <Command.Item
                         key={section.key}
@@ -151,10 +135,7 @@ export function CommandPalette({
 
                 {/* Actions */}
                 {(onSave || onEvaluate) && (
-                  <Command.Group
-                    heading="Actions"
-                    className="text-xs font-medium text-zinc-500 px-3 py-2"
-                  >
+                  <Command.Group heading="Actions" className="text-xs font-medium text-zinc-500 px-3 py-2">
                     {onSave && (
                       <Command.Item
                         onSelect={() => handleSelect(onSave)}
@@ -188,9 +169,7 @@ export function CommandPalette({
                 <div className="flex items-center justify-between">
                   <span>Press ⌘K to toggle command palette</span>
                   <div className="flex items-center gap-2">
-                    <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">
-                      ↑↓
-                    </kbd>
+                    <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">↑↓</kbd>
                     <span>Navigate</span>
                     <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">↵</kbd>
                     <span>Select</span>

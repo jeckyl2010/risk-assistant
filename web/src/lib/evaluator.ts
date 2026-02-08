@@ -19,10 +19,7 @@ export type ControlCatalogEntry = {
   evidence_type?: string[];
 };
 
-export type DerivedControls = Record<
-  string,
-  { because: Record<string, unknown>[]; control: ControlCatalogEntry | null }
->;
+export type DerivedControls = Record<string, { because: Record<string, unknown>[]; control: ControlCatalogEntry | null }>;
 
 export type EvaluateResult = {
   activated_domains: string[];
@@ -69,9 +66,7 @@ export async function deriveActivatedDomains(facts: Facts, paths: ModelPaths): P
   const activated = new Set<string>();
 
   const triggers =
-    triggersDoc &&
-    typeof triggersDoc === "object" &&
-    "triggers" in (triggersDoc as Record<string, unknown>)
+    triggersDoc && typeof triggersDoc === "object" && "triggers" in (triggersDoc as Record<string, unknown>)
       ? ((triggersDoc as Record<string, unknown>).triggers as unknown)
       : [];
 
@@ -111,11 +106,7 @@ export async function deriveControls(facts: Facts, paths: ModelPaths): Promise<D
   const catalogDoc = await loadYamlFile<unknown>(paths.controlsCatalogFile);
   const catalog = new Map<string, ControlCatalogEntry>();
 
-  if (
-    catalogDoc &&
-    typeof catalogDoc === "object" &&
-    "controls" in (catalogDoc as Record<string, unknown>)
-  ) {
+  if (catalogDoc && typeof catalogDoc === "object" && "controls" in (catalogDoc as Record<string, unknown>)) {
     const controls = (catalogDoc as Record<string, unknown>).controls;
     if (Array.isArray(controls)) {
       for (const c of controls) {
@@ -153,10 +144,7 @@ export async function deriveControls(facts: Facts, paths: ModelPaths): Promise<D
   return derived;
 }
 
-export async function requiredQuestionIds(
-  paths: ModelPaths,
-  activatedDomains: string[],
-): Promise<string[]> {
+export async function requiredQuestionIds(paths: ModelPaths, activatedDomains: string[]): Promise<string[]> {
   const baseDoc = await loadYamlFile<unknown>(paths.baseQuestionsFile);
   const qs =
     baseDoc && typeof baseDoc === "object" && "questions" in (baseDoc as Record<string, unknown>)
@@ -215,11 +203,7 @@ async function loadControlLinks(paths: ModelPaths): Promise<Map<string, ControlR
   const linksMap = new Map<string, ControlReference[]>();
   try {
     const linksDoc = await loadYamlFile<unknown>(paths.controlsLinksFile);
-    if (
-      linksDoc &&
-      typeof linksDoc === "object" &&
-      "links" in (linksDoc as Record<string, unknown>)
-    ) {
+    if (linksDoc && typeof linksDoc === "object" && "links" in (linksDoc as Record<string, unknown>)) {
       const links = (linksDoc as Record<string, unknown>).links;
       if (Array.isArray(links)) {
         for (const link of links) {

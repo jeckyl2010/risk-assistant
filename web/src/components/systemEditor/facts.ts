@@ -18,8 +18,7 @@ export function deepSet(obj: unknown, dotted: string, value: unknown): Facts {
   for (let i = 0; i < parts.length - 1; i++) {
     const p = parts[i];
     const next = cur[p];
-    const nextObj =
-      typeof next === "object" && next !== null ? { ...(next as Record<string, unknown>) } : {};
+    const nextObj = typeof next === "object" && next !== null ? { ...(next as Record<string, unknown>) } : {};
     cur[p] = nextObj;
     cur = nextObj;
   }

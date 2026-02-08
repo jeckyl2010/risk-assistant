@@ -27,9 +27,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
         className="mb-6 rounded-full bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 p-6 shadow-lg"
       >
-        <div className="text-zinc-600 dark:text-zinc-400">
-          {icon || <Inbox className="h-12 w-12" />}
-        </div>
+        <div className="text-zinc-600 dark:text-zinc-400">{icon || <Inbox className="h-12 w-12" />}</div>
       </motion.div>
 
       <motion.h3
@@ -51,11 +49,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
       </motion.p>
 
       {action && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <Button onClick={action.onClick} size="lg" className="shadow-lg">
             {action.label}
           </Button>

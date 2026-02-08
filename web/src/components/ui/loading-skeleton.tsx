@@ -39,6 +39,7 @@ export function QuestionsSectionSkeleton() {
         <Skeleton className="h-4 w-96" />
       </div>
       {Array.from({ length: 5 }).map((_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: Static loading skeleton array never reorders
         <QuestionCardSkeleton key={i} />
       ))}
     </div>
@@ -61,6 +62,7 @@ export function SystemHeaderSkeleton() {
       </div>
       <div className="flex gap-2">
         {Array.from({ length: 3 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Static loading skeleton array never reorders
           <Skeleton key={i} className="h-6 w-20 rounded-full" />
         ))}
       </div>
@@ -79,6 +81,7 @@ export function PortfolioSkeleton() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Static loading skeleton array never reorders
           <Card key={i}>
             <CardContent className="p-6">
               <Skeleton className="h-4 w-24 mb-2" />
@@ -93,6 +96,7 @@ export function PortfolioSkeleton() {
       <div className="space-y-3">
         <Skeleton className="h-6 w-32 mb-4" />
         {Array.from({ length: 3 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Static loading skeleton array never reorders
           <Card key={i}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">

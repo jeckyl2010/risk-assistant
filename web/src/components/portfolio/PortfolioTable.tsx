@@ -93,10 +93,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {rows.map((r) => (
-            <tr
-              key={r.id}
-              className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
-            >
+            <tr key={r.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
               <td className="px-6 py-4">
                 <Link
                   className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
@@ -115,9 +112,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                   <Badge variant="success">0</Badge>
                 )}
               </td>
-              <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                {r.activatedDomains || "—"}
-              </td>
+              <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{r.activatedDomains || "—"}</td>
               <td className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
                   <Button

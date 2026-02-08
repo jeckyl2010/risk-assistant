@@ -1,24 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Circle, Edit3, Eye, HelpCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, Circle, Edit3, Eye, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MarkdownViewer } from "@/components/ui/markdown-viewer";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { SENTINEL_VALUES } from "@/lib/constants";
-import { formatBoolean, formatIdentifier } from "@/lib/formatting";
+import { formatIdentifier } from "@/lib/formatting";
 import type { Question } from "@/lib/uiTypes";
 import { sectionAccent } from "../systemEditor/sectionAccent";
 
@@ -32,15 +25,7 @@ interface QuestionCardProps {
   domain?: string;
 }
 
-export function QuestionCard({
-  question,
-  value,
-  reason,
-  onChange,
-  onReasonChange,
-  index,
-  domain = "base",
-}: QuestionCardProps) {
+export function QuestionCard({ question, value, reason, onChange, onReasonChange, index, domain = "base" }: QuestionCardProps) {
   const isAnswered = value !== null;
   const [isEditingReason, setIsEditingReason] = useState(false);
   const [justAnswered, setJustAnswered] = useState(false);
@@ -57,12 +42,7 @@ export function QuestionCard({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      layout
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} layout>
       <motion.div
         whileHover={{ scale: 1.01, y: -2 }}
         whileTap={{ scale: 0.99 }}
@@ -120,9 +100,7 @@ export function QuestionCard({
                       {question.text}
                     </h3>
                     {question.description && (
-                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                        {question.description}
-                      </p>
+                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{question.description}</p>
                     )}
                   </div>
                 </div>
@@ -143,12 +121,8 @@ export function QuestionCard({
                 <Label className="text-sm font-medium">Answer</Label>
                 {question.type === "bool" ? (
                   <Select
-                    value={
-                      value === true ? "true" : value === false ? "false" : SENTINEL_VALUES.UNSET
-                    }
-                    onValueChange={(v) =>
-                      handleChange(v === SENTINEL_VALUES.UNSET ? null : v === "true")
-                    }
+                    value={value === true ? "true" : value === false ? "false" : SENTINEL_VALUES.UNSET}
+                    onValueChange={(v) => handleChange(v === SENTINEL_VALUES.UNSET ? null : v === "true")}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an answer" />

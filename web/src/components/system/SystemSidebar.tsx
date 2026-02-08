@@ -47,12 +47,7 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
 
             <div className="flex flex-1 items-center gap-3">
               {item.icon && (
-                <div
-                  className={cn(
-                    "transition-all",
-                    isActive ? "scale-110" : "scale-100 group-hover:scale-105",
-                  )}
-                >
+                <div className={cn("transition-all", isActive ? "scale-110" : "scale-100 group-hover:scale-105")}>
                   {item.icon}
                 </div>
               )}

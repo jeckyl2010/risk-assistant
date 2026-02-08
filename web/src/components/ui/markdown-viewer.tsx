@@ -21,9 +21,7 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          p: ({ node, ...props }) => (
-            <p style={{ marginBottom: "0.5rem", color: "inherit" }} {...props} />
-          ),
+          p: ({ node, ...props }) => <p style={{ marginBottom: "0.5rem", color: "inherit" }} {...props} />,
           strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
           em: ({ node, ...props }) => <em {...props} />,
           ul: ({ node, ...props }) => (
@@ -74,9 +72,7 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
               <code {...props} />
             );
           },
-          a: ({ node, ...props }) => (
-            <a style={{ color: "rgb(79 70 229)", textDecoration: "underline" }} {...props} />
-          ),
+          a: ({ node, ...props }) => <a style={{ color: "rgb(79 70 229)", textDecoration: "underline" }} {...props} />,
         }}
       >
         {content.trim()}

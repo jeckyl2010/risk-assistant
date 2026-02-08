@@ -24,11 +24,9 @@ export function SectionButton({
         (active ? accent.navActive : accent.navIdle)
       }
     >
-      <span className={"absolute left-0 top-0 h-full w-1 " + accent.bar} />
+      <span className={`absolute left-0 top-0 h-full w-1 ${accent.bar}`} />
       <div className="font-medium">{title}</div>
-      {subtitle ? (
-        <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</div>
-      ) : null}
+      {subtitle ? <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</div> : null}
     </button>
   );
 }

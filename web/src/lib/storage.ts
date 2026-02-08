@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { type Facts, normalizeFactsForDump } from "./evaluator";
 import { findRepoRoot } from "./repoRoot";
 import { dumpYaml, loadYamlFile } from "./yaml";
@@ -69,9 +69,7 @@ export async function listSystems(): Promise<string[]> {
   return manifest.systems.map((s) => s.name).sort();
 }
 
-export async function getSystemFacts(
-  id: string,
-): Promise<{ id: string; factsPath: string; facts: Facts } | null> {
+export async function getSystemFacts(id: string): Promise<{ id: string; factsPath: string; facts: Facts } | null> {
   const manifest = await readPortfolio();
   const entry = manifest.systems.find((s) => s.name === id);
 
@@ -88,10 +86,7 @@ export async function getSystemFacts(
   }
 }
 
-export async function createSystem(
-  id: string,
-  systemPath?: string,
-): Promise<{ id: string; factsPath: string; facts: Facts }> {
+export async function createSystem(id: string, systemPath?: string): Promise<{ id: string; factsPath: string; facts: Facts }> {
   const safe = sanitizeSystemId(id);
 
   // Default path: ./systems/[SystemName].yaml
@@ -168,9 +163,7 @@ export async function deleteSystem(id: string): Promise<boolean> {
   }
 }
 
-export async function addExistingSystem(
-  systemPath: string,
-): Promise<{ id: string; factsPath: string; facts: Facts }> {
+export async function addExistingSystem(systemPath: string): Promise<{ id: string; factsPath: string; facts: Facts }> {
   const yamlPath = resolveSystemPath(systemPath);
 
   // Load the facts to verify it's a valid system file and get the name

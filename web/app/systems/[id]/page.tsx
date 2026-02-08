@@ -21,10 +21,7 @@ export default async function SystemPage({ params }: { params: Promise<{ id: str
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-10">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-        <Link
-          href="/"
-          className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-        >
+        <Link href="/" className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
           <Home className="h-4 w-4" />
           Portfolio
         </Link>

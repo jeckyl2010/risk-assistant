@@ -22,7 +22,7 @@ export function QuestionsList({
   title,
   description,
   questions,
-  prefix,
+  prefix: _prefix,
   domain,
   getValue,
   getReason,
@@ -32,11 +32,7 @@ export function QuestionsList({
   const answeredCount = questions.filter((q) => getValue(q.id) !== null).length;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <Card className="border border-zinc-200/40 shadow-md dark:border-zinc-700/40">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -51,9 +47,7 @@ export function QuestionsList({
 
       {questions.length === 0 ? (
         <Card>
-          <CardContent className="py-8 text-center text-zinc-600 dark:text-zinc-400">
-            No questions in this section
-          </CardContent>
+          <CardContent className="py-8 text-center text-zinc-600 dark:text-zinc-400">No questions in this section</CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
