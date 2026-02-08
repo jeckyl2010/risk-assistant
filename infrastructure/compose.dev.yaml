@@ -1,0 +1,28 @@
+# Development overrides for Podman Compose
+# Run from project root: podman-compose -f infrastructure/compose.yaml -f infrastructure/compose.dev.yaml up
+
+services:
+  backend:
+    volumes:
+      # Read-write mounts for development
+      - ../model:/app/model:rw
+      - ../systems:/app/systems:rw
+      - ../tools:/app/tools:rw
+    command: ["python", "tools/riskctl.py", "--help"]
+    
+  frontend:
+    build:
+      context: ../web
+      dockerfile: ../infrastructure/frontend.Dockerfile
+      target: base  # Use base stage for development
+    command: ["bun", "run", "dev"]
+    volumes:
+      # Bind mount source code for hot reload
+      - ../web:/app:rw
+      # Preserve node_modules from container
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"

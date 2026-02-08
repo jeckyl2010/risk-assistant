@@ -47,6 +47,14 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 - **Linting/Formatting**: Ruff (Rust-based, replaces Flake8/Black/isort)
 - **Environment**: All Python tools installed in `.venv` virtual environment
 
+### Containerization
+- **Runtime**: Podman (Docker-compatible, no licensing issues)
+- **Location**: `infrastructure/` directory for all container files
+- **Compose**: `compose.yaml` for production, `compose.dev.yaml` for development
+- **Images**: Multi-stage builds (Python 3.12-slim for backend, Bun 1.3.8-slim for frontend)
+- **Helper**: `infrastructure/podman.ps1` for common operations (build, up, dev, logs, shell, clean)
+- **Philosophy**: Podman over Docker Desktop (Apache 2.0 license, rootless by default)
+
 ## Code Preferences
 
 - Use TypeScript strictly (no `any` unless absolutely necessary)
@@ -54,6 +62,35 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 - Keep components focused and single-purpose
 - Use Tailwind utilities over custom CSS
 - Follow established typography hierarchy (text-5xl → text-3xl → text-2xl → text-xl → text-lg → base)
+
+## File Organization & Structure
+
+**Critical: The maintainer values clean, structured file organization.**
+
+- **Never dump files in the root directory** - Use proper subdirectories for logical grouping
+- **Think before creating** - Plan file placement based on purpose and category
+- **Use established patterns**:
+  - Infrastructure files → `infrastructure/`
+  - Tooling/scripts → Keep in root only if frequently executed (e.g., `setup.ps1`)
+  - Configuration → Root for project-wide (e.g., `pyproject.toml`), subdirs for scoped config
+  - Documentation → Root for primary docs (README.md), subdirs for detailed topics
+- **Group related files together** - Don't scatter Dockerfiles, compose files, and related configs across multiple locations
+- **Clean naming conventions** - Use descriptive, consistent names (e.g., `backend.Dockerfile` not just `Dockerfile`)
+
+**Examples of proper structure:**
+- ✅ `infrastructure/compose.yaml`, `infrastructure/backend.Dockerfile`, `infrastructure/README.md`
+- ❌ `Dockerfile.backend`, `compose.yaml`, `PODMAN.md` scattered in root
+- ✅ `web/biome.json` (scoped to frontend)
+- ❌ `biome.json` in root when it only applies to web/
+
+**When adding new files:**
+1. Identify the logical category (infrastructure, tooling, config, docs, code)
+2. Check if a directory exists for that category
+3. Create a proper directory structure if needed
+4. Place files in the appropriate location
+5. Never default to "just put it in root"
+
+This isn't about over-engineering - it's about respecting the maintainer's workspace and keeping the project navigable.
 
 ## Automation Preferences
 

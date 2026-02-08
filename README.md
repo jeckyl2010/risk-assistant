@@ -69,6 +69,20 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Podman / Docker Deployment
+
+**Production deployment with Podman Compose:**
+```powershell
+.\infrastructure\podman.ps1 up
+```
+
+**Development mode with hot reload:**
+```powershell
+.\infrastructure\podman.ps1 dev
+```
+
+See [infrastructure/README.md](infrastructure/README.md) for complete Podman setup, troubleshooting, and CI/CD integration.
+
 ## VS Code Setup
 
 **Install recommended extensions:**
