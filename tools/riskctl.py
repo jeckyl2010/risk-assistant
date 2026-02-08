@@ -48,10 +48,7 @@ def matches_condition(facts: dict, cond: dict) -> bool:
     Values can be scalars or membership checks when actual is a list.
     """
     for k, expected in cond.items():
-        if "." in k:
-            actual = deep_get(facts, k)
-        else:
-            actual = deep_get(facts, f"base.{k}")
+        actual = deep_get(facts, k) if "." in k else deep_get(facts, f"base.{k}")
 
         # membership check: actual list contains expected scalar
         if isinstance(actual, list) and not isinstance(expected, list):
@@ -221,7 +218,7 @@ def validate_scope_facts(scope: str, facts_section, questions_index: dict[str, d
         reasons = facts_section.get("_reasons")
 
     # warn for unknown keys to avoid silent non-matches
-    for k in facts_section.keys():
+    for k in facts_section:
         if k == "_reasons":
             continue
         if k not in questions_index:

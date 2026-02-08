@@ -11,8 +11,8 @@ dependencies = [
 # Target Python 3.11+
 target-version = "py311"
 
-# Line length to match Biome frontend config
-line-length = 100
+# Line length - 128 for modern wide screens
+line-length = 128
 
 # Exclude patterns
 exclude = [
