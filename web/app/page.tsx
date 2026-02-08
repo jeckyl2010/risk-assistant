@@ -1,4 +1,5 @@
-import { Activity, FolderPlus, Shield } from "lucide-react";
+import { Activity, FolderPlus, HelpCircle, Shield } from "lucide-react";
+import Link from "next/link";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 import { PortfolioTable } from "@/components/portfolio/PortfolioTable";
 import { SystemManagement } from "@/components/SystemManagement";
@@ -44,24 +45,44 @@ export default async function Home() {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10">
       {/* Header */}
       <div className="relative overflow-hidden rounded-xl border border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-sm">
-        {/* Subtle gradient background */}
+        {/* Background pattern with gradient overlay */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/header-pattern.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.50,
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10" />
 
-        <div className="relative p-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
-              <Shield className="h-7 w-7 text-white" />
+        <div className="relative p-6 pb-14">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
+                <Shield className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-zinc-50" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>Risk Assistant</h1>
+                <p className="text-sm text-slate-700 dark:text-zinc-400 mt-1" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.05)' }}>
+                  Smart questions. Clear controls. No scores, no guesswork.
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Risk Assistant</h1>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                Smart questions. Clear controls. No scores, no guesswork.
-              </p>
-            </div>
+
+            {/* Documentation Link */}
+            <Link
+              href="/docs"
+              className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100 hover:border-indigo-300 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900 self-start"
+            >
+              <HelpCircle className="h-4 w-4" />
+              Documentation
+            </Link>
           </div>
 
           {/* Version Info - Bottom Right */}
-          <div className="absolute bottom-4 right-6 flex flex-col items-end gap-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+          <div className="absolute bottom-4 right-6 flex flex-col items-end gap-0.5 text-xs text-slate-700 dark:text-zinc-400" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
             <span>Version: 0.6.7</span>
             <span>Model: {modelVersion}</span>
           </div>
