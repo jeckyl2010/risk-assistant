@@ -1,11 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Network, Shield, TrendingUp } from "lucide-react";
-import Link from "next/link";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { CheckCircle2, FileText, Shield, Target } from "lucide-react";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tooltip as InfoTooltip } from "@/components/ui/tooltip";
 
 interface PortfolioStats {
   totalSystems: number;
@@ -25,35 +23,22 @@ interface StatsCardProps {
   value: string | number;
   description: string;
   icon: React.ReactNode;
-  trend?: {
-    value: string;
-    positive: boolean;
-  };
   delay: number;
 }
 
-function StatsCard({ title, value, description, icon, trend, delay }: StatsCardProps) {
+function StatsCard({ title, value, description, icon, delay }: StatsCardProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
-      <Card className="overflow-hidden border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <Card className="overflow-hidden border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{title}</p>
-              <div className="mt-2 flex items-baseline gap-2">
-                <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{value}</p>
-                {trend && (
-                  <span
-                    className={`text-sm font-medium ${trend.positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-                  >
-                    {trend.value}
-                  </span>
-                )}
-              </div>
+              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">{value}</p>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">{description}</p>
             </div>
-            <div className="rounded-lg bg-zinc-100 dark:bg-zinc-800 p-3 shadow-inner">
-              <div className="text-zinc-600 dark:text-zinc-400">{icon}</div>
+            <div className="rounded-lg bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-3">
+              <div className="text-indigo-600 dark:text-indigo-400">{icon}</div>
             </div>
           </div>
         </CardContent>
@@ -63,32 +48,48 @@ function StatsCard({ title, value, description, icon, trend, delay }: StatsCardP
 }
 
 export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
-  const COLORS = ["#10b981", "#f59e0b", "#ef4444"]; // Green, Amber, Red
+  // Calculate domain activation frequency
+  const domainFrequency = stats.portfolioRows.reduce(
+    (acc, row) => {
+      row.domains.forEach((domain) => {
+        acc[domain] = (acc[domain] || 0) + 1;
+      });
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const statusData = Object.entries(stats.systemStatus)
-    .filter(([_, value]) => value > 0) // Only show categories with systems
-    .map(([name, value], index) => ({
-      name,
-      value,
-      fill: COLORS[index % COLORS.length],
-    }));
+  const domainData = Object.entries(domainFrequency)
+    .map(([name, count]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      count,
+      percentage: Math.round((count / stats.totalSystems) * 100),
+    }))
+    .sort((a, b) => b.count - a.count);
 
-  // Calculate question breakdown
-  const avgQuestionsPerSystem = 15;
-  const totalPossibleQuestions = stats.totalSystems * avgQuestionsPerSystem;
-  const answeredQuestions = totalPossibleQuestions - stats.totalMissing;
-
-  const _questionData = [
-    { name: "Answered", value: answeredQuestions, fill: "#10b981" },
-    { name: "Missing", value: stats.totalMissing, fill: "#f59e0b" },
+  // Controls distribution - show systems grouped by control count ranges
+  const controlRanges = [
+    { range: "0-10", min: 0, max: 10, count: 0 },
+    { range: "11-20", min: 11, max: 20, count: 0 },
+    { range: "21-30", min: 21, max: 30, count: 0 },
+    { range: "31+", min: 31, max: 999, count: 0 },
   ];
 
-  const _radialData = [
-    {
-      name: "Completion",
-      value: stats.completionRate,
-      fill: stats.completionRate >= 80 ? "#10b981" : stats.completionRate >= 50 ? "#f59e0b" : "#ef4444",
-    },
+  stats.portfolioRows.forEach((row) => {
+    const range = controlRanges.find((r) => row.derivedControls >= r.min && row.derivedControls <= r.max);
+    if (range) range.count++;
+  });
+
+  const controlDistribution = controlRanges.filter((r) => r.count > 0);
+
+  const DOMAIN_COLORS = [
+    "#6366f1", // indigo
+    "#8b5cf6", // purple
+    "#ec4899", // pink
+    "#f59e0b", // amber
+    "#10b981", // emerald
+    "#06b6d4", // cyan
+    "#ef4444", // red
   ];
 
   return (
@@ -106,210 +107,114 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           title="Derived Controls"
           value={stats.totalControls}
           description="Across all systems"
-          icon={<CheckCircle2 className="h-5 w-5" />}
+          icon={<Target className="h-5 w-5" />}
           delay={0.1}
         />
         <StatsCard
           title="Completion Rate"
           value={`${stats.completionRate}%`}
           description="Questions answered"
-          icon={<TrendingUp className="h-5 w-5" />}
-          trend={{ value: "+12%", positive: true }}
+          icon={<FileText className="h-5 w-5" />}
           delay={0.2}
         />
         <StatsCard
           title="Systems Complete"
           value={stats.systemStatus.Complete || 0}
-          description="Fully assessed systems"
+          description={`${stats.totalSystems - (stats.systemStatus.Complete || 0)} need work`}
           icon={<CheckCircle2 className="h-5 w-5" />}
           delay={0.3}
         />
       </div>
 
-      {/* Charts */}
+      {/* Charts - Only show when there's data */}
       {stats.totalSystems > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
-          {/* System Status */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <Card className="overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">System Status</CardTitle>
-                <CardDescription>Assessment completion by system</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {statusData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={240}>
+          {/* Domain Activation Frequency */}
+          {domainData.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Domain Activation</CardTitle>
+                  <CardDescription>How often each domain is activated across systems</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={domainData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload?.[0]) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
+                                <p className="font-semibold text-zinc-900 dark:text-zinc-50">{data.name}</p>
+                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                  {data.count} of {stats.totalSystems} systems ({data.percentage}%)
+                                </p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                        {domainData.map((entry, index) => (
+                          <Cell key={entry.name} fill={DOMAIN_COLORS[index % DOMAIN_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Controls Distribution */}
+          {controlDistribution.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Controls Distribution</CardTitle>
+                  <CardDescription>Systems grouped by number of derived controls</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
                       <Pie
-                        data={statusData}
+                        data={controlDistribution}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, value, percent }) => `${name}: ${value} (${((percent ?? 0) * 100).toFixed(0)}%)`}
-                        outerRadius={80}
-                        dataKey="value"
+                        label={({ range, count }) => `${range}: ${count}`}
+                        outerRadius={90}
+                        dataKey="count"
                       >
-                        {statusData.map((entry) => (
-                          <Cell key={entry.name} fill={entry.fill} />
+                        {controlDistribution.map((entry, index) => (
+                          <Cell key={entry.range} fill={DOMAIN_COLORS[index]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload?.[0]) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
+                                <p className="font-semibold text-zinc-900 dark:text-zinc-50">{data.range} controls</p>
+                                <p className="text-sm text-zinc-600 dark:text-zinc-400">{data.count} systems</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
-                ) : (
-                  <div className="flex h-60 items-center justify-center text-sm text-zinc-500">No systems yet</div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Completion Status */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <Card className="overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Question Coverage</CardTitle>
-                <CardDescription>Portfolio-wide assessment progress</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Overall Progress Bar */}
-                <div className="space-y-3">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <div className="text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                        Overall Progress
-                      </div>
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">{answeredQuestions}</span>
-                        <span className="text-lg text-zinc-500 dark:text-zinc-400">/ {totalPossibleQuestions}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{stats.completionRate}%</div>
-                      <div className="text-xs text-zinc-500 dark:text-zinc-400">complete</div>
-                    </div>
-                  </div>
-
-                  {/* Large Progress Bar */}
-                  <div className="h-6 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
-                      style={{ width: `${stats.completionRate}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Breakdown */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-gradient-to-br from-green-500 to-emerald-500" />
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Answered</span>
-                    </div>
-                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{answeredQuestions}</div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400">{stats.completionRate}% of total</div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-gradient-to-br from-amber-500 to-orange-500" />
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Missing</span>
-                    </div>
-                    <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{stats.totalMissing}</div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {Math.round((stats.totalMissing / totalPossibleQuestions) * 100)}% remaining
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </div>
-      )}
-
-      {/* Domain Coverage Heatmap */}
-      {stats.portfolioRows.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-          <Card className="overflow-hidden shadow-lg">
-            <CardHeader className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-              <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-                <Network className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-                Domain Coverage Matrix
-                <InfoTooltip content="Shows which risk domains (Security, Data, Integration, etc.) are relevant for each system. Domains are automatically activated based on your answers." />
-              </CardTitle>
-              <CardDescription>Which domains are activated across your systems</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              {(() => {
-                // Get all unique domains across all systems
-                const allDomains = Array.from(new Set(stats.portfolioRows.flatMap((r) => r.domains))).sort();
-
-                if (allDomains.length === 0) {
-                  return (
-                    <div className="flex h-40 items-center justify-center text-sm text-zinc-500">No domains activated yet</div>
-                  );
-                }
-
-                return (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="border-b-2 border-zinc-200 dark:border-zinc-800">
-                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 sticky left-0 bg-zinc-50/50 dark:bg-zinc-900/50">
-                            System
-                          </th>
-                          {allDomains.map((domain) => (
-                            <th
-                              key={domain}
-                              className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400"
-                            >
-                              {domain}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                        {stats.portfolioRows.map((row) => (
-                          <tr key={row.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-                            <td className="px-6 py-4 sticky left-0 bg-white dark:bg-zinc-950 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/50">
-                              <Link
-                                className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
-                                href={`/systems/${encodeURIComponent(row.id)}`}
-                              >
-                                {row.id}
-                              </Link>
-                            </td>
-                            {allDomains.map((domain) => {
-                              const isActivated = row.domains.includes(domain);
-                              return (
-                                <td key={`${row.id}-${domain}`} className="px-6 py-4 text-center">
-                                  <div className="flex justify-center">
-                                    <div
-                                      className={`
-                                        inline-flex h-8 w-8 items-center justify-center rounded-md transition-all
-                                        ${
-                                          isActivated
-                                            ? "bg-gradient-to-br from-green-500 to-emerald-500 shadow-md"
-                                            : "bg-zinc-100 dark:bg-zinc-800"
-                                        }
-                                      `}
-                                      title={isActivated ? `${domain} activated` : `${domain} not activated`}
-                                    >
-                                      {isActivated && <CheckCircle2 className="h-4 w-4 text-white" />}
-                                    </div>
-                                  </div>
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              })()}
-            </CardContent>
-          </Card>
-        </motion.div>
       )}
     </div>
   );

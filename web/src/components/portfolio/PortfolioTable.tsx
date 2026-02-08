@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderMinus, Trash2 } from "lucide-react";
+import { ArrowRight, FolderMinus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -81,10 +81,10 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
               Controls
             </th>
             <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              Missing Answers
+              Missing
             </th>
             <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              Activated Domains
+              Domains
             </th>
             <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               Actions
@@ -96,25 +96,54 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
             <tr key={r.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
               <td className="px-6 py-4">
                 <Link
-                  className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300"
+                  className="font-semibold text-zinc-900 hover:text-indigo-600 dark:text-zinc-50 dark:hover:text-indigo-400 transition-colors"
                   href={`/systems/${encodeURIComponent(r.id)}`}
                 >
                   {r.id}
                 </Link>
               </td>
               <td className="px-6 py-4">
-                <Badge variant="secondary">{r.derivedControls}</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {r.derivedControls}
+                </Badge>
               </td>
               <td className="px-6 py-4">
                 {r.missingAnswers > 0 ? (
-                  <Badge variant="warning">{r.missingAnswers}</Badge>
+                  <Badge variant="warning" className="font-mono">
+                    {r.missingAnswers}
+                  </Badge>
                 ) : (
-                  <Badge variant="success">0</Badge>
+                  <Badge variant="success" className="font-mono">
+                    0
+                  </Badge>
                 )}
               </td>
-              <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{r.activatedDomains || "—"}</td>
-              <td className="px-6 py-4 text-right">
+              <td className="px-6 py-4">
+                {r.domains.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {r.domains.map((domain) => (
+                      <Badge key={domain} variant="outline" className="text-xs">
+                        {domain}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-zinc-400">—</span>
+                )}
+              </td>
+              <td className="px-6 py-4">
                 <div className="flex items-center justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    asChild
+                    className="h-8 gap-1.5 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-300"
+                  >
+                    <Link href={`/systems/${encodeURIComponent(r.id)}`}>
+                      Open
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -123,7 +152,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                     className="h-8 gap-1.5 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30 dark:hover:text-amber-300"
                   >
                     <FolderMinus className="h-3.5 w-3.5" />
-                    {removingId === r.id ? "Removing..." : "Remove"}
+                    {removingId === r.id ? "..." : "Remove"}
                   </Button>
                   <Button
                     size="sm"
@@ -133,7 +162,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                     className="h-8 gap-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    {deletingId === r.id ? "Deleting..." : "Delete"}
+                    {deletingId === r.id ? "..." : "Delete"}
                   </Button>
                 </div>
               </td>

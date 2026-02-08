@@ -2,7 +2,6 @@ import { Activity, FolderPlus, Shield } from "lucide-react";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 import { PortfolioTable } from "@/components/portfolio/PortfolioTable";
 import { SystemManagement } from "@/components/SystemManagement";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { NoSystemsEmpty } from "@/components/ui/empty-state";
 import { buildPortfolio } from "@/lib/portfolio";
@@ -48,7 +47,7 @@ export default async function Home() {
         {/* Subtle gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10" />
 
-        <div className="relative flex items-start justify-between gap-6 p-6">
+        <div className="relative p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
               <Shield className="h-7 w-7 text-white" />
@@ -60,8 +59,11 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">Model {modelVersion}</Badge>
+
+          {/* Version Info - Bottom Right */}
+          <div className="absolute bottom-4 right-6 flex flex-col items-end gap-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+            <span>Version: 0.6.7</span>
+            <span>Model: {modelVersion}</span>
           </div>
         </div>
       </div>
