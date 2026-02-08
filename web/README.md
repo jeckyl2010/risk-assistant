@@ -2,19 +2,36 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Install Bun
+
+If you don't have Bun installed:
+
+```powershell
+# Windows
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+For other platforms, see [bun.sh](https://bun.sh).
+
+### Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+```
+
+### Run Development Server
+
+```bash
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Update Dependencies
+
+```bash
+bun update
+```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

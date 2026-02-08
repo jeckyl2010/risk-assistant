@@ -72,6 +72,11 @@ operations:
   change_model: cicd
   deployment_scale: global
   environment: prod
+  observability_signals:
+    - alerts
+    - logs
+    - traces
+  observability_scope: global_centralized
 cost:
   cost_scaling_model: growth_based
   vendor_lock_in: medium

@@ -32,6 +32,7 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 
 ## Tech Stack Specifics
 
+- **Runtime**: Bun (fast JavaScript runtime and package manager)
 - **Next.js**: App Router with React Server Components
 - **TypeScript**: Strict mode, prefer type safety
 - **Styling**: Tailwind CSS v4, indigo/purple gradient theme, Geist Sans + Geist Mono fonts

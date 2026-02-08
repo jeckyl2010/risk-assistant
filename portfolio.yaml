@@ -1,7 +1,3 @@
 systems:
   - name: TestMe
     path: ./systems/TestMe.yaml
-  - name: Test-2
-    path: ./systems/Test-2.yaml
-  - name: New-Test
-    path: C:\Repos\risk-assistant\systems\New-Test.yaml
