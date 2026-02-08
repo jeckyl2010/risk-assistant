@@ -9,7 +9,7 @@ Container orchestration and deployment configuration for Risk Assistant.
 **Windows:**
 ```powershell
 winget install RedHat.Podman
-pip install podman-compose
+uv pip install podman-compose
 ```
 
 **macOS:**
