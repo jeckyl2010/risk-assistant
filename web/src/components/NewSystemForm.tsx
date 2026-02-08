@@ -6,11 +6,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { motion } from 'framer-motion'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FileBrowserModal } from '@/components/FileBrowserModal'
 
 const formSchema = z.object({
   id: z.string()
@@ -23,9 +24,10 @@ type FormData = z.infer<typeof formSchema>
 
 export function NewSystemForm() {
   const [isCreating, setIsCreating] = useState(false)
+  const [showBrowser, setShowBrowser] = useState(false)
   const router = useRouter()
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       path: ''
@@ -34,6 +36,15 @@ export function NewSystemForm() {
   
   const systemId = watch('id')
   const defaultPath = systemId ? `./systems/${systemId}.yaml` : './systems/[SystemID].yaml'
+
+  const handleDirectorySelect = (dirPath: string) => {
+    // Construct full path with system ID
+    const fileName = systemId ? `${systemId}.yaml` : 'system.yaml'
+    const fullPath = dirPath.endsWith('\\') || dirPath.endsWith('/') 
+      ? `${dirPath}${fileName}`
+      : `${dirPath}\\${fileName}`
+    setValue('path', fullPath)
+  }
 
   async function onSubmit(data: FormData) {
     setIsCreating(true)
@@ -85,12 +96,26 @@ export function NewSystemForm() {
           <Label htmlFor="system-path">
             File Path <span className="text-sm font-normal text-gray-500">(optional)</span>
           </Label>
-          <Input
-            id="system-path"
-            {...register('path')}
-            placeholder={defaultPath}
-            disabled={isCreating}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="system-path"
+              {...register('path')}
+              placeholder={defaultPath}
+              disabled={isCreating}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={() => setShowBrowser(true)}
+              disabled={isCreating}
+              className="gap-1.5"
+            >
+              <FolderOpen className="h-4 w-4" />
+              Browse
+            </Button>
+          </div>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             Relative (./systems/...) or absolute (C:\Repos\...). Defaults to ./systems/{'{SystemID}'}.yaml
           </p>
@@ -115,6 +140,14 @@ export function NewSystemForm() {
           </>
         )}
       </Button>
+
+      <FileBrowserModal
+        isOpen={showBrowser}
+        onClose={() => setShowBrowser(false)}
+        onSelect={handleDirectorySelect}
+        mode="directory"
+        title="Select Directory for System File"
+      />
     </motion.form>
   )
 }

@@ -1,23 +1,7 @@
-# Risk Assistant Portfolio Manifest
-# This file tracks all systems managed by this Risk Assistant instance.
-# Systems can be located anywhere on your filesystem, allowing for:
-# - Team-specific repositories
-# - Separate Git version control per system or portfolio
-# - Distributed system ownership
-
 systems:
-  # Example: System in default location (relative path)
-  - name: "TestMe"
-    path: "./systems/TestMe.yaml"
-  
-  # Example: System in default location (relative path)
-  - name: "Test-2"
-    path: "./systems/Test-2.yaml"
-  
-  # Example: System in another repository (absolute path)
-  # - name: "ProductionAPI"
-  #   path: "C:\\Repos\\backend-systems\\ProductionAPI.yaml"
-  
-  # Example: System in team shared location
-  # - name: "DataPipeline"
-  #   path: "\\\\shared\\IT\\risk-systems\\DataPipeline.yaml"
+  - name: TestMe
+    path: ./systems/TestMe.yaml
+  - name: Test-2
+    path: ./systems/Test-2.yaml
+  - name: New-Test
+    path: C:\Repos\risk-assistant\systems\New-Test.yaml

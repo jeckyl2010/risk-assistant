@@ -1,12 +1,11 @@
 import Link from 'next/link'
 import { buildPortfolio } from '@/lib/portfolio'
-import { NewSystemForm } from '@/components/NewSystemForm'
-import { AddExistingSystemForm } from '@/components/AddExistingSystemForm'
+import { SystemManagement } from '@/components/SystemManagement'
 import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
 import { PortfolioTable } from '@/components/portfolio/PortfolioTable'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Shield, FileCheck, Activity, FolderPlus } from 'lucide-react'
+import { Shield, Activity } from 'lucide-react'
 import { NoSystemsEmpty } from '@/components/ui/empty-state'
 
 export default async function Home() {
@@ -70,35 +69,18 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Create New System Card */}
+      {/* System Management */}
       <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold text-indigo-900 dark:text-indigo-100">
-            <FileCheck className="h-6 w-6" />
-            Create New System
+          <CardTitle className="text-xl font-semibold text-indigo-900 dark:text-indigo-100">
+            Add System to Portfolio
           </CardTitle>
           <CardDescription>
-            Start a new risk assessment by creating a system
+            Create a new risk assessment or add an existing system file
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <NewSystemForm />
-        </CardContent>
-      </Card>
-
-      {/* Add Existing System Card */}
-      <Card className="border-2 border-dashed border-purple-200 dark:border-purple-900">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold text-purple-900 dark:text-purple-100">
-            <FolderPlus className="h-6 w-6" />
-            Add Existing System
-          </CardTitle>
-          <CardDescription>
-            Add a system file that already exists on your filesystem to the portfolio
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddExistingSystemForm />
+          <SystemManagement />
         </CardContent>
       </Card>
 

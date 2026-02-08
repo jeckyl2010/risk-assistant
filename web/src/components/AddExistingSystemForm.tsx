@@ -6,11 +6,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { motion } from 'framer-motion'
-import { FolderPlus, Loader2 } from 'lucide-react'
+import { FolderPlus, Loader2, FileSearch } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FileBrowserModal } from '@/components/FileBrowserModal'
 
 const formSchema = z.object({
   path: z.string().min(1, 'File path is required')
@@ -20,11 +21,16 @@ type FormData = z.infer<typeof formSchema>
 
 export function AddExistingSystemForm() {
   const [isAdding, setIsAdding] = useState(false)
+  const [showBrowser, setShowBrowser] = useState(false)
   const router = useRouter()
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema)
   })
+
+  const handleFileSelect = (filePath: string) => {
+    setValue('path', filePath)
+  }
 
   async function onSubmit(data: FormData) {
     setIsAdding(true)
@@ -63,12 +69,26 @@ export function AddExistingSystemForm() {
           <Label htmlFor="system-path">
             Existing System File Path
           </Label>
-          <Input
-            id="system-path"
-            {...register('path')}
-            placeholder="./systems/MySystem.yaml or C:\Repos\team-systems\MySystem.yaml"
-            disabled={isAdding}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="system-path"
+              {...register('path')}
+              placeholder="./systems/MySystem.yaml or C:\Repos\team-systems\MySystem.yaml"
+              disabled={isAdding}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={() => setShowBrowser(true)}
+              disabled={isAdding}
+              className="gap-1.5"
+            >
+              <FileSearch className="h-4 w-4" />
+              Browse
+            </Button>
+          </div>
           {errors.path && (
             <motion.p
               initial={{ opacity: 0, y: -5 }}
@@ -103,6 +123,14 @@ export function AddExistingSystemForm() {
           </>
         )}
       </Button>
+
+      <FileBrowserModal
+        isOpen={showBrowser}
+        onClose={() => setShowBrowser(false)}
+        onSelect={handleFileSelect}
+        mode="file"
+        title="Select Existing System File"
+      />
     </motion.form>
   )
 }
