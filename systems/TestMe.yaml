@@ -39,7 +39,7 @@ security:
 data:
   personal_data: true
   data_subject_region: non_eu
-  data_leaves_manufacturing_zone: true
+  data_leaves_manufacturing_zone: null
 ai:
   ai_autonomy: advisory
   model_change: retrained

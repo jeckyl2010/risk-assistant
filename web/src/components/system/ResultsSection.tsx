@@ -14,12 +14,112 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip as InfoTooltip } from "@/components/ui/tooltip";
 import { formatEnforcementIntent, formatEvidenceType, formatPhase, formatReferenceType, formatScope } from "@/lib/formatting";
+
+// Domain color mappings matching the sidebar theme
+function getDomainColor(prefix: string): {
+  bg: string;
+  border: string;
+  borderIdle: string;
+  borderHover: string;
+  chart: string;
+} {
+  const colorMap: Record<string, { bg: string; border: string; borderIdle: string; borderHover: string; chart: string }> = {
+    AI: {
+      bg: "bg-violet-50/30 dark:bg-violet-950/20",
+      border: "border-violet-300 dark:border-violet-700",
+      borderIdle: "border-l-violet-500/50 dark:border-l-violet-400/50",
+      borderHover: "hover:border-l-violet-500 dark:hover:border-l-violet-400",
+      chart: "#8b5cf6",
+    },
+    COST: {
+      bg: "bg-lime-50/30 dark:bg-lime-950/20",
+      border: "border-lime-300 dark:border-lime-700",
+      borderIdle: "border-l-lime-500/50 dark:border-l-lime-400/50",
+      borderHover: "hover:border-l-lime-500 dark:hover:border-l-lime-400",
+      chart: "#84cc16",
+    },
+    CRIT: {
+      bg: "bg-amber-50/30 dark:bg-amber-950/20",
+      border: "border-amber-300 dark:border-amber-700",
+      borderIdle: "border-l-amber-500/50 dark:border-l-amber-400/50",
+      borderHover: "hover:border-l-amber-500 dark:hover:border-l-amber-400",
+      chart: "#f59e0b",
+    },
+    DATA: {
+      bg: "bg-cyan-50/30 dark:bg-cyan-950/20",
+      border: "border-cyan-300 dark:border-cyan-700",
+      borderIdle: "border-l-cyan-500/50 dark:border-l-cyan-400/50",
+      borderHover: "hover:border-l-cyan-500 dark:hover:border-l-cyan-400",
+      chart: "#06b6d4",
+    },
+    INT: {
+      bg: "bg-sky-50/30 dark:bg-sky-950/20",
+      border: "border-sky-300 dark:border-sky-700",
+      borderIdle: "border-l-sky-500/50 dark:border-l-sky-400/50",
+      borderHover: "hover:border-l-sky-500 dark:hover:border-l-sky-400",
+      chart: "#0ea5e9",
+    },
+    OPS: {
+      bg: "bg-teal-50/30 dark:bg-teal-950/20",
+      border: "border-teal-300 dark:border-teal-700",
+      borderIdle: "border-l-teal-500/50 dark:border-l-teal-400/50",
+      borderHover: "hover:border-l-teal-500 dark:hover:border-l-teal-400",
+      chart: "#14b8a6",
+    },
+    SEC: {
+      bg: "bg-rose-50/30 dark:bg-rose-950/20",
+      border: "border-rose-300 dark:border-rose-700",
+      borderIdle: "border-l-rose-500/50 dark:border-l-rose-400/50",
+      borderHover: "hover:border-l-rose-500 dark:hover:border-l-rose-400",
+      chart: "#f43f5e",
+    },
+    GDPR: {
+      bg: "bg-orange-50/30 dark:bg-orange-950/20",
+      border: "border-orange-300 dark:border-orange-700",
+      borderIdle: "border-l-orange-500/50 dark:border-l-orange-400/50",
+      borderHover: "hover:border-l-orange-500 dark:hover:border-l-orange-400",
+      chart: "#f97316",
+    },
+    IAM: {
+      bg: "bg-fuchsia-50/30 dark:bg-fuchsia-950/20",
+      border: "border-fuchsia-300 dark:border-fuchsia-700",
+      borderIdle: "border-l-fuchsia-500/50 dark:border-l-fuchsia-400/50",
+      borderHover: "hover:border-l-fuchsia-500 dark:hover:border-l-fuchsia-400",
+      chart: "#d946ef",
+    },
+  };
+  return (
+    colorMap[prefix] || {
+      bg: "bg-slate-50/30 dark:bg-slate-950/20",
+      border: "border-slate-300 dark:border-slate-700",
+      borderIdle: "border-l-slate-500/50 dark:border-l-slate-400/50",
+      borderHover: "hover:border-l-slate-500 dark:hover:border-l-slate-400",
+      chart: "#64748b",
+    }
+  );
+}
+
+// Format domain prefix to human-readable name
+function formatDomainName(prefix: string): string {
+  const domainNames: Record<string, string> = {
+    AI: "AI",
+    COST: "Cost",
+    CRIT: "Criticality",
+    DATA: "Data",
+    INT: "Integration",
+    OPS: "Operations",
+    SEC: "Security",
+    GDPR: "GDPR",
+    IAM: "IAM",
+  };
+  return domainNames[prefix] || prefix;
+}
 
 interface DerivedControl {
   id: string;
@@ -53,19 +153,12 @@ interface ResultsSectionProps {
 function getControlStatus(control: DerivedControl) {
   const requiresEvidence = control.evidence_type && control.evidence_type.length > 0;
   const hasEvidenceProvided = control.references && control.references.length > 0;
-  const isMandatory = control.enforcement_intent === "mandatory" || control.enforcement_intent === "required";
-  const isRecommended = control.enforcement_intent === "recommended" || control.enforcement_intent === "suggested";
 
   // Control requires evidence but none provided yet
   if (requiresEvidence && !hasEvidenceProvided) {
     return {
       status: "Pending Evidence",
       statusColor: "border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:bg-amber-950/50",
-      borderColor: isMandatory
-        ? "border-red-300 dark:border-red-700"
-        : isRecommended
-          ? "border-amber-300 dark:border-amber-700"
-          : "border-blue-300 dark:border-blue-700",
     };
   }
 
@@ -73,12 +166,6 @@ function getControlStatus(control: DerivedControl) {
   return {
     status: "Active",
     statusColor: "border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/50",
-    borderColor:
-      requiresEvidence && hasEvidenceProvided
-        ? "border-green-300 dark:border-green-700" // Evidence provided = green
-        : isMandatory
-          ? "border-red-300 dark:border-red-700"
-          : "border-green-300 dark:border-green-700",
   };
 }
 
@@ -132,20 +219,49 @@ export function ResultsSection({
   );
 
   const enforcementData = Object.entries(enforcementDistribution).map(([name, value]) => ({
-    name,
+    name: formatEnforcementIntent(name),
+    rawName: name,
     value,
   }));
   const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }));
   const evidenceData = Object.entries(evidenceDistribution).map(([name, value]) => ({
-    name,
+    name: formatEvidenceType(name),
+    rawName: name,
     value,
   }));
   const categoryData = Object.entries(categoryDistribution).map(([name, value]) => ({
-    name,
+    name: formatDomainName(name),
+    rawName: name,
     value,
+    color: getDomainColor(name).chart,
   }));
 
-  const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#06b6d4", "#f43f5e"];
+  const PHASE_COLORS: Record<string, string> = {
+    Plan: "#8b5cf6",
+    Build: "#0ea5e9",
+    Deploy: "#f59e0b",
+    Run: "#10b981",
+    Operate: "#06b6d4",
+  };
+
+  const ENFORCEMENT_COLORS: Record<string, string> = {
+    procedural: "#8b5cf6",
+    "semi-automatic": "#0ea5e9",
+    automatic: "#10b981",
+  };
+
+  const EVIDENCE_COLORS: Record<string, string> = {
+    logs: "#06b6d4",
+    config: "#8b5cf6",
+    attestation: "#f59e0b",
+    testing: "#10b981",
+    documentation: "#ec4899",
+    practice: "#f97316",
+  };
+
+  // Helper to get color by raw name
+  const getEnforcementColor = (rawName: string) => ENFORCEMENT_COLORS[rawName] || "#64748b";
+  const getEvidenceColor = (rawName: string) => EVIDENCE_COLORS[rawName] || "#64748b";
 
   // Get unique categories
   const categories = Array.from(new Set(derivedControls.map((c) => c.id.split("-")[0]))).sort();
@@ -262,23 +378,41 @@ export function ResultsSection({
                 <CardDescription className="text-xs">How controls can be enforced</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={180}>
+                <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
                     <Pie
                       data={enforcementData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                      outerRadius={60}
+                      label={false}
+                      outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {enforcementData.map((entry, index) => (
-                        <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                      {enforcementData.map((entry) => (
+                        <Cell key={entry.name} fill={getEnforcementColor(entry.rawName)} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={36}
+                      iconType="circle"
+                      formatter={(value: string, entry: { payload?: { value?: number } }) => {
+                        const total = enforcementData.reduce((sum, item) => sum + item.value, 0);
+                        const percent = entry.payload?.value ? ((entry.payload.value / total) * 100).toFixed(0) : "0";
+                        return `${value} (${percent}%)`;
+                      }}
+                      wrapperStyle={{ fontSize: "13px", paddingTop: "10px" }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -297,14 +431,21 @@ export function ResultsSection({
                 <CardDescription className="text-xs">When controls must be satisfied</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={phaseData}>
-                    <XAxis dataKey="name" fontSize={11} angle={-45} textAnchor="end" height={80} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={phaseData} margin={{ bottom: 20, left: 0, right: 10 }}>
+                    <XAxis dataKey="name" fontSize={13} angle={0} textAnchor="middle" height={60} tick={{ fill: "#71717a" }} />
+                    <YAxis fontSize={13} tick={{ fill: "#71717a" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                      }}
+                    />
                     <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                      {phaseData.map((entry, index) => (
-                        <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                      {phaseData.map((entry) => (
+                        <Cell key={entry.name} fill={PHASE_COLORS[entry.name] || "#64748b"} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -325,14 +466,21 @@ export function ResultsSection({
                 <CardDescription className="text-xs">Verification methods needed</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={evidenceData}>
-                    <XAxis dataKey="name" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={evidenceData} margin={{ bottom: 20, left: 0, right: 10 }}>
+                    <XAxis dataKey="name" fontSize={13} angle={-15} textAnchor="end" height={70} tick={{ fill: "#71717a" }} />
+                    <YAxis fontSize={13} tick={{ fill: "#71717a" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                      }}
+                    />
                     <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                      {evidenceData.map((entry, index) => (
-                        <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                      {evidenceData.map((entry) => (
+                        <Cell key={entry.name} fill={getEvidenceColor(entry.rawName)} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -352,14 +500,21 @@ export function ResultsSection({
                 <CardDescription className="text-xs">Distribution by domain</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={categoryData}>
-                    <XAxis dataKey="name" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
-                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                      {categoryData.map((entry, index) => (
-                        <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={categoryData} margin={{ bottom: 20, left: 0, right: 10 }}>
+                    <XAxis dataKey="name" fontSize={13} angle={-15} textAnchor="end" height={70} tick={{ fill: "#71717a" }} />
+                    <YAxis fontSize={13} tick={{ fill: "#71717a" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                      }}
+                    />
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]} label={{ position: "top", fontSize: 12, fill: "#52525b" }}>
+                      {categoryData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -421,17 +576,25 @@ export function ResultsSection({
                 <div className="flex flex-wrap items-center gap-2">
                   <Filter className="h-4 w-4 text-zinc-500" />
                   <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Filter by category:</span>
-                  {categories.map((category) => (
-                    <Badge
-                      key={category}
-                      variant={selectedCategories.includes(category) ? "default" : "outline"}
-                      className="cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                      onClick={() => toggleCategory(category)}
-                    >
-                      {category}
-                      {selectedCategories.includes(category) && <X className="ml-1 h-3 w-3" />}
-                    </Badge>
-                  ))}
+                  {categories.map((category) => {
+                    const domainColor = getDomainColor(category);
+                    const isSelected = selectedCategories.includes(category);
+                    return (
+                      <Badge
+                        key={category}
+                        variant="outline"
+                        className={`cursor-pointer transition-all ${
+                          isSelected
+                            ? `${domainColor.border} ${domainColor.bg} font-semibold shadow-sm`
+                            : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                        }`}
+                        onClick={() => toggleCategory(category)}
+                      >
+                        {category}
+                        {isSelected && <X className="ml-1 h-3 w-3" />}
+                      </Badge>
+                    );
+                  })}
                   {selectedCategories.length > 0 && (
                     <Button size="sm" variant="ghost" onClick={() => setSelectedCategories([])} className="h-6 text-xs">
                       Clear filters
@@ -455,7 +618,9 @@ export function ResultsSection({
                   <div className="space-y-2">
                     {filteredControls.map((control, index) => {
                       const isExpanded = expandedControls.includes(control.id);
-                      const { status, statusColor, borderColor } = getControlStatus(control);
+                      const { status, statusColor } = getControlStatus(control);
+                      const controlPrefix = control.id.split("-")[0];
+                      const domainColor = getDomainColor(controlPrefix);
                       return (
                         <motion.div
                           key={control.id}
@@ -466,7 +631,7 @@ export function ResultsSection({
                           transition={{ delay: Math.min(index * 0.03, 0.3) }}
                         >
                           <Card
-                            className={`cursor-pointer border-2 shadow-sm transition-all duration-200 ${borderColor} hover:scale-[1.02] hover:shadow-2xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:-translate-y-0.5`}
+                            className={`group cursor-pointer border-l-4 shadow-sm transition-all duration-200 ${domainColor.borderIdle} border-zinc-200 dark:border-zinc-800 ${domainColor.borderHover} hover:shadow-lg hover:${domainColor.bg} hover:-translate-y-0.5`}
                             onClick={() => toggleExpanded(control.id)}
                           >
                             <CardContent className="p-4">
