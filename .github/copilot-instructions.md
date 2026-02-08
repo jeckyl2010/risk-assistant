@@ -80,6 +80,8 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 **Examples of proper structure:**
 - ✅ `infrastructure/compose.yaml`, `infrastructure/backend.Dockerfile`, `infrastructure/README.md`
 - ❌ `Dockerfile.backend`, `compose.yaml`, `PODMAN.md` scattered in root
+- ✅ `scripts/setup.ps1`, `scripts/update.ps1` (development tooling)
+- ❌ `setup.ps1`, `update.ps1` in root
 - ✅ `web/biome.json` (scoped to frontend)
 - ❌ `biome.json` in root when it only applies to web/
 
@@ -90,12 +92,21 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 4. Place files in the appropriate location
 5. Never default to "just put it in root"
 
+**Current directory structure:**
+- `infrastructure/` - Container orchestration (Dockerfiles, compose files, podman.ps1)
+- `scripts/` - Development tooling (setup.ps1, update.ps1, install-extensions.ps1)
+- `prompts/` - AI prompts and system instructions
+- `tools/` - Python backend tools (riskctl.py)
+- `web/` - Next.js frontend application
+- `model/` - YAML-based question/control/rule catalogs
+- `systems/` - System definition files
+
 This isn't about over-engineering - it's about respecting the maintainer's workspace and keeping the project navigable.
 
 ## Automation Preferences
 
 - **Automate repetitive tasks** — write scripts instead of documenting manual steps
-- **One command per task** — setup, update, install should each be a single script
+- **One command per task** — setup, update, install should each be a single script in `scripts/`
 - **PowerShell for tooling** — project uses `.ps1` scripts for cross-platform Windows/Linux/Mac support
 - **Hide complexity** — manual steps go in collapsible sections, automation goes first
 

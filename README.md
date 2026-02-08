@@ -10,7 +10,7 @@ Non-goals: scoring, RAG, workshops, approvals.
 ### One-Command Setup
 
 ```powershell
-.\setup.ps1
+.\scripts\setup.ps1
 ```
 
 This installs everything: uv, Bun, Python dependencies, and frontend packages.
@@ -87,7 +87,7 @@ See [infrastructure/README.md](infrastructure/README.md) for complete Podman set
 
 **Install recommended extensions:**
 ```powershell
-.\install-extensions.ps1
+.\scripts\install-extensions.ps1
 ```
 
 This installs:
@@ -102,7 +102,7 @@ Alternatively, VS Code will prompt you to install recommended extensions when yo
 
 **Update all dependencies:**
 ```powershell
-.\update.ps1
+.\scripts\update.ps1
 ```
 
 **Code quality:**
