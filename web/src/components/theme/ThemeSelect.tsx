@@ -1,82 +1,82 @@
-'use client'
+"use client";
 
-import { useEffect, useMemo, useState } from 'react'
-import { Moon, Sun, Monitor } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { applyTheme } from './theme'
-import { THEME_STORAGE_KEY, type ThemeMode } from './themeInit'
+import { motion } from "framer-motion";
+import { Monitor, Moon, Sun } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { applyTheme } from "./theme";
+import { THEME_STORAGE_KEY, type ThemeMode } from "./themeInit";
 
 function safeGetStoredTheme(): ThemeMode {
   try {
-    const raw = localStorage.getItem(THEME_STORAGE_KEY)
-    if (raw === 'light' || raw === 'dark' || raw === 'system') return raw
+    const raw = localStorage.getItem(THEME_STORAGE_KEY);
+    if (raw === "light" || raw === "dark" || raw === "system") return raw;
   } catch {
     // ignore
   }
-  return 'system'
+  return "system";
 }
 
 export function ThemeSelect() {
-  const [mounted, setMounted] = useState(false)
-  const [theme, setTheme] = useState<ThemeMode>('system')
+  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<ThemeMode>("system");
 
   // Mount: read persisted theme. We don't render anything until mounted.
   useEffect(() => {
-    setMounted(true)
-    const stored = safeGetStoredTheme()
-    setTheme(stored)
-  }, [])
+    setMounted(true);
+    const stored = safeGetStoredTheme();
+    setTheme(stored);
+  }, []);
 
   // Persist & apply when user changes.
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted) return;
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, theme)
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {
       // ignore
     }
-    applyTheme(theme)
-  }, [mounted, theme])
+    applyTheme(theme);
+  }, [mounted, theme]);
 
   // When in system mode, react to OS theme changes.
   useEffect(() => {
-    if (theme !== 'system') return
-    const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
-    if (!mql) return
+    if (theme !== "system") return;
+    const mql = window.matchMedia?.("(prefers-color-scheme: dark)");
+    if (!mql) return;
 
-    const handler = () => applyTheme('system')
+    const handler = () => applyTheme("system");
     if (mql.addEventListener) {
-      mql.addEventListener('change', handler)
+      mql.addEventListener("change", handler);
     } else {
-      ;(mql as unknown as { addListener?: (fn: () => void) => void }).addListener?.(handler)
+      (mql as unknown as { addListener?: (fn: () => void) => void }).addListener?.(handler);
     }
 
     return () => {
       if (mql.removeEventListener) {
-        mql.removeEventListener('change', handler)
+        mql.removeEventListener("change", handler);
       } else {
-        ;(mql as unknown as { removeListener?: (fn: () => void) => void }).removeListener?.(handler)
+        (mql as unknown as { removeListener?: (fn: () => void) => void }).removeListener?.(handler);
       }
-    }
-  }, [theme])
+    };
+  }, [theme]);
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
   const themes: { value: ThemeMode; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
-  ]
+    { value: "light", icon: Sun, label: "Light" },
+    { value: "dark", icon: Moon, label: "Dark" },
+    { value: "system", icon: Monitor, label: "System" },
+  ];
 
-  const currentThemeIndex = themes.findIndex(t => t.value === theme)
-  const currentTheme = themes[currentThemeIndex]
-  
+  const currentThemeIndex = themes.findIndex((t) => t.value === theme);
+  const currentTheme = themes[currentThemeIndex];
+
   const cycleTheme = () => {
-    const nextIndex = (currentThemeIndex + 1) % themes.length
-    setTheme(themes[nextIndex].value)
-  }
+    const nextIndex = (currentThemeIndex + 1) % themes.length;
+    setTheme(themes[nextIndex].value);
+  };
 
-  const Icon = currentTheme.icon
+  const Icon = currentTheme.icon;
 
   return (
     <motion.button
@@ -92,6 +92,5 @@ export function ThemeSelect() {
         {currentTheme.label}
       </span>
     </motion.button>
-  )
+  );
 }
-

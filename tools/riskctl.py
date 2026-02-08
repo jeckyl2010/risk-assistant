@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import sys
 import argparse
-import yaml
+import sys
 from pathlib import Path
+
+import yaml
 
 DEFAULT_MODEL_DIR = Path("model")
 MODEL_MANIFEST_CANDIDATES = ("model.manifest.yaml", "manifest.yaml")
@@ -116,7 +117,9 @@ def validate_model_component_headers(model_dir: Path):
                 continue
 
             if "version" in doc:
-                warn(f"model: {p} uses 'version' header; use 'schema_version' to avoid confusion with model SemVer")
+                warn(
+                    f"model: {p} uses 'version' header; use 'schema_version' to avoid confusion with model SemVer"
+                )
 
             if "schema_version" not in doc:
                 warn(f"model: {p} missing required 'schema_version' header")
@@ -157,7 +160,9 @@ def domain_name_from_questions_file(path: Path) -> str | None:
     return domain or None
 
 
-def list_available_domain_question_files(questions_dir: Path, base_questions_file: Path) -> dict[str, Path]:
+def list_available_domain_question_files(
+    questions_dir: Path, base_questions_file: Path
+) -> dict[str, Path]:
     out: dict[str, Path] = {}
     if not questions_dir.exists():
         return out
@@ -332,7 +337,9 @@ def validate_controls_rules(rules_doc: dict, catalog: dict[str, dict]):
         for cid in required:
             if cid not in catalog:
                 cond = rule.get("when", {})
-                warn(f"controls rules: rule #{idx} references missing control '{cid}' (when: {cond})")
+                warn(
+                    f"controls rules: rule #{idx} references missing control '{cid}' (when: {cond})"
+                )
 
 
 def collect_base_question_ids(base_questions_file: Path) -> list[str]:
@@ -366,7 +373,9 @@ def list_domain_questions(questions_dir: Path, domain: str) -> list[dict]:
     return doc.get("questions", [])
 
 
-def derive_controls(facts: dict, *, controls_rules_file: Path, controls_catalog_file: Path) -> tuple[dict, dict]:
+def derive_controls(
+    facts: dict, *, controls_rules_file: Path, controls_catalog_file: Path
+) -> tuple[dict, dict]:
     """
     Returns:
       derived: control_id -> list[cond] (why)
@@ -390,7 +399,9 @@ def derive_controls(facts: dict, *, controls_rules_file: Path, controls_catalog_
     return derived, catalog
 
 
-def print_required_questions(base_ids: list[str], activated_domains: list[str], facts: dict, *, questions_dir: Path):
+def print_required_questions(
+    base_ids: list[str], activated_domains: list[str], facts: dict, *, questions_dir: Path
+):
     print("Required questions (progressive disclosure):")
     print("- base:")
     for qid in base_ids:
@@ -434,7 +445,9 @@ def print_activated_domains_with_paths(activated_domains: list[str], questions_d
     print()
 
 
-def required_question_ids(base_questions_file: Path, questions_dir: Path, activated_domains: list[str]) -> list[str]:
+def required_question_ids(
+    base_questions_file: Path, questions_dir: Path, activated_domains: list[str]
+) -> list[str]:
     base = load_yaml(base_questions_file)
     base_ids = [q["id"] for q in base.get("questions", [])]
     out = [f"base.{qid}" for qid in base_ids]
@@ -472,7 +485,9 @@ def evaluate(facts_path: Path, model_dir: Path):
 
     pinned = facts.get("model_version")
     if isinstance(pinned, str) and pinned.strip() and pinned.strip() != model_version:
-        warn(f"facts: model_version '{pinned.strip()}' does not match loaded model '{model_version}'")
+        warn(
+            f"facts: model_version '{pinned.strip()}' does not match loaded model '{model_version}'"
+        )
 
     # 1) Base + triggers => activated domains
     base_ids = collect_base_question_ids(paths["base_questions_file"])
@@ -486,7 +501,9 @@ def evaluate(facts_path: Path, model_dir: Path):
     )
 
     print_activated_domains_with_paths(activated_domains, paths["questions_dir"])
-    print_required_questions(base_ids, activated_domains, facts, questions_dir=paths["questions_dir"])
+    print_required_questions(
+        base_ids, activated_domains, facts, questions_dir=paths["questions_dir"]
+    )
 
     # 2) Controls
     derived, catalog = derive_controls(
@@ -519,8 +536,12 @@ def diff_models(facts_path: Path, old_model_dir: Path, new_model_dir: Path):
     old_domains = derive_activated_domains(facts, old_paths["triggers_file"])
     new_domains = derive_activated_domains(facts, new_paths["triggers_file"])
 
-    old_required = required_question_ids(old_paths["base_questions_file"], old_paths["questions_dir"], old_domains)
-    new_required = required_question_ids(new_paths["base_questions_file"], new_paths["questions_dir"], new_domains)
+    old_required = required_question_ids(
+        old_paths["base_questions_file"], old_paths["questions_dir"], old_domains
+    )
+    new_required = required_question_ids(
+        new_paths["base_questions_file"], new_paths["questions_dir"], new_domains
+    )
 
     old_missing = set(missing_required_questions(old_required, facts))
     new_missing = set(missing_required_questions(new_required, facts))
@@ -609,9 +630,15 @@ def main():
 
     p_eval = sub.add_parser("evaluate", help="Evaluate a facts file against a model")
     p_eval.add_argument("facts", help="Path to facts YAML")
-    p_eval.add_argument("--model-dir", default=str(DEFAULT_MODEL_DIR), help="Path to model directory (default: model)")
+    p_eval.add_argument(
+        "--model-dir",
+        default=str(DEFAULT_MODEL_DIR),
+        help="Path to model directory (default: model)",
+    )
 
-    p_diff = sub.add_parser("diff", help="Compare outcomes between two model versions for the same facts")
+    p_diff = sub.add_parser(
+        "diff", help="Compare outcomes between two model versions for the same facts"
+    )
     p_diff.add_argument("facts", help="Path to facts YAML")
     p_diff.add_argument("--old", required=True, help="Old model directory")
     p_diff.add_argument("--new", required=True, help="New model directory")

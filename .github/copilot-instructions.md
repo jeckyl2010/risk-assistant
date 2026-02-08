@@ -32,12 +32,20 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 
 ## Tech Stack Specifics
 
+### Frontend
 - **Runtime**: Bun (fast JavaScript runtime and package manager)
 - **Next.js**: App Router with React Server Components
 - **TypeScript**: Strict mode, prefer type safety
 - **Styling**: Tailwind CSS v4, indigo/purple gradient theme, Geist Sans + Geist Mono fonts
 - **Components**: Portal-based tooltips, client-side state management
 - **Build**: Turbopack for dev, standard Next.js build for production
+- **Linting/Formatting**: Biome (Rust-based, replaces ESLint + Prettier)
+
+### Backend
+- **Python**: FastAPI for evaluation engine
+- **Package Manager**: uv (fast Rust-based pip replacement)
+- **Linting/Formatting**: Ruff (Rust-based, replaces Flake8/Black/isort)
+- **Environment**: All Python tools installed in `.venv` virtual environment
 
 ## Code Preferences
 

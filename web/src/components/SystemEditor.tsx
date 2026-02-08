@@ -1,3 +1,3 @@
-'use client'
+"use client";
 
-export { SystemEditor } from './systemEditor/SystemEditor'
+export { SystemEditor } from "./systemEditor/SystemEditor";

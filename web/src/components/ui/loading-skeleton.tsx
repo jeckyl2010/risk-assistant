@@ -1,15 +1,12 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { Skeleton } from './skeleton'
-import { Card, CardContent } from './card'
+import { motion } from "framer-motion";
+import { Card, CardContent } from "./card";
+import { Skeleton } from "./skeleton";
 
 export function QuestionCardSkeleton() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="border-zinc-200/30 bg-white/60 dark:border-zinc-700/30 dark:bg-zinc-900/60">
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
@@ -31,7 +28,7 @@ export function QuestionCardSkeleton() {
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 export function QuestionsSectionSkeleton() {
@@ -45,7 +42,7 @@ export function QuestionsSectionSkeleton() {
         <QuestionCardSkeleton key={i} />
       ))}
     </div>
-  )
+  );
 }
 
 export function SystemHeaderSkeleton() {
@@ -68,7 +65,7 @@ export function SystemHeaderSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export function PortfolioSkeleton() {
@@ -78,7 +75,7 @@ export function PortfolioSkeleton() {
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-10 w-40 rounded-lg" />
       </div>
-      
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -110,5 +107,5 @@ export function PortfolioSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }

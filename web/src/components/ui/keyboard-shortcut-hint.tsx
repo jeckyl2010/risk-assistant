@@ -1,44 +1,44 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Command, X } from 'lucide-react'
+import { AnimatePresence, motion } from "framer-motion";
+import { Command, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function KeyboardShortcutHint() {
-  const [show, setShow] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
+  const [show, setShow] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     // Check if user has dismissed before
-    const wasDismissed = localStorage.getItem('keyboard-hint-dismissed')
+    const wasDismissed = localStorage.getItem("keyboard-hint-dismissed");
     if (wasDismissed) {
-      setDismissed(true)
-      return
+      setDismissed(true);
+      return;
     }
 
     // Show after 2 seconds
     const timer = setTimeout(() => {
-      setShow(true)
-    }, 2000)
+      setShow(true);
+    }, 2000);
 
     // Auto-hide after 8 seconds
     const hideTimer = setTimeout(() => {
-      setShow(false)
-    }, 10000)
+      setShow(false);
+    }, 10000);
 
     return () => {
-      clearTimeout(timer)
-      clearTimeout(hideTimer)
-    }
-  }, [])
+      clearTimeout(timer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
 
   const handleDismiss = () => {
-    setShow(false)
-    setDismissed(true)
-    localStorage.setItem('keyboard-hint-dismissed', 'true')
-  }
+    setShow(false);
+    setDismissed(true);
+    localStorage.setItem("keyboard-hint-dismissed", "true");
+  };
 
-  if (dismissed) return null
+  if (dismissed) return null;
 
   return (
     <AnimatePresence>
@@ -51,7 +51,7 @@ export function KeyboardShortcutHint() {
         >
           <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-500 to-purple-600 p-4 shadow-2xl dark:border-indigo-900">
             <div className="absolute inset-0 bg-grid-white/10" />
-            
+
             <button
               onClick={handleDismiss}
               className="absolute top-2 right-2 rounded-full p-1 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
@@ -66,10 +66,10 @@ export function KeyboardShortcutHint() {
               <div>
                 <div className="font-semibold text-sm">Pro tip!</div>
                 <div className="text-xs text-indigo-100">
-                  Press{' '}
+                  Press{" "}
                   <kbd className="mx-1 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs backdrop-blur">
                     ⌘K
-                  </kbd>{' '}
+                  </kbd>{" "}
                   for quick actions
                 </div>
               </div>
@@ -78,5 +78,5 @@ export function KeyboardShortcutHint() {
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 export function AutoGrowTextArea({
   value,
@@ -9,24 +9,24 @@ export function AutoGrowTextArea({
   minRows,
   className,
 }: {
-  value: string
-  onChange: (next: string) => void
-  placeholder?: string
-  minRows: number
-  className?: string
+  value: string;
+  onChange: (next: string) => void;
+  placeholder?: string;
+  minRows: number;
+  className?: string;
 }) {
-  const ref = useRef<HTMLTextAreaElement | null>(null)
+  const ref = useRef<HTMLTextAreaElement | null>(null);
 
   const resize = () => {
-    const el = ref.current
-    if (!el) return
-    el.style.height = 'auto'
-    el.style.height = `${el.scrollHeight}px`
-  }
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
 
   useEffect(() => {
-    resize()
-  }, [value])
+    resize();
+  }, [value]);
 
   return (
     <textarea
@@ -38,5 +38,5 @@ export function AutoGrowTextArea({
       rows={minRows}
       className={className}
     />
-  )
+  );
 }

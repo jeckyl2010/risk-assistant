@@ -1,152 +1,218 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, AlertCircle, Shield, ArrowRight, BarChart3, PieChart as PieChartIcon, ChevronDown, Filter, X, GitBranch } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Tooltip as InfoTooltip } from '@/components/ui/tooltip'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { 
-  formatPhase, 
-  formatReferenceType, 
-  formatScope, 
-  formatEnforcementIntent, 
-  formatEvidenceType 
-} from '@/lib/formatting'
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertCircle,
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  ChevronDown,
+  Filter,
+  GitBranch,
+  PieChart as PieChartIcon,
+  Shield,
+  X,
+} from "lucide-react";
+import { useState } from "react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip as InfoTooltip } from "@/components/ui/tooltip";
+import {
+  formatEnforcementIntent,
+  formatEvidenceType,
+  formatPhase,
+  formatReferenceType,
+  formatScope,
+} from "@/lib/formatting";
 
 interface DerivedControl {
-  id: string
-  title: string
-  description?: string
-  scope: string
-  enforcement_intent: string
-  activation_phase: string
-  evidence_type: string[]
-  because: Record<string, unknown>[]
+  id: string;
+  title: string;
+  description?: string;
+  scope: string;
+  enforcement_intent: string;
+  activation_phase: string;
+  evidence_type: string[];
+  because: Record<string, unknown>[];
   references?: Array<{
-    type: string
-    ref: string
-    description?: string
-  }>
+    type: string;
+    ref: string;
+    description?: string;
+  }>;
 }
 
 interface RequiredQuestion {
-  id: string
-  answered: boolean
+  id: string;
+  answered: boolean;
 }
 
 interface ResultsSectionProps {
-  derivedControls: DerivedControl[]
-  requiredQuestions: RequiredQuestion[]
-  questionMetaByFullId: Map<string, { sectionKey: string; sectionTitle: string; text: string }>
-  onNavigateToSection: (sectionKey: string) => void
+  derivedControls: DerivedControl[];
+  requiredQuestions: RequiredQuestion[];
+  questionMetaByFullId: Map<string, { sectionKey: string; sectionTitle: string; text: string }>;
+  onNavigateToSection: (sectionKey: string) => void;
 }
 
 // Helper to determine control status and semantic colors
 function getControlStatus(control: DerivedControl) {
-  const requiresEvidence = control.evidence_type && control.evidence_type.length > 0
-  const hasEvidenceProvided = control.references && control.references.length > 0
-  const isMandatory = control.enforcement_intent === 'mandatory' || control.enforcement_intent === 'required'
-  const isRecommended = control.enforcement_intent === 'recommended' || control.enforcement_intent === 'suggested'
-  
+  const requiresEvidence = control.evidence_type && control.evidence_type.length > 0;
+  const hasEvidenceProvided = control.references && control.references.length > 0;
+  const isMandatory =
+    control.enforcement_intent === "mandatory" || control.enforcement_intent === "required";
+  const isRecommended =
+    control.enforcement_intent === "recommended" || control.enforcement_intent === "suggested";
+
   // Control requires evidence but none provided yet
   if (requiresEvidence && !hasEvidenceProvided) {
     return {
-      status: 'Pending Evidence',
-      statusColor: 'border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:bg-amber-950/50',
-      borderColor: isMandatory ? 'border-red-300 dark:border-red-700' : isRecommended ? 'border-amber-300 dark:border-amber-700' : 'border-blue-300 dark:border-blue-700'
-    }
+      status: "Pending Evidence",
+      statusColor:
+        "border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:bg-amber-950/50",
+      borderColor: isMandatory
+        ? "border-red-300 dark:border-red-700"
+        : isRecommended
+          ? "border-amber-300 dark:border-amber-700"
+          : "border-blue-300 dark:border-blue-700",
+    };
   }
-  
+
   // Control has evidence provided or doesn't require evidence
   return {
-    status: 'Active',
-    statusColor: 'border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/50',
-    borderColor: requiresEvidence && hasEvidenceProvided 
-      ? 'border-green-300 dark:border-green-700'  // Evidence provided = green
-      : isMandatory ? 'border-red-300 dark:border-red-700' : 'border-green-300 dark:border-green-700'
-  }
+    status: "Active",
+    statusColor:
+      "border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/50",
+    borderColor:
+      requiresEvidence && hasEvidenceProvided
+        ? "border-green-300 dark:border-green-700" // Evidence provided = green
+        : isMandatory
+          ? "border-red-300 dark:border-red-700"
+          : "border-green-300 dark:border-green-700",
+  };
 }
 
 export function ResultsSection({
   derivedControls,
   requiredQuestions,
   questionMetaByFullId,
-  onNavigateToSection
+  onNavigateToSection,
 }: ResultsSectionProps) {
-  const [activePhase, setActivePhase] = useState<string>('all')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [expandedControls, setExpandedControls] = useState<string[]>([])
+  const [activePhase, setActivePhase] = useState<string>("all");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [expandedControls, setExpandedControls] = useState<string[]>([]);
 
-  const missingQuestions = requiredQuestions.filter(q => !q.answered)
+  const missingQuestions = requiredQuestions.filter((q) => !q.answered);
 
   // Analytics data
-  const enforcementDistribution = derivedControls.reduce((acc, c) => {
-    acc[c.enforcement_intent] = (acc[c.enforcement_intent] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const enforcementDistribution = derivedControls.reduce(
+    (acc, c) => {
+      acc[c.enforcement_intent] = (acc[c.enforcement_intent] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const phaseDistribution = derivedControls.reduce((acc, c) => {
-    const formattedPhase = formatPhase(c.activation_phase)
-    acc[formattedPhase] = (acc[formattedPhase] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const phaseDistribution = derivedControls.reduce(
+    (acc, c) => {
+      const formattedPhase = formatPhase(c.activation_phase);
+      acc[formattedPhase] = (acc[formattedPhase] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const evidenceDistribution = derivedControls.reduce((acc, c) => {
-    c.evidence_type?.forEach(type => {
-      acc[type] = (acc[type] || 0) + 1
-    })
-    return acc
-  }, {} as Record<string, number>)
+  const evidenceDistribution = derivedControls.reduce(
+    (acc, c) => {
+      c.evidence_type?.forEach((type) => {
+        acc[type] = (acc[type] || 0) + 1;
+      });
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const categoryDistribution = derivedControls.reduce((acc, c) => {
-    const prefix = c.id.split('-')[0]
-    acc[prefix] = (acc[prefix] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const categoryDistribution = derivedControls.reduce(
+    (acc, c) => {
+      const prefix = c.id.split("-")[0];
+      acc[prefix] = (acc[prefix] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const enforcementData = Object.entries(enforcementDistribution).map(([name, value]) => ({ name, value }))
-  const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }))
-  const evidenceData = Object.entries(evidenceDistribution).map(([name, value]) => ({ name, value }))
-  const categoryData = Object.entries(categoryDistribution).map(([name, value]) => ({ name, value }))
+  const enforcementData = Object.entries(enforcementDistribution).map(([name, value]) => ({
+    name,
+    value,
+  }));
+  const phaseData = Object.entries(phaseDistribution).map(([name, value]) => ({ name, value }));
+  const evidenceData = Object.entries(evidenceDistribution).map(([name, value]) => ({
+    name,
+    value,
+  }));
+  const categoryData = Object.entries(categoryDistribution).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
-  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#06b6d4', '#f43f5e']
+  const COLORS = [
+    "#6366f1",
+    "#8b5cf6",
+    "#ec4899",
+    "#f59e0b",
+    "#10b981",
+    "#3b82f6",
+    "#06b6d4",
+    "#f43f5e",
+  ];
 
   // Get unique categories
-  const categories = Array.from(new Set(derivedControls.map(c => c.id.split('-')[0]))).sort()
+  const categories = Array.from(new Set(derivedControls.map((c) => c.id.split("-")[0]))).sort();
 
   // Filter controls
-  const filteredControls = derivedControls.filter(control => {
-    const controlCategory = control.id.split('-')[0]
-    const matchesPhase = activePhase === 'all' || control.activation_phase === activePhase
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(controlCategory)
-    return matchesPhase && matchesCategory
-  })
+  const filteredControls = derivedControls.filter((control) => {
+    const controlCategory = control.id.split("-")[0];
+    const matchesPhase = activePhase === "all" || control.activation_phase === activePhase;
+    const matchesCategory =
+      selectedCategories.length === 0 || selectedCategories.includes(controlCategory);
+    return matchesPhase && matchesCategory;
+  });
 
   // Group by phase for counts
-  const phases = ['plan', 'build', 'deploy', 'run', 'operate']
-  const phaseCounts = phases.reduce((acc, phase) => {
-    acc[phase] = derivedControls.filter(c => c.activation_phase === phase).length
-    return acc
-  }, {} as Record<string, number>)
+  const phases = ["plan", "build", "deploy", "run", "operate"];
+  const phaseCounts = phases.reduce(
+    (acc, phase) => {
+      acc[phase] = derivedControls.filter((c) => c.activation_phase === phase).length;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter(c => c !== category))
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
     } else {
-      setSelectedCategories([...selectedCategories, category])
+      setSelectedCategories([...selectedCategories, category]);
     }
-  }
+  };
 
   const toggleExpanded = (controlId: string) => {
     if (expandedControls.includes(controlId)) {
-      setExpandedControls(expandedControls.filter(id => id !== controlId))
+      setExpandedControls(expandedControls.filter((id) => id !== controlId));
     } else {
-      setExpandedControls([...expandedControls, controlId])
+      setExpandedControls([...expandedControls, controlId]);
     }
-  }
+  };
 
   return (
     <motion.div
@@ -163,27 +229,31 @@ export function ResultsSection({
               Missing Answers
             </CardTitle>
             <CardDescription>
-              {missingQuestions.length} required {missingQuestions.length === 1 ? 'question needs' : 'questions need'} to be answered
+              {missingQuestions.length} required{" "}
+              {missingQuestions.length === 1 ? "question needs" : "questions need"} to be answered
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {Array.from(
               missingQuestions.reduce((acc, q) => {
-                const meta = questionMetaByFullId.get(q.id)
-                const sectionKey = meta?.sectionKey ?? 'base'
-                const sectionTitle = meta?.sectionTitle ?? 'System facts'
-                const text = meta?.text ?? q.id
+                const meta = questionMetaByFullId.get(q.id);
+                const sectionKey = meta?.sectionKey ?? "base";
+                const sectionTitle = meta?.sectionTitle ?? "System facts";
+                const text = meta?.text ?? q.id;
                 const existing = acc.get(sectionKey) ?? {
                   sectionKey,
                   sectionTitle,
-                  items: [] as string[]
-                }
-                existing.items.push(text)
-                acc.set(sectionKey, existing)
-                return acc
-              }, new Map<string, { sectionKey: string; sectionTitle: string; items: string[] }>())
+                  items: [] as string[],
+                };
+                existing.items.push(text);
+                acc.set(sectionKey, existing);
+                return acc;
+              }, new Map<string, { sectionKey: string; sectionTitle: string; items: string[] }>()),
             ).map(([key, group]) => (
-              <Card key={key} className="border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <Card
+                key={key}
+                className="border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-2">
                     <div className="font-medium text-amber-900 dark:text-amber-100">
@@ -200,7 +270,10 @@ export function ResultsSection({
                   </div>
                   <ul className="mt-3 space-y-1 text-sm">
                     {group.items.map((text, i) => (
-                      <li key={i} className="flex items-start gap-2 text-amber-800 dark:text-amber-200">
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 text-amber-800 dark:text-amber-200"
+                      >
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                         {text}
                       </li>
@@ -238,9 +311,7 @@ export function ResultsSection({
                   Enforcement Intent
                   <InfoTooltip content="How you can enforce this control: manual (human process), semi-automated (tools assist), or automated (fully automated enforcement)." />
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  How controls can be enforced
-                </CardDescription>
+                <CardDescription className="text-xs">How controls can be enforced</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={180}>
@@ -313,9 +384,7 @@ export function ResultsSection({
                   Evidence Required
                   <InfoTooltip content="What type of proof is needed to demonstrate this control is working: logs, configurations, attestations, test results, documentation, or audit trails." />
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  Verification methods needed
-                </CardDescription>
+                <CardDescription className="text-xs">Verification methods needed</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={180}>
@@ -346,9 +415,7 @@ export function ResultsSection({
                   <BarChart3 className="h-5 w-5" />
                   Control Categories
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  Distribution by domain
-                </CardDescription>
+                <CardDescription className="text-xs">Distribution by domain</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={180}>
@@ -378,11 +445,11 @@ export function ResultsSection({
             <InfoTooltip content="Security and compliance controls automatically determined based on your system's characteristics and answers. These help you understand what safeguards are needed." />
           </CardTitle>
           <CardDescription>
-            {derivedControls.length} {derivedControls.length === 1 ? 'control has' : 'controls have'} been derived from your answers
+            {derivedControls.length}{" "}
+            {derivedControls.length === 1 ? "control has" : "controls have"} been derived from your
+            answers
             {filteredControls.length < derivedControls.length && (
-              <span className="ml-1 text-zinc-500">
-                ({filteredControls.length} shown)
-              </span>
+              <span className="ml-1 text-zinc-500">({filteredControls.length} shown)</span>
             )}
           </CardDescription>
         </CardHeader>
@@ -397,17 +464,17 @@ export function ResultsSection({
               <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-700">
                 <Button
                   size="sm"
-                  variant={activePhase === 'all' ? 'default' : 'ghost'}
-                  onClick={() => setActivePhase('all')}
+                  variant={activePhase === "all" ? "default" : "ghost"}
+                  onClick={() => setActivePhase("all")}
                   className="h-8"
                 >
                   All ({derivedControls.length})
                 </Button>
-                {phases.map(phase => (
+                {phases.map((phase) => (
                   <Button
                     key={phase}
                     size="sm"
-                    variant={activePhase === phase ? 'default' : 'ghost'}
+                    variant={activePhase === phase ? "default" : "ghost"}
                     onClick={() => setActivePhase(phase)}
                     className="h-8"
                   >
@@ -423,17 +490,15 @@ export function ResultsSection({
                   <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                     Filter by category:
                   </span>
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <Badge
                       key={category}
-                      variant={selectedCategories.includes(category) ? 'default' : 'outline'}
+                      variant={selectedCategories.includes(category) ? "default" : "outline"}
                       className="cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       onClick={() => toggleCategory(category)}
                     >
                       {category}
-                      {selectedCategories.includes(category) && (
-                        <X className="ml-1 h-3 w-3" />
-                      )}
+                      {selectedCategories.includes(category) && <X className="ml-1 h-3 w-3" />}
                     </Badge>
                   ))}
                   {selectedCategories.length > 0 && (
@@ -463,8 +528,8 @@ export function ResultsSection({
                 ) : (
                   <div className="space-y-2">
                     {filteredControls.map((control, index) => {
-                      const isExpanded = expandedControls.includes(control.id)
-                      const { status, statusColor, borderColor } = getControlStatus(control)
+                      const isExpanded = expandedControls.includes(control.id);
+                      const { status, statusColor, borderColor } = getControlStatus(control);
                       return (
                         <motion.div
                           key={control.id}
@@ -486,7 +551,7 @@ export function ResultsSection({
                                     <Badge variant="outline" className="shrink-0 font-mono text-xs">
                                       {control.id}
                                     </Badge>
-                                    {status === 'Pending Evidence' ? (
+                                    {status === "Pending Evidence" ? (
                                       <InfoTooltip content="This control requires evidence (logs, configs, test results, etc.). Add Implementation references below with links to where your evidence lives (Azure DevOps work items, Confluence docs, CI/CD reports, etc.).">
                                         <Badge className={`shrink-0 text-xs ${statusColor}`}>
                                           {status}
@@ -514,7 +579,7 @@ export function ResultsSection({
                                 </div>
                                 <ChevronDown
                                   className={`h-5 w-5 shrink-0 text-zinc-500 transition-transform ${
-                                    isExpanded ? 'rotate-180' : ''
+                                    isExpanded ? "rotate-180" : ""
                                   }`}
                                 />
                               </div>
@@ -524,7 +589,7 @@ export function ResultsSection({
                                 {isExpanded && (
                                   <motion.div
                                     initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
+                                    animate={{ height: "auto", opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
                                     transition={{ duration: 0.2 }}
                                     className="overflow-hidden"
@@ -537,36 +602,57 @@ export function ResultsSection({
                                       )}
 
                                       <div className="flex flex-wrap gap-2">
-                                        <Badge variant="secondary">scope: {formatScope(control.scope)}</Badge>
                                         <Badge variant="secondary">
-                                          intent: {formatEnforcementIntent(control.enforcement_intent)}
+                                          scope: {formatScope(control.scope)}
+                                        </Badge>
+                                        <Badge variant="secondary">
+                                          intent:{" "}
+                                          {formatEnforcementIntent(control.enforcement_intent)}
                                         </Badge>
                                         <Badge variant="secondary">
                                           phase: {formatPhase(control.activation_phase)}
                                         </Badge>
                                         {control.evidence_type?.length > 0 && (
                                           <Badge variant="secondary">
-                                            evidence: {control.evidence_type.map(formatEvidenceType).join(', ')}
+                                            evidence:{" "}
+                                            {control.evidence_type
+                                              .map(formatEvidenceType)
+                                              .join(", ")}
                                           </Badge>
                                         )}
                                       </div>
 
                                       {/* Helper callout for controls needing evidence but missing references */}
-                                      {control.evidence_type && control.evidence_type.length > 0 && (!control.references || control.references.length === 0) && (
-                                        <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/50">
-                                          <div className="flex items-start gap-2">
-                                            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                                            <div className="text-xs">
-                                              <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">Evidence Required</p>
-                                              <p className="text-amber-800 dark:text-amber-200">
-                                                This control needs <span className="font-semibold">{control.evidence_type.map(formatEvidenceType).join(', ')}</span>. 
-                                                Edit the system YAML file to add <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">references</code> linking to where your evidence lives 
-                                                (Azure DevOps work items, Confluence docs, CI/CD test reports, config repos, etc.).
-                                              </p>
+                                      {control.evidence_type &&
+                                        control.evidence_type.length > 0 &&
+                                        (!control.references ||
+                                          control.references.length === 0) && (
+                                          <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/50">
+                                            <div className="flex items-start gap-2">
+                                              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                                              <div className="text-xs">
+                                                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                                                  Evidence Required
+                                                </p>
+                                                <p className="text-amber-800 dark:text-amber-200">
+                                                  This control needs{" "}
+                                                  <span className="font-semibold">
+                                                    {control.evidence_type
+                                                      .map(formatEvidenceType)
+                                                      .join(", ")}
+                                                  </span>
+                                                  . Edit the system YAML file to add{" "}
+                                                  <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">
+                                                    references
+                                                  </code>{" "}
+                                                  linking to where your evidence lives (Azure DevOps
+                                                  work items, Confluence docs, CI/CD test reports,
+                                                  config repos, etc.).
+                                                </p>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                      )}
+                                        )}
 
                                       {control.because && control.because.length > 0 && (
                                         <div>
@@ -574,7 +660,7 @@ export function ResultsSection({
                                             <GitBranch className="h-3 w-3" />
                                             Derivation Path
                                           </div>
-                                          
+
                                           {/* Visual Flow Diagram */}
                                           <div className="mt-3 overflow-x-auto pb-2">
                                             <div className="flex items-center gap-2 min-w-max">
@@ -583,16 +669,21 @@ export function ResultsSection({
                                                 <div key={i} className="flex items-center">
                                                   <div className="group relative">
                                                     <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:bg-indigo-950/50">
-                                                      {Object.entries(fact).map(([key, val], idx) => (
-                                                        <div key={idx} className="flex items-center gap-1.5 text-xs">
-                                                          <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-                                                            {key}:
-                                                          </span>
-                                                          <span className="font-mono text-indigo-900 dark:text-indigo-100">
-                                                            {JSON.stringify(val)}
-                                                          </span>
-                                                        </div>
-                                                      ))}
+                                                      {Object.entries(fact).map(
+                                                        ([key, val], idx) => (
+                                                          <div
+                                                            key={idx}
+                                                            className="flex items-center gap-1.5 text-xs"
+                                                          >
+                                                            <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                                                              {key}:
+                                                            </span>
+                                                            <span className="font-mono text-indigo-900 dark:text-indigo-100">
+                                                              {JSON.stringify(val)}
+                                                            </span>
+                                                          </div>
+                                                        ),
+                                                      )}
                                                     </div>
                                                   </div>
                                                   {i < control.because.length - 1 && (
@@ -603,13 +694,13 @@ export function ResultsSection({
                                                   )}
                                                 </div>
                                               ))}
-                                              
+
                                               {/* Arrow to Control */}
                                               <div className="flex items-center px-2">
                                                 <div className="h-0.5 w-8 bg-gradient-to-r from-purple-300 to-emerald-300 dark:from-purple-600 dark:to-emerald-600" />
                                                 <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-emerald-300 dark:border-l-emerald-600" />
                                               </div>
-                                              
+
                                               {/* Control Node */}
                                               <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:bg-emerald-950/50">
                                                 <div className="flex items-center gap-2">
@@ -633,31 +724,46 @@ export function ResultsSection({
                                           </div>
                                           <div className="space-y-1.5">
                                             {control.references.map((ref, i) => {
-                                              const isUrl = ref.ref.startsWith('http://') || ref.ref.startsWith('https://')
-                                              const isFilePath = !isUrl
-                                              
+                                              const isUrl =
+                                                ref.ref.startsWith("http://") ||
+                                                ref.ref.startsWith("https://");
+                                              const isFilePath = !isUrl;
+
                                               // Subtle color coding by type
                                               const typeColors: Record<string, string> = {
-                                                requirement: 'border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30',
-                                                work_item: 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30',
-                                                documentation: 'border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30',
-                                              }
-                                              
+                                                requirement:
+                                                  "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30",
+                                                work_item:
+                                                  "border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30",
+                                                documentation:
+                                                  "border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30",
+                                              };
+
                                               const typeBadgeColors: Record<string, string> = {
-                                                requirement: 'border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300',
-                                                work_item: 'border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300',
-                                                documentation: 'border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300',
-                                              }
-                                              
-                                              const containerColor = typeColors[ref.type] || 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50'
-                                              const badgeColor = typeBadgeColors[ref.type] || 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300'
-                                              
+                                                requirement:
+                                                  "border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300",
+                                                work_item:
+                                                  "border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300",
+                                                documentation:
+                                                  "border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300",
+                                              };
+
+                                              const containerColor =
+                                                typeColors[ref.type] ||
+                                                "border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50";
+                                              const badgeColor =
+                                                typeBadgeColors[ref.type] ||
+                                                "border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300";
+
                                               return (
                                                 <div
                                                   key={i}
                                                   className={`flex items-start gap-2 rounded-md border px-2.5 py-1.5 text-xs ${containerColor}`}
                                                 >
-                                                  <Badge variant="outline" className={`mt-0.5 text-[10px] ${badgeColor}`}>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className={`mt-0.5 text-[10px] ${badgeColor}`}
+                                                  >
                                                     {formatReferenceType(ref.type)}
                                                   </Badge>
                                                   <div className="flex-1 min-w-0">
@@ -682,7 +788,7 @@ export function ResultsSection({
                                                     )}
                                                   </div>
                                                 </div>
-                                              )
+                                              );
                                             })}
                                           </div>
                                         </div>
@@ -694,7 +800,7 @@ export function ResultsSection({
                             </CardContent>
                           </Card>
                         </motion.div>
-                      )
+                      );
                     })}
                   </div>
                 )}
@@ -704,5 +810,5 @@ export function ResultsSection({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

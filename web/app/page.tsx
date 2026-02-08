@@ -1,37 +1,40 @@
-import Link from 'next/link'
-import { buildPortfolio } from '@/lib/portfolio'
-import { SystemManagement } from '@/components/SystemManagement'
-import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
-import { PortfolioTable } from '@/components/portfolio/PortfolioTable'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Shield, Activity } from 'lucide-react'
-import { NoSystemsEmpty } from '@/components/ui/empty-state'
+import { Activity, Shield } from "lucide-react";
+import Link from "next/link";
+import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
+import { PortfolioTable } from "@/components/portfolio/PortfolioTable";
+import { SystemManagement } from "@/components/SystemManagement";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { NoSystemsEmpty } from "@/components/ui/empty-state";
+import { buildPortfolio } from "@/lib/portfolio";
 
 export default async function Home() {
-  const { modelVersion, rows } = await buildPortfolio('model')
+  const { modelVersion, rows } = await buildPortfolio("model");
 
   // Calculate stats
-  const totalSystems = rows.length
-  const totalControls = rows.reduce((sum, r) => sum + r.derivedControls, 0)
-  const totalMissing = rows.reduce((sum, r) => sum + r.missingAnswers, 0)
-  
+  const totalSystems = rows.length;
+  const totalControls = rows.reduce((sum, r) => sum + r.derivedControls, 0);
+  const totalMissing = rows.reduce((sum, r) => sum + r.missingAnswers, 0);
+
   // Calculate completion rate (rough estimate based on missing answers)
-  const avgQuestionsPerSystem = 15 // rough estimate
-  const totalPossibleAnswers = rows.length * avgQuestionsPerSystem
-  const answeredQuestions = totalPossibleAnswers - totalMissing
-  const completionRate = totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0
+  const avgQuestionsPerSystem = 15; // rough estimate
+  const totalPossibleAnswers = rows.length * avgQuestionsPerSystem;
+  const answeredQuestions = totalPossibleAnswers - totalMissing;
+  const completionRate =
+    totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0;
 
   // System status - how many systems are complete vs need work
-  const systemsComplete = rows.filter(r => r.missingAnswers === 0).length
-  const systemsInProgress = rows.filter(r => r.missingAnswers > 0 && r.missingAnswers <= 5).length
-  const systemsNeedWork = rows.filter(r => r.missingAnswers > 5).length
+  const systemsComplete = rows.filter((r) => r.missingAnswers === 0).length;
+  const systemsInProgress = rows.filter(
+    (r) => r.missingAnswers > 0 && r.missingAnswers <= 5,
+  ).length;
+  const systemsNeedWork = rows.filter((r) => r.missingAnswers > 5).length;
 
   const systemStatus = {
-    'Complete': systemsComplete,
-    'In Progress': systemsInProgress,
-    'Need Work': systemsNeedWork,
-  }
+    Complete: systemsComplete,
+    "In Progress": systemsInProgress,
+    "Need Work": systemsNeedWork,
+  };
 
   const stats = {
     totalSystems,
@@ -40,7 +43,7 @@ export default async function Home() {
     completionRate,
     systemStatus,
     portfolioRows: rows, // Pass full data for heatmap
-  }
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10">
@@ -48,7 +51,7 @@ export default async function Home() {
       <div className="relative overflow-hidden rounded-xl border border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-sm">
         {/* Subtle gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10" />
-        
+
         <div className="relative flex items-start justify-between gap-6 p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
@@ -91,9 +94,7 @@ export default async function Home() {
             <Activity className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             Portfolio
           </CardTitle>
-          <CardDescription>
-            All risk assessment systems in your portfolio
-          </CardDescription>
+          <CardDescription>All risk assessment systems in your portfolio</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {rows.length === 0 ? (
@@ -107,5 +108,5 @@ export default async function Home() {
       {/* Stats Dashboard */}
       {rows.length > 0 && <PortfolioStats stats={stats} />}
     </div>
-  )
+  );
 }

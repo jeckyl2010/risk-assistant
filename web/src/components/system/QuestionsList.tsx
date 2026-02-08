@@ -1,21 +1,21 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import type { Question } from '@/lib/uiTypes'
-import { QuestionCard } from './QuestionCard'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Question } from "@/lib/uiTypes";
+import { QuestionCard } from "./QuestionCard";
 
 interface QuestionsListProps {
-  title: string
-  description?: string
-  questions: Question[]
-  prefix: string
-  domain?: string
-  getValue: (questionId: string) => unknown
-  getReason: (questionId: string) => unknown
-  onChange: (questionId: string, value: unknown) => void
-  onReasonChange: (questionId: string, value: string) => void
+  title: string;
+  description?: string;
+  questions: Question[];
+  prefix: string;
+  domain?: string;
+  getValue: (questionId: string) => unknown;
+  getReason: (questionId: string) => unknown;
+  onChange: (questionId: string, value: unknown) => void;
+  onReasonChange: (questionId: string, value: string) => void;
 }
 
 export function QuestionsList({
@@ -27,9 +27,9 @@ export function QuestionsList({
   getValue,
   getReason,
   onChange,
-  onReasonChange
+  onReasonChange,
 }: QuestionsListProps) {
-  const answeredCount = questions.filter(q => getValue(q.id) !== null).length
+  const answeredCount = questions.filter((q) => getValue(q.id) !== null).length;
 
   return (
     <motion.div
@@ -72,5 +72,5 @@ export function QuestionsList({
         </div>
       )}
     </motion.div>
-  )
+  );
 }

@@ -1,73 +1,73 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Trash2, FolderMinus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FolderMinus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 type PortfolioRow = {
-  id: string
-  derivedControls: number
-  missingAnswers: number
-  activatedDomains: number
-  domains: string[]
-}
+  id: string;
+  derivedControls: number;
+  missingAnswers: number;
+  activatedDomains: number;
+  domains: string[];
+};
 
 export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
-  const router = useRouter()
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [removingId, setRemovingId] = useState<string | null>(null)
+  const router = useRouter();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const handleRemove = async (id: string) => {
     if (!confirm(`Remove "${id}" from portfolio? The system file will not be deleted.`)) {
-      return
+      return;
     }
 
-    setRemovingId(id)
+    setRemovingId(id);
     try {
-      const res = await fetch('/api/systems/remove', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/systems/remove", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ id }),
-      })
+      });
 
       if (!res.ok) {
-        throw new Error('Failed to remove system from portfolio')
+        throw new Error("Failed to remove system from portfolio");
       }
 
-      router.refresh()
+      router.refresh();
     } catch (error) {
-      console.error('Remove error:', error)
-      alert('Failed to remove system from portfolio. Please try again.')
-      setRemovingId(null)
+      console.error("Remove error:", error);
+      alert("Failed to remove system from portfolio. Please try again.");
+      setRemovingId(null);
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    const msg = `Delete "${id}"? This will DELETE THE FILE and remove it from the portfolio. This action cannot be undone.`
+    const msg = `Delete "${id}"? This will DELETE THE FILE and remove it from the portfolio. This action cannot be undone.`;
     if (!confirm(msg)) {
-      return
+      return;
     }
 
-    setDeletingId(id)
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/systems/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
       if (!res.ok) {
-        throw new Error('Failed to delete system')
+        throw new Error("Failed to delete system");
       }
 
-      router.refresh()
+      router.refresh();
     } catch (error) {
-      console.error('Delete error:', error)
-      alert('Failed to delete system. Please try again.')
-      setDeletingId(null)
+      console.error("Delete error:", error);
+      alert("Failed to delete system. Please try again.");
+      setDeletingId(null);
     }
-  }
+  };
 
   return (
     <div className="overflow-hidden">
@@ -116,7 +116,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                 )}
               </td>
               <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                {r.activatedDomains || '—'}
+                {r.activatedDomains || "—"}
               </td>
               <td className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
@@ -128,7 +128,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                     className="h-8 gap-1.5 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30 dark:hover:text-amber-300"
                   >
                     <FolderMinus className="h-3.5 w-3.5" />
-                    {removingId === r.id ? 'Removing...' : 'Remove'}
+                    {removingId === r.id ? "Removing..." : "Remove"}
                   </Button>
                   <Button
                     size="sm"
@@ -138,7 +138,7 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
                     className="h-8 gap-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    {deletingId === r.id ? 'Deleting...' : 'Delete'}
+                    {deletingId === r.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </td>
@@ -147,5 +147,5 @@ export function PortfolioTable({ rows }: { rows: PortfolioRow[] }) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }

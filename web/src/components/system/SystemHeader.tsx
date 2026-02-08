@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { Save, Play, Loader2, CheckCircle2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { motion } from "framer-motion";
+import { CheckCircle2, Loader2, Play, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-type SaveState = 'idle' | 'saving' | 'saved' | 'error'
-type EvalState = 'idle' | 'running' | 'error'
+type SaveState = "idle" | "saving" | "saved" | "error";
+type EvalState = "idle" | "running" | "error";
 
 interface SystemHeaderProps {
-  id: string
-  modelVersion: string
-  activatedDomains: string[]
-  onSave: () => void
-  onEvaluate: () => void
-  saveState: SaveState
-  evalState: EvalState
-  derivedControls?: number
-  missingAnswers?: number
+  id: string;
+  modelVersion: string;
+  activatedDomains: string[];
+  onSave: () => void;
+  onEvaluate: () => void;
+  saveState: SaveState;
+  evalState: EvalState;
+  derivedControls?: number;
+  missingAnswers?: number;
 }
 
 export function SystemHeader({
@@ -29,7 +29,7 @@ export function SystemHeader({
   saveState,
   evalState,
   derivedControls,
-  missingAnswers
+  missingAnswers,
 }: SystemHeaderProps) {
   return (
     <motion.div
@@ -57,17 +57,13 @@ export function SystemHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button
-            onClick={onSave}
-            variant="outline"
-            disabled={saveState === 'saving'}
-          >
-            {saveState === 'saving' ? (
+          <Button onClick={onSave} variant="outline" disabled={saveState === "saving"}>
+            {saveState === "saving" ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Saving…
               </>
-            ) : saveState === 'saved' ? (
+            ) : saveState === "saved" ? (
               <>
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 Saved
@@ -80,11 +76,8 @@ export function SystemHeader({
             )}
           </Button>
 
-          <Button
-            onClick={onEvaluate}
-            disabled={evalState === 'running'}
-          >
-            {evalState === 'running' ? (
+          <Button onClick={onEvaluate} disabled={evalState === "running"}>
+            {evalState === "running" ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Evaluating…
@@ -111,7 +104,9 @@ export function SystemHeader({
               </div>
               <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
               <div className="flex items-center gap-1.5">
-                <span className={`font-medium ${missingAnswers > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}>
+                <span
+                  className={`font-medium ${missingAnswers > 0 ? "text-amber-600 dark:text-amber-400" : "text-green-600 dark:text-green-400"}`}
+                >
                   {missingAnswers}
                 </span>
                 <span className="text-zinc-600 dark:text-zinc-400">missing</span>
@@ -121,5 +116,5 @@ export function SystemHeader({
         </div>
       </div>
     </motion.div>
-  )
+  );
 }

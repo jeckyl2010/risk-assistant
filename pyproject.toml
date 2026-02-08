@@ -1,0 +1,51 @@
+[project]
+name = "risk-assistant"
+version = "0.1.0"
+description = "Lightweight, deterministic, facts-based guardrail engine"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[tool.ruff]
+# Target Python 3.11+
+target-version = "py311"
+
+# Line length to match Biome frontend config
+line-length = 100
+
+# Exclude patterns
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "*.pyc",
+    ".pytest_cache",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+# Enable pycodestyle (E), Pyflakes (F), isort (I), and other recommended rules
+select = [
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+# Ignore specific rules if needed
+ignore = []
+
+[tool.ruff.lint.isort]
+# Organize imports
+known-first-party = ["risk_assistant"]
+
+[tool.ruff.format]
+# Use double quotes (consistent with Biome config)
+quote-style = "double"
+indent-style = "space"

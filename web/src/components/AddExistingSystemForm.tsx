@@ -1,59 +1,64 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { motion } from 'framer-motion'
-import { FolderPlus, Loader2, FileSearch } from 'lucide-react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { FileBrowserModal } from '@/components/FileBrowserModal'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { FileSearch, FolderPlus, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import { FileBrowserModal } from "@/components/FileBrowserModal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
-  path: z.string().min(1, 'File path is required')
-})
+  path: z.string().min(1, "File path is required"),
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 export function AddExistingSystemForm() {
-  const [isAdding, setIsAdding] = useState(false)
-  const [showBrowser, setShowBrowser] = useState(false)
-  const router = useRouter()
+  const [isAdding, setIsAdding] = useState(false);
+  const [showBrowser, setShowBrowser] = useState(false);
+  const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
-    resolver: zodResolver(formSchema)
-  })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
 
   const handleFileSelect = (filePath: string) => {
-    setValue('path', filePath)
-  }
+    setValue("path", filePath);
+  };
 
   async function onSubmit(data: FormData) {
-    setIsAdding(true)
+    setIsAdding(true);
     try {
-      const res = await fetch('/api/systems/add', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/systems/add", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
-      })
-      
+      });
+
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || `Failed: ${res.status}`)
+        const error = await res.json();
+        throw new Error(error.error || `Failed: ${res.status}`);
       }
-      
-      const json = (await res.json()) as { id: string }
-      toast.success('System added to portfolio!')
-      router.refresh()
-      router.push(`/systems/${encodeURIComponent(json.id)}`)
+
+      const json = (await res.json()) as { id: string };
+      toast.success("System added to portfolio!");
+      router.refresh();
+      router.push(`/systems/${encodeURIComponent(json.id)}`);
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : 'Failed to add system')
+      toast.error(e instanceof Error ? e.message : "Failed to add system");
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
   }
 
@@ -66,13 +71,11 @@ export function AddExistingSystemForm() {
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
-          <Label htmlFor="system-path">
-            Existing System File Path
-          </Label>
+          <Label htmlFor="system-path">Existing System File Path</Label>
           <div className="flex gap-2">
             <Input
               id="system-path"
-              {...register('path')}
+              {...register("path")}
               placeholder="./systems/MySystem.yaml or C:\Repos\team-systems\MySystem.yaml"
               disabled={isAdding}
               className="flex-1"
@@ -103,7 +106,7 @@ export function AddExistingSystemForm() {
           </p>
         </div>
       </div>
-      
+
       <Button
         type="submit"
         disabled={isAdding}
@@ -132,5 +135,5 @@ export function AddExistingSystemForm() {
         title="Select Existing System File"
       />
     </motion.form>
-  )
+  );
 }

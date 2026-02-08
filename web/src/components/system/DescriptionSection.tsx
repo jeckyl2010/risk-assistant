@@ -1,21 +1,18 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { FileText } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+import { motion } from "framer-motion";
+import { FileText } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 
 interface DescriptionSectionProps {
-  description: string
-  onChange: (value: string) => void
+  description: string;
+  onChange: (value: string) => void;
 }
 
 export function DescriptionSection({ description, onChange }: DescriptionSectionProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl font-semibold">
@@ -36,5 +33,5 @@ export function DescriptionSection({ description, onChange }: DescriptionSection
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

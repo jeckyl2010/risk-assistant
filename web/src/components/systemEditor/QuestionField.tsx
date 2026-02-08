@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import type { Question } from '@/lib/uiTypes'
-import { AutoGrowTextArea } from './AutoGrowTextArea'
-import type { SectionAccent } from './sectionAccent'
-import { sectionAccent } from './sectionAccent'
-import styles from './systemEditorStyles.module.css'
-import { formatBoolean, formatIdentifier } from '@/lib/formatting'
+import { formatBoolean, formatIdentifier } from "@/lib/formatting";
+import type { Question } from "@/lib/uiTypes";
+import { AutoGrowTextArea } from "./AutoGrowTextArea";
+import type { SectionAccent } from "./sectionAccent";
+import { sectionAccent } from "./sectionAccent";
+import styles from "./systemEditorStyles.module.css";
 
 export function QuestionField({
   q,
@@ -15,15 +15,15 @@ export function QuestionField({
   onReasonChange,
   accent,
 }: {
-  q: Question
-  value: unknown
-  reason: unknown
-  onChange: (next: unknown) => void
-  onReasonChange: (next: string) => void
-  accent?: SectionAccent
+  q: Question;
+  value: unknown;
+  reason: unknown;
+  onChange: (next: unknown) => void;
+  onReasonChange: (next: string) => void;
+  accent?: SectionAccent;
 }) {
-  const isUnset = value === null
-  const a = accent ?? sectionAccent('base')
+  const isUnset = value === null;
+  const a = accent ?? sectionAccent("base");
 
   return (
     <div className={`${styles.questionCard} ${a.cardTop} ${a.cardBg}`}>
@@ -37,23 +37,29 @@ export function QuestionField({
       <div
         className={
           styles.answerPanel +
-          ' ' +
+          " " +
           (isUnset
-            ? 'border-dashed border-amber-200/80 bg-amber-50/60 dark:border-amber-900/50 dark:bg-amber-950/15'
-            : 'border-sky-200/80 bg-sky-50/60 dark:border-sky-900/50 dark:bg-sky-950/15')
+            ? "border-dashed border-amber-200/80 bg-amber-50/60 dark:border-amber-900/50 dark:bg-amber-950/15"
+            : "border-sky-200/80 bg-sky-50/60 dark:border-sky-900/50 dark:bg-sky-950/15")
         }
       >
         <div className={styles.answerRow}>
           <div
             className={
               styles.answerChip +
-              ' ' +
+              " " +
               (isUnset
-                ? 'border-amber-200/80 bg-amber-50 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100'
-                : 'border-sky-200/80 bg-sky-50 text-sky-900 dark:border-sky-900/50 dark:bg-sky-950/20 dark:text-sky-100')
+                ? "border-amber-200/80 bg-amber-50 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100"
+                : "border-sky-200/80 bg-sky-50 text-sky-900 dark:border-sky-900/50 dark:bg-sky-950/20 dark:text-sky-100")
             }
           >
-            <span className={styles.answerDot + ' ' + (isUnset ? 'bg-amber-500 dark:bg-amber-300' : 'bg-sky-600 dark:bg-sky-300')} />
+            <span
+              className={
+                styles.answerDot +
+                " " +
+                (isUnset ? "bg-amber-500 dark:bg-amber-300" : "bg-sky-600 dark:bg-sky-300")
+              }
+            />
             Answer
           </div>
           {isUnset ? (
@@ -64,16 +70,16 @@ export function QuestionField({
         </div>
 
         <div className="mt-2">
-          {q.type === 'bool' ? (
+          {q.type === "bool" ? (
             <select
-              value={value === true ? 'true' : value === false ? 'false' : ''}
+              value={value === true ? "true" : value === false ? "false" : ""}
               onChange={(e) => {
-                const v = e.target.value
-                onChange(v === '' ? null : v === 'true')
+                const v = e.target.value;
+                onChange(v === "" ? null : v === "true");
               }}
               className={
                 styles.answerInput +
-                ' [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30'
+                " [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
               }
             >
               <option value="">(unset)</option>
@@ -82,14 +88,14 @@ export function QuestionField({
             </select>
           ) : null}
 
-          {q.type === 'enum' ? (
+          {q.type === "enum" ? (
             <div className="flex flex-col gap-2">
               <select
-                value={typeof value === 'string' ? value : ''}
+                value={typeof value === "string" ? value : ""}
                 onChange={(e) => onChange(e.target.value || null)}
                 className={
                   styles.answerInput +
-                  ' [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30'
+                  " [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
                 }
               >
                 <option value="">(unset)</option>
@@ -102,28 +108,31 @@ export function QuestionField({
             </div>
           ) : null}
 
-          {q.type === 'set' ? (
+          {q.type === "set" ? (
             <div className="flex flex-col gap-2">
               <div className={styles.setContainer}>
                 {(q.allowed ?? []).map((a) => {
-                  const arr = Array.isArray(value) ? value : []
-                  const checked = arr.includes(a)
+                  const arr = Array.isArray(value) ? value : [];
+                  const checked = arr.includes(a);
                   return (
-                    <label key={a} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
+                    <label
+                      key={a}
+                      className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200"
+                    >
                       <input
                         type="checkbox"
                         checked={checked}
                         onChange={(e) => {
-                          const next = new Set(arr)
-                          if (e.target.checked) next.add(a)
-                          else next.delete(a)
-                          onChange(Array.from(next).sort())
+                          const next = new Set(arr);
+                          if (e.target.checked) next.add(a);
+                          else next.delete(a);
+                          onChange(Array.from(next).sort());
                         }}
                         className="h-4 w-4 accent-zinc-900 dark:accent-zinc-50"
                       />
                       {formatIdentifier(a)}
                     </label>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -134,16 +143,16 @@ export function QuestionField({
       <div className="mt-3">
         <label className={styles.reasonLabel}>Reason (optional)</label>
         <AutoGrowTextArea
-          value={typeof reason === 'string' ? reason : ''}
+          value={typeof reason === "string" ? reason : ""}
           onChange={onReasonChange}
           placeholder="Why did you choose this answer? Link to docs, context, constraints, …"
           minRows={2}
           className={
             styles.reasonTextArea +
-            ' [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30'
+            " [color-scheme:light] dark:[color-scheme:dark] focus:border-sky-400 focus:ring-2 focus:ring-sky-200/40 dark:focus:border-sky-500 dark:focus:ring-sky-900/30"
           }
         />
       </div>
     </div>
-  )
+  );
 }

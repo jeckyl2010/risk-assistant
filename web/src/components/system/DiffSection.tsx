@@ -1,31 +1,31 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { GitCompare, Loader2, Play } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { motion } from "framer-motion";
+import { GitCompare, Loader2, Play } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface DiffResult {
-  old: { modelDir: string; modelVersion: string }
-  new: { modelDir: string; modelVersion: string }
-  controls: { added: string[]; removed: string[] }
-  questions: { newlyMissing: string[]; noLongerMissing: string[] }
-  activatedDomains: { old: string[]; new: string[] }
+  old: { modelDir: string; modelVersion: string };
+  new: { modelDir: string; modelVersion: string };
+  controls: { added: string[]; removed: string[] };
+  questions: { newlyMissing: string[]; noLongerMissing: string[] };
+  activatedDomains: { old: string[]; new: string[] };
 }
 
 interface DiffSectionProps {
-  onRunDiff: (oldModelDir: string, newModelDir: string) => Promise<void>
-  diffResult: DiffResult | null
-  isRunning: boolean
+  onRunDiff: (oldModelDir: string, newModelDir: string) => Promise<void>;
+  diffResult: DiffResult | null;
+  isRunning: boolean;
 }
 
 export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionProps) {
-  const [oldModelDir, setOldModelDir] = useState('model')
-  const [newModelDir, setNewModelDir] = useState('model')
+  const [oldModelDir, setOldModelDir] = useState("model");
+  const [newModelDir, setNewModelDir] = useState("model");
 
   return (
     <motion.div
@@ -96,7 +96,8 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
             <CardHeader>
               <CardTitle className="text-base">Version Comparison</CardTitle>
               <CardDescription>
-                {diffResult.old.modelDir} ({diffResult.old.modelVersion}) → {diffResult.new.modelDir} ({diffResult.new.modelVersion})
+                {diffResult.old.modelDir} ({diffResult.old.modelVersion}) →{" "}
+                {diffResult.new.modelDir} ({diffResult.new.modelVersion})
               </CardDescription>
             </CardHeader>
           </Card>
@@ -223,5 +224,5 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
         </motion.div>
       )}
     </motion.div>
-  )
+  );
 }

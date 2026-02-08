@@ -1,6 +1,6 @@
-export type ThemeMode = 'system' | 'light' | 'dark'
+export type ThemeMode = "system" | "light" | "dark";
 
-export const THEME_STORAGE_KEY = 'risk-assistant.theme'
+export const THEME_STORAGE_KEY = "risk-assistant.theme";
 
 export function getThemeInitScript() {
   // Runs before React hydration to avoid a flash.
@@ -13,5 +13,5 @@ export function getThemeInitScript() {
     const root = document.documentElement;
     if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
   } catch (e) {}
-})();`
+})();`;
 }

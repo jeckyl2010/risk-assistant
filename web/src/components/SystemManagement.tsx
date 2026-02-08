@@ -1,108 +1,118 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, FolderPlus, FolderOpen, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { FileBrowserModal } from '@/components/FileBrowserModal'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion } from "framer-motion";
+import { FolderOpen, FolderPlus, Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import { FileBrowserModal } from "@/components/FileBrowserModal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
-  id: z.string()
-    .min(1, 'System ID is required')
-    .regex(/^[a-zA-Z0-9-_]+$/, 'Only letters, numbers, dashes, and underscores allowed'),
-  path: z.string().optional()
-})
+  id: z
+    .string()
+    .min(1, "System ID is required")
+    .regex(/^[a-zA-Z0-9-_]+$/, "Only letters, numbers, dashes, and underscores allowed"),
+  path: z.string().optional(),
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 export function SystemManagement() {
-  const [mode, setMode] = useState<'none' | 'create'>('none')
-  const [isCreating, setIsCreating] = useState(false)
-  const [isAdding, setIsAdding] = useState(false)
-  const [showBrowser, setShowBrowser] = useState(false)
-  const [browserMode, setBrowserMode] = useState<'file' | 'directory'>('file')
-  const router = useRouter()
+  const [mode, setMode] = useState<"none" | "create">("none");
+  const [isCreating, setIsCreating] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showBrowser, setShowBrowser] = useState(false);
+  const [browserMode, setBrowserMode] = useState<"file" | "directory">("file");
+  const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    reset,
+  } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      path: ''
-    }
-  })
-  
-  const systemId = watch('id')
-  const customPath = watch('path')
+      path: "",
+    },
+  });
+
+  const systemId = watch("id");
+  const customPath = watch("path");
 
   const handleCreateClick = () => {
-    setMode('create')
-    reset()
-  }
+    setMode("create");
+    reset();
+  };
 
   const handleAddExistingClick = () => {
-    setBrowserMode('file')
-    setShowBrowser(true)
-  }
+    setBrowserMode("file");
+    setShowBrowser(true);
+  };
 
   const handleDirectorySelect = (dirPath: string) => {
-    const fileName = systemId ? `${systemId}.yaml` : 'system.yaml'
-    const fullPath = dirPath.endsWith('\\') || dirPath.endsWith('/') 
-      ? `${dirPath}${fileName}`
-      : `${dirPath}\\${fileName}`
-    setValue('path', fullPath)
-  }
+    const fileName = systemId ? `${systemId}.yaml` : "system.yaml";
+    const fullPath =
+      dirPath.endsWith("\\") || dirPath.endsWith("/")
+        ? `${dirPath}${fileName}`
+        : `${dirPath}\\${fileName}`;
+    setValue("path", fullPath);
+  };
 
   const handleFileSelect = async (filePath: string) => {
-    setIsAdding(true)
+    setIsAdding(true);
     try {
-      const res = await fetch('/api/systems/add', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/systems/add", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ path: filePath }),
-      })
-      
+      });
+
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || `Failed: ${res.status}`)
+        const error = await res.json();
+        throw new Error(error.error || `Failed: ${res.status}`);
       }
-      
-      const json = (await res.json()) as { id: string }
-      toast.success('System added to portfolio!')
-      router.refresh()
-      router.push(`/systems/${encodeURIComponent(json.id)}`)
+
+      const json = (await res.json()) as { id: string };
+      toast.success("System added to portfolio!");
+      router.refresh();
+      router.push(`/systems/${encodeURIComponent(json.id)}`);
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : 'Failed to add system')
+      toast.error(e instanceof Error ? e.message : "Failed to add system");
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
-  }
+  };
 
   const onSubmit = async (data: FormData) => {
-    setIsCreating(true)
+    setIsCreating(true);
     try {
-      const res = await fetch('/api/systems', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/systems", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
-      })
-      if (!res.ok) throw new Error(`Failed: ${res.status}`)
-      const json = (await res.json()) as { id: string }
-      toast.success('System created successfully!')
-      router.push(`/systems/${encodeURIComponent(json.id)}`)
+      });
+      if (!res.ok) throw new Error(`Failed: ${res.status}`);
+      const json = (await res.json()) as { id: string };
+      toast.success("System created successfully!");
+      router.push(`/systems/${encodeURIComponent(json.id)}`);
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : 'Failed to create system')
+      toast.error(e instanceof Error ? e.message : "Failed to create system");
     } finally {
-      setIsCreating(false)
+      setIsCreating(false);
     }
-  }
+  };
 
-  const displayPath = customPath || (systemId ? `./systems/${systemId}.yaml` : './systems/[SystemID].yaml')
+  const displayPath =
+    customPath || (systemId ? `./systems/${systemId}.yaml` : "./systems/[SystemID].yaml");
 
   return (
     <div className="space-y-4">
@@ -150,10 +160,10 @@ export function SystemManagement() {
 
       {/* Create Form (Expandable) */}
       <AnimatePresence>
-        {mode === 'create' && (
+        {mode === "create" && (
           <motion.form
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleSubmit(onSubmit)}
             className="overflow-hidden"
@@ -164,15 +174,13 @@ export function SystemManagement() {
                   <Label htmlFor="system-id">System ID</Label>
                   <Input
                     id="system-id"
-                    {...register('id')}
+                    {...register("id")}
                     placeholder="e.g. shopfloor-analytics"
                     disabled={isCreating}
                     autoFocus
                   />
                   {errors.id && (
-                    <p className="text-sm text-red-600 dark:text-red-400">
-                      {errors.id.message}
-                    </p>
+                    <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>
                   )}
                 </div>
 
@@ -183,8 +191,8 @@ export function SystemManagement() {
                     variant="outline"
                     size="default"
                     onClick={() => {
-                      setBrowserMode('directory')
-                      setShowBrowser(true)
+                      setBrowserMode("directory");
+                      setShowBrowser(true);
                     }}
                     disabled={isCreating || !systemId}
                     className="gap-2"
@@ -196,20 +204,14 @@ export function SystemManagement() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label className="text-xs text-zinc-600 dark:text-zinc-400">
-                  Save Location
-                </Label>
+                <Label className="text-xs text-zinc-600 dark:text-zinc-400">Save Location</Label>
                 <code className="rounded bg-white px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
                   {displayPath}
                 </code>
               </div>
 
               <div className="flex items-center gap-2">
-                <Button
-                  type="submit"
-                  disabled={isCreating}
-                  className="gap-2"
-                >
+                <Button type="submit" disabled={isCreating} className="gap-2">
                   {isCreating ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -226,8 +228,8 @@ export function SystemManagement() {
                   type="button"
                   variant="ghost"
                   onClick={() => {
-                    setMode('none')
-                    reset()
+                    setMode("none");
+                    reset();
                   }}
                   disabled={isCreating}
                 >
@@ -243,10 +245,14 @@ export function SystemManagement() {
       <FileBrowserModal
         isOpen={showBrowser}
         onClose={() => setShowBrowser(false)}
-        onSelect={browserMode === 'file' ? handleFileSelect : handleDirectorySelect}
+        onSelect={browserMode === "file" ? handleFileSelect : handleDirectorySelect}
         mode={browserMode}
-        title={browserMode === 'file' ? 'Select Existing System File' : 'Select Directory for System File'}
+        title={
+          browserMode === "file"
+            ? "Select Existing System File"
+            : "Select Directory for System File"
+        }
       />
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { AlertCircle } from 'lucide-react'
+import { motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 
 interface ErrorAlertProps {
-  message: string
+  message: string;
 }
 
 export function ErrorAlert({ message }: ErrorAlertProps) {
@@ -20,5 +20,5 @@ export function ErrorAlert({ message }: ErrorAlertProps) {
         <div className="mt-1">{message}</div>
       </div>
     </motion.div>
-  )
+  );
 }

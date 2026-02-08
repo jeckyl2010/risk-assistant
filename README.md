@@ -5,12 +5,53 @@ facts -> (conditional questions) -> derived controls.
 
 Non-goals: scoring, RAG, workshops, approvals.
 
-## Quick start
-1) Put your facts in `examples/*.yaml`
-2) Install dependencies:
-   python -m pip install -r requirements.txt
-3) Run:
+## Quick Start
+
+### Backend (Python)
+
+1. Install uv (fast Python package manager):
+   ```powershell
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+2. Create virtual environment and install dependencies:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   # source .venv/bin/activate  # Linux/Mac
+   
+   # Install runtime dependencies
+   uv pip install -r requirements.txt
+   
+   # Install development tools (Ruff)
+   uv pip install -r requirements-dev.txt
+   ```
+
+3. Run the evaluation engine:
+   ```bash
    python tools/riskctl.py evaluate examples/system.example.yaml
+   ```
+
+### Frontend (Web)
+
+See [web/README.md](web/README.md) for Next.js frontend setup.
+
+### Code Quality
+
+- **Python**: Use Ruff for linting and formatting (with venv activated)
+  ```bash
+  ruff check .        # Lint
+  ruff format .       # Format
+  ruff check . --fix  # Auto-fix issues
+  ```
+
+- **TypeScript/React**: Use Biome (see web/ directory)
+  ```bash
+  cd web
+  bun run lint        # Lint
+  bun run format      # Format
+  bun run check       # Lint + format with auto-fix
+  ```
 
 Outputs:
 - derived controls

@@ -1,121 +1,125 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Folder, FileText, ChevronUp, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronUp, FileText, Folder, Loader2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
 
 type BrowseItem = {
-  name: string
-  path: string
-  isDirectory: boolean
-  isYaml: boolean
-}
+  name: string;
+  path: string;
+  isDirectory: boolean;
+  isYaml: boolean;
+};
 
 type BrowseResponse = {
-  currentPath: string
-  parent: string | null
-  items: BrowseItem[]
-  error?: string
-}
+  currentPath: string;
+  parent: string | null;
+  items: BrowseItem[];
+  error?: string;
+};
 
 type FileBrowserModalProps = {
-  isOpen: boolean
-  onClose: () => void
-  onSelect: (path: string) => void
-  mode: 'file' | 'directory'
-  title?: string
-}
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (path: string) => void;
+  mode: "file" | "directory";
+  title?: string;
+};
 
-export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: FileBrowserModalProps) {
-  const [currentPath, setCurrentPath] = useState<string>('')
-  const [parent, setParent] = useState<string | null>(null)
-  const [items, setItems] = useState<BrowseItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [mounted, setMounted] = useState(false)
+export function FileBrowserModal({
+  isOpen,
+  onClose,
+  onSelect,
+  mode,
+  title,
+}: FileBrowserModalProps) {
+  const [currentPath, setCurrentPath] = useState<string>("");
+  const [parent, setParent] = useState<string | null>(null);
+  const [items, setItems] = useState<BrowseItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const fetchDirectory = async (path?: string) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const url = path 
-        ? `/api/browse?path=${encodeURIComponent(path)}`
-        : '/api/browse'
-      
-      const res = await fetch(url)
-      const data: BrowseResponse = await res.json()
-      
+      const url = path ? `/api/browse?path=${encodeURIComponent(path)}` : "/api/browse";
+
+      const res = await fetch(url);
+      const data: BrowseResponse = await res.json();
+
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to browse directory')
+        throw new Error(data.error || "Failed to browse directory");
       }
-      
-      setCurrentPath(data.currentPath)
-      setParent(data.parent)
-      setItems(data.items)
+
+      setCurrentPath(data.currentPath);
+      setParent(data.parent);
+      setItems(data.items);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load directory')
+      setError(e instanceof Error ? e.message : "Failed to load directory");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      fetchDirectory()
+      fetchDirectory();
       // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden'
-      
+      document.body.style.overflow = "hidden";
+
       // Close on ESC key
       const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClose()
+        if (e.key === "Escape") {
+          onClose();
         }
-      }
-      
-      document.addEventListener('keydown', handleEscape)
-      
+      };
+
+      document.addEventListener("keydown", handleEscape);
+
       return () => {
-        document.body.style.overflow = 'unset'
-        document.removeEventListener('keydown', handleEscape)
-      }
+        document.body.style.overflow = "unset";
+        document.removeEventListener("keydown", handleEscape);
+      };
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = "unset";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen, onClose])
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
 
   const handleItemClick = (item: BrowseItem) => {
     if (item.isDirectory) {
-      fetchDirectory(item.path)
-    } else if (mode === 'file' && item.isYaml) {
-      onSelect(item.path)
-      onClose()
+      fetchDirectory(item.path);
+    } else if (mode === "file" && item.isYaml) {
+      onSelect(item.path);
+      onClose();
     }
-  }
+  };
 
   const handleSelectCurrentDirectory = () => {
-    if (mode === 'directory') {
-      onSelect(currentPath)
-      onClose()
+    if (mode === "directory") {
+      onSelect(currentPath);
+      onClose();
     }
-  }
+  };
 
-  if (!isOpen) return null
-  if (!mounted) return null
+  if (!isOpen) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>
-      <div 
+      <div
         className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
         onClick={onClose}
       >
@@ -129,14 +133,9 @@ export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: Fil
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-200 p-4 dark:border-zinc-800">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-              {title || (mode === 'file' ? 'Select System File' : 'Select Directory')}
+              {title || (mode === "file" ? "Select System File" : "Select Directory")}
             </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -199,14 +198,13 @@ export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: Fil
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-zinc-200 p-4 dark:border-zinc-800">
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {mode === 'file' ? 'Click a .yaml file to select' : 'Select current directory or navigate to choose location'}
+              {mode === "file"
+                ? "Click a .yaml file to select"
+                : "Select current directory or navigate to choose location"}
             </p>
             <div className="flex gap-2">
-              {mode === 'directory' && (
-                <Button
-                  onClick={handleSelectCurrentDirectory}
-                  disabled={!currentPath}
-                >
+              {mode === "directory" && (
+                <Button onClick={handleSelectCurrentDirectory} disabled={!currentPath}>
                   Select This Directory
                 </Button>
               )}
@@ -218,6 +216,6 @@ export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: Fil
         </motion.div>
       </div>
     </AnimatePresence>,
-    document.body
-  )
+    document.body,
+  );
 }

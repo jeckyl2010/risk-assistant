@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Command } from 'cmdk'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Command } from "cmdk";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Shield,
-  FileText,
   BarChart3,
+  FileText,
   GitCompare,
-  Save,
-  Play,
   Home,
+  Play,
+  Save,
   Search,
+  Shield,
   Sparkles,
-} from 'lucide-react'
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 interface CommandPaletteProps {
-  systemId?: string
-  onSave?: () => void
-  onEvaluate?: () => void
-  onNavigate?: (section: string) => void
-  questionSections?: Array<{ key: string; title: string }>
+  systemId?: string;
+  onSave?: () => void;
+  onEvaluate?: () => void;
+  onNavigate?: (section: string) => void;
+  questionSections?: Array<{ key: string; title: string }>;
 }
 
 export function CommandPalette({
@@ -31,26 +31,26 @@ export function CommandPalette({
   onNavigate,
   questionSections = [],
 }: CommandPaletteProps) {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   // Toggle the command palette
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
+    };
 
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleSelect = useCallback((callback: () => void) => {
-    callback()
-    setOpen(false)
-  }, [])
+    callback();
+    setOpen(false);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -70,7 +70,7 @@ export function CommandPalette({
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', duration: 0.3 }}
+            transition={{ type: "spring", duration: 0.3 }}
             className="fixed left-1/2 top-[20%] z-50 w-full max-w-2xl -translate-x-1/2"
           >
             <Command className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
@@ -92,9 +92,12 @@ export function CommandPalette({
                 </Command.Empty>
 
                 {/* Navigation */}
-                <Command.Group heading="Navigation" className="text-xs font-medium text-zinc-500 px-3 py-2">
+                <Command.Group
+                  heading="Navigation"
+                  className="text-xs font-medium text-zinc-500 px-3 py-2"
+                >
                   <Command.Item
-                    onSelect={() => handleSelect(() => router.push('/'))}
+                    onSelect={() => handleSelect(() => router.push("/"))}
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-indigo-500 aria-selected:text-white cursor-pointer"
                   >
                     <Home className="h-4 w-4" />
@@ -103,21 +106,21 @@ export function CommandPalette({
                   {onNavigate && (
                     <>
                       <Command.Item
-                        onSelect={() => handleSelect(() => onNavigate('description'))}
+                        onSelect={() => handleSelect(() => onNavigate("description"))}
                         className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-indigo-500 aria-selected:text-white cursor-pointer"
                       >
                         <FileText className="h-4 w-4" />
                         <span>Go to Overview</span>
                       </Command.Item>
                       <Command.Item
-                        onSelect={() => handleSelect(() => onNavigate('results'))}
+                        onSelect={() => handleSelect(() => onNavigate("results"))}
                         className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-indigo-500 aria-selected:text-white cursor-pointer"
                       >
                         <BarChart3 className="h-4 w-4" />
                         <span>Go to Results</span>
                       </Command.Item>
                       <Command.Item
-                        onSelect={() => handleSelect(() => onNavigate('diff'))}
+                        onSelect={() => handleSelect(() => onNavigate("diff"))}
                         className="flex items-center gap-3 rounded-lg px-3 py-2.5 aria-selected:bg-indigo-500 aria-selected:text-white cursor-pointer"
                       >
                         <GitCompare className="h-4 w-4" />
@@ -129,7 +132,10 @@ export function CommandPalette({
 
                 {/* Question Sections */}
                 {questionSections.length > 0 && (
-                  <Command.Group heading="Question Sections" className="text-xs font-medium text-zinc-500 px-3 py-2">
+                  <Command.Group
+                    heading="Question Sections"
+                    className="text-xs font-medium text-zinc-500 px-3 py-2"
+                  >
                     {questionSections.map((section) => (
                       <Command.Item
                         key={section.key}
@@ -145,7 +151,10 @@ export function CommandPalette({
 
                 {/* Actions */}
                 {(onSave || onEvaluate) && (
-                  <Command.Group heading="Actions" className="text-xs font-medium text-zinc-500 px-3 py-2">
+                  <Command.Group
+                    heading="Actions"
+                    className="text-xs font-medium text-zinc-500 px-3 py-2"
+                  >
                     {onSave && (
                       <Command.Item
                         onSelect={() => handleSelect(onSave)}
@@ -179,7 +188,9 @@ export function CommandPalette({
                 <div className="flex items-center justify-between">
                   <span>Press ⌘K to toggle command palette</span>
                   <div className="flex items-center gap-2">
-                    <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">↑↓</kbd>
+                    <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">
+                      ↑↓
+                    </kbd>
                     <span>Navigate</span>
                     <kbd className="rounded bg-white px-2 py-1 font-medium dark:bg-zinc-900">↵</kbd>
                     <span>Select</span>
@@ -191,5 +202,5 @@ export function CommandPalette({
         </>
       )}
     </AnimatePresence>
-  )
+  );
 }
