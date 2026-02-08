@@ -9,7 +9,6 @@ Container orchestration and deployment configuration for Risk Assistant.
 **Windows:**
 ```powershell
 winget install RedHat.Podman
-uv pip install podman-compose
 ```
 
 **macOS:**
@@ -49,11 +48,9 @@ Run from project root:
 
 # View logs
 .\infrastructure\podman.ps1 logs frontend
-.\infrastructure\podman.ps1 logs backend
 
 # Open shell
 .\infrastructure\podman.ps1 shell frontend
-.\infrastructure\podman.ps1 shell backend
 
 # Stop containers
 .\infrastructure\podman.ps1 down
@@ -71,7 +68,6 @@ podman-compose -f infrastructure/compose.yaml up -d
 
 Access the application:
 - **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:8000 (if running standalone)
 
 Stop containers:
 ```powershell
@@ -105,22 +101,13 @@ podman-compose -f infrastructure/compose.yaml build --no-cache
 
 ## Container Structure
 
-### Backend (`risk-assistant-backend`)
-- **Base**: Python 3.12-slim
-- **Package Manager**: uv (fast Rust-based pip)
-- **Code**: `/app/tools/riskctl.py`
-- **Volumes**: 
-  - `./model` → `/app/model` (read-only)
-  - `./systems` → `/app/systems` (read-write)
-  - `./tools` → `/app/tools` (read-only in prod, read-write in dev)
-- **Port**: 8000
-
 ### Frontend (`risk-assistant-frontend`)
 - **Base**: oven/bun:1.3.8-slim
 - **Framework**: Next.js 16 (standalone output)
 - **Build**: Multi-stage (deps → builder → runner)
 - **Port**: 3000
 - **User**: Non-root (nextjs:nodejs)
+- **Evaluation**: Runs in Next.js API routes via `web/src/lib/evaluator.ts`
 
 ## Differences from Docker
 
@@ -143,7 +130,7 @@ docker ps            →  podman ps
 ## Troubleshooting
 
 ### Port conflicts
-If ports 3000 or 8000 are in use:
+If port 3000 is in use:
 ```yaml
 # Edit infrastructure/compose.yaml
 ports:
@@ -159,13 +146,11 @@ podman-compose -f infrastructure/compose.yaml up --security-opt label=disable
 ### View logs
 ```powershell
 podman-compose -f infrastructure/compose.yaml logs -f frontend
-podman-compose -f infrastructure/compose.yaml logs -f backend
 ```
 
 ### Shell into container
 ```powershell
 podman exec -it risk-assistant-frontend sh
-podman exec -it risk-assistant-backend bash
 ```
 
 ## CI/CD Integration
@@ -188,7 +173,6 @@ Example GitHub Actions workflow:
 
 ```
 infrastructure/
-├── backend.Dockerfile       # Python backend container
 ├── frontend.Dockerfile      # Next.js frontend container
 ├── compose.yaml            # Production compose configuration
 ├── compose.dev.yaml        # Development overrides

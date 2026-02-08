@@ -13,7 +13,7 @@
     .\infrastructure\podman.ps1 up
     .\infrastructure\podman.ps1 dev
     .\infrastructure\podman.ps1 logs frontend
-    .\infrastructure\podman.ps1 shell backend
+    .\infrastructure\podman.ps1 shell frontend
 #>
 
 param(
@@ -69,7 +69,6 @@ switch ($Command) {
         podman-compose -f $composeFile up -d
         Write-Host "`n✓ Containers started!" -ForegroundColor Green
         Write-Host "  Frontend: http://localhost:3000" -ForegroundColor Yellow
-        Write-Host "  Backend:  http://localhost:8000" -ForegroundColor Yellow
     }
     
     'down' {
@@ -95,25 +94,22 @@ switch ($Command) {
     
     'shell' {
         if (-not $Target) {
-            Write-Host "❌ Target required. Usage: .\infrastructure\podman.ps1 shell [frontend|backend]" -ForegroundColor Red
-            exit 1
+            $Target = 'frontend'
         }
         
         $containerMap = @{
             'frontend' = 'risk-assistant-frontend'
-            'backend' = 'risk-assistant-backend'
         }
         
         $container = $containerMap[$Target]
         if (-not $container) {
-            Write-Host "❌ Invalid target. Use 'frontend' or 'backend'" -ForegroundColor Red
+            Write-Host "❌ Invalid target. Use 'frontend'" -ForegroundColor Red
             exit 1
         }
         
         Write-Step "Opening shell in: $container"
         
-        $shell = if ($Target -eq 'backend') { 'bash' } else { 'sh' }
-        podman exec -it $container $shell
+        podman exec -it $container sh
     }
     
     'restart' {

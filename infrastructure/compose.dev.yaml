@@ -2,14 +2,6 @@
 # Run from project root: podman-compose -f infrastructure/compose.yaml -f infrastructure/compose.dev.yaml up
 
 services:
-  backend:
-    volumes:
-      # Read-write mounts for development
-      - ../model:/app/model:rw
-      - ../systems:/app/systems:rw
-      - ../tools:/app/tools:rw
-    command: ["python", "tools/riskctl.py", "--help"]
-    
   frontend:
     build:
       context: ../web

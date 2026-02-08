@@ -13,32 +13,12 @@ Non-goals: scoring, RAG, workshops, approvals.
 .\scripts\setup.ps1
 ```
 
-This installs everything: uv, Bun, Python dependencies, and frontend packages.
+This installs Bun and all project dependencies.
 
 ### Manual Setup
 
 <details>
 <summary>Click to expand manual installation steps</summary>
-
-#### Backend (Python)
-
-1. Install uv (fast Python package manager):
-   ```powershell
-   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-   ```
-
-2. Create virtual environment and install dependencies:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   # source .venv/bin/activate  # Linux/Mac
-   
-   # Install all dependencies
-   uv pip install -r requirements.txt
-   uv pip install -r requirements-dev.txt
-   ```
-
-#### Frontend (Web)
 
 1. Install Bun:
    ```powershell
@@ -55,10 +35,10 @@ This installs everything: uv, Bun, Python dependencies, and frontend packages.
 
 ### Run the Application
 
-**Backend:**
+**CLI:**
 ```bash
-.venv\Scripts\activate
-python tools/riskctl.py evaluate examples/system.example.yaml
+bun riskctl evaluate systems/TestMe.yaml
+bun riskctl diff systems/TestMe.yaml --old model-v1 --new model-v2
 ```
 
 **Frontend:**
@@ -91,8 +71,7 @@ See [infrastructure/README.md](infrastructure/README.md) for complete Podman set
 ```
 
 This installs:
-- **Biome** - Frontend linting/formatting
-- **Ruff** - Python linting/formatting
+- **Biome** - Linting and formatting
 - **Tailwind CSS IntelliSense** - Tailwind autocomplete and IntelliSense
 - **Bun** - Bun runtime support
 
@@ -107,10 +86,6 @@ Alternatively, VS Code will prompt you to install recommended extensions when yo
 
 **Code quality:**
 ```bash
-# Python (with venv activated)
-ruff check . --fix && ruff format .
-
-# Frontend
 cd web
 bun run check
 ```
@@ -128,9 +103,8 @@ bun run check
 - Control derivation (via `model/rules/controls.rules.yaml`) evaluates directly against the facts provided; it is not gated by whether a domain was activated.
 
 **Validation:**
-- `riskctl.py` emits warning-only diagnostics (stderr) to catch model drift and input mistakes early.
-- It validates facts against the question schemas (types + allowed values) and warns on unknown keys that would otherwise silently not match any rules.
-- It also warns if rules reference control IDs missing from the control catalog, or if the control catalog contains unknown metadata values.
+- The CLI tool (`tools/riskctl.ts`) provides evaluation and diff capabilities.
+- The evaluation logic validates facts against question schemas and triggers, deriving applicable controls.
 
 **Versioning:**
 - The model uses SemVer via `model/model.manifest.yaml` (`model_version`).

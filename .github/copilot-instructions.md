@@ -23,7 +23,7 @@
 
 ### Architecture
 - **Model**: Question catalog, control catalog, trigger rules (YAML-based)
-- **Backend**: Python FastAPI (`tools/riskctl.py`) for evaluation engine
+- **Evaluation Engine**: TypeScript (`tools/riskctl.ts` CLI, `web/src/lib/evaluator.ts` library)
 - **Frontend**: Next.js 16 + React 19 + TypeScript + Tailwind CSS v4
 - **Storage**: File-based (YAML) for systems and model definitions
 
@@ -32,26 +32,27 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 
 ## Tech Stack Specifics
 
-### Frontend
+### Runtime & Tools
 - **Runtime**: Bun (fast JavaScript runtime and package manager)
+- **TypeScript**: Strict mode throughout, prefer type safety
+- **Linting/Formatting**: Biome (Rust-based, replaces ESLint + Prettier)
+
+### Frontend
 - **Next.js**: App Router with React Server Components
-- **TypeScript**: Strict mode, prefer type safety
 - **Styling**: Tailwind CSS v4, indigo/purple gradient theme, Geist Sans + Geist Mono fonts
 - **Components**: Portal-based tooltips, client-side state management
 - **Build**: Turbopack for dev, standard Next.js build for production
-- **Linting/Formatting**: Biome (Rust-based, replaces ESLint + Prettier)
 
-### Backend
-- **Python**: FastAPI for evaluation engine
-- **Package Manager**: uv (fast Rust-based pip replacement)
-- **Linting/Formatting**: Ruff (Rust-based, replaces Flake8/Black/isort)
-- **Environment**: All Python tools installed in `.venv` virtual environment
+### CLI
+- **Tool**: `tools/riskctl.ts` - TypeScript CLI for evaluation and diff
+- **Library**: `web/src/lib/evaluator.ts` - Shared evaluation logic
+- **Commands**: `bun riskctl evaluate`, `bun riskctl diff`
 
 ### Containerization
 - **Runtime**: Podman (Docker-compatible, no licensing issues)
 - **Location**: `infrastructure/` directory for all container files
 - **Compose**: `compose.yaml` for production, `compose.dev.yaml` for development
-- **Images**: Multi-stage builds (Python 3.12-slim for backend, Bun 1.3.8-slim for frontend)
+- **Images**: Multi-stage builds (Bun 1.3.8-slim for both CLI and frontend)
 - **Helper**: `infrastructure/podman.ps1` for common operations (build, up, dev, logs, shell, clean)
 - **Philosophy**: Podman over Docker Desktop (Apache 2.0 license, rootless by default)
 
@@ -72,14 +73,14 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 - **Use established patterns**:
   - Infrastructure files → `infrastructure/`
   - Tooling/scripts → Keep in root only if frequently executed (e.g., `setup.ps1`)
-  - Configuration → Root for project-wide (e.g., `pyproject.toml`), subdirs for scoped config
+  - Configuration → Root for project-wide (e.g., `package.json`), subdirs for scoped config
   - Documentation → Root for primary docs (README.md), subdirs for detailed topics
 - **Group related files together** - Don't scatter Dockerfiles, compose files, and related configs across multiple locations
-- **Clean naming conventions** - Use descriptive, consistent names (e.g., `backend.Dockerfile` not just `Dockerfile`)
+- **Clean naming conventions** - Use descriptive, consistent names (e.g., `frontend.Dockerfile` not just `Dockerfile`)
 
 **Examples of proper structure:**
-- ✅ `infrastructure/compose.yaml`, `infrastructure/backend.Dockerfile`, `infrastructure/README.md`
-- ❌ `Dockerfile.backend`, `compose.yaml`, `PODMAN.md` scattered in root
+- ✅ `infrastructure/compose.yaml`, `infrastructure/frontend.Dockerfile`, `infrastructure/README.md`
+- ❌ `Dockerfile.frontend`, `compose.yaml`, `PODMAN.md` scattered in root
 - ✅ `scripts/setup.ps1`, `scripts/update.ps1` (development tooling)
 - ❌ `setup.ps1`, `update.ps1` in root
 - ✅ `web/biome.json` (scoped to frontend)
@@ -96,7 +97,7 @@ Security, Data, Operations, Integration, Cost, Criticality, AI (emerging technol
 - `infrastructure/` - Container orchestration (Dockerfiles, compose files, podman.ps1)
 - `scripts/` - Development tooling (setup.ps1, update.ps1, install-extensions.ps1)
 - `prompts/` - AI prompts and system instructions
-- `tools/` - Python backend tools (riskctl.py)
+- `tools/` - TypeScript CLI tool (riskctl.ts)
 - `web/` - Next.js frontend application
 - `model/` - YAML-based question/control/rule catalogs
 - `systems/` - System definition files

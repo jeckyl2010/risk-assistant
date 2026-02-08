@@ -1,0 +1,17 @@
+{
+  "name": "risk-assistant",
+  "version": "0.6.7",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "riskctl": "bun tools/riskctl.ts",
+    "evaluate": "bun tools/riskctl.ts evaluate",
+    "diff": "bun tools/riskctl.ts diff"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "workspaces": [
+    "web"
+  ]
+}

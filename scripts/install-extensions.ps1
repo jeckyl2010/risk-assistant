@@ -27,7 +27,6 @@ if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
 # List of recommended extensions
 $extensions = @(
     "biomejs.biome",              # Biome - Linting/Formatting
-    "charliermarsh.ruff",          # Ruff - Python Linter/Formatter
     "bradlc.vscode-tailwindcss",   # Tailwind CSS IntelliSense
     "oven.bun-vscode"              # Bun Runtime Support
 )
