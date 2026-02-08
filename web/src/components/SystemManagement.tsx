@@ -112,41 +112,53 @@ export function SystemManagement() {
 
   return (
     <div className="space-y-4">
-      {/* Action Buttons */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Button size="lg" onClick={handleCreateClick} disabled={isAdding} className="h-auto flex-col gap-2 py-6">
-          <Plus className="h-6 w-6" />
-          <div className="flex flex-col gap-1">
-            <span className="font-semibold">Create New System</span>
-            <span className="text-xs font-normal opacity-90">Start a new risk assessment</span>
+      {/* Action Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Create New System Card */}
+        <button
+          type="button"
+          onClick={handleCreateClick}
+          disabled={isAdding}
+          className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 text-left shadow-sm transition-all hover:border-indigo-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 transition-opacity group-hover:opacity-100 dark:from-indigo-500/10 dark:to-purple-500/10" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm">
+              <Plus className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">Create New System</h3>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Start a new risk assessment</p>
+            </div>
           </div>
-        </Button>
+        </button>
 
-        <Button
-          size="lg"
-          variant="outline"
+        {/* Add Existing System Card */}
+        <button
+          type="button"
           onClick={handleAddExistingClick}
           disabled={isAdding || isCreating}
-          className="h-auto flex-col gap-2 py-6"
+          className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 text-left shadow-sm transition-all hover:border-indigo-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
         >
-          {isAdding ? (
-            <>
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <div className="flex flex-col gap-1">
-                <span className="font-semibold">Adding System...</span>
-                <span className="text-xs font-normal opacity-90">Please wait</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <FolderPlus className="h-6 w-6" />
-              <div className="flex flex-col gap-1">
-                <span className="font-semibold">Add Existing System</span>
-                <span className="text-xs font-normal opacity-90">Import from filesystem</span>
-              </div>
-            </>
-          )}
-        </Button>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 transition-opacity group-hover:opacity-100 dark:from-indigo-500/10 dark:to-purple-500/10" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm">
+              {isAdding ? (
+                <Loader2 className="h-6 w-6 animate-spin text-white" />
+              ) : (
+                <FolderPlus className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                {isAdding ? "Adding System..." : "Add Existing System"}
+              </h3>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                {isAdding ? "Please wait" : "Import from filesystem"}
+              </p>
+            </div>
+          </div>
+        </button>
       </div>
 
       {/* Create Form (Expandable) */}

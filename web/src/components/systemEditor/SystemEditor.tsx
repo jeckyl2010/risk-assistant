@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, FileText, GitCompare } from "lucide-react";
+import { BarChart3, Cog, Database, DollarSign, FileText, GitCompare, Link2, Lock, Sparkles, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDiffSystem, useEvaluateSystem, useSaveSystem } from "@/hooks/useSystemApi";
 import { SECTION_IDS } from "@/lib/constants";
@@ -26,6 +26,28 @@ function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean 
     }
   }
   return true;
+}
+
+function getDomainIcon(domain: string) {
+  const iconClass = "h-4 w-4";
+  switch (domain) {
+    case "ai":
+      return <Sparkles className={iconClass} />;
+    case "cost":
+      return <DollarSign className={iconClass} />;
+    case "criticality":
+      return <Zap className={iconClass} />;
+    case "data":
+      return <Database className={iconClass} />;
+    case "integration":
+      return <Link2 className={iconClass} />;
+    case "operations":
+      return <Cog className={iconClass} />;
+    case "security":
+      return <Lock className={iconClass} />;
+    default:
+      return null;
+  }
 }
 
 function deriveActivatedDomainsFromTriggers(facts: Facts, triggers: TriggerRule[]): string[] {
@@ -168,6 +190,7 @@ export function SystemEditor({
       items.push({
         id: s.key,
         label: s.title,
+        icon: getDomainIcon(s.key),
         badge: progress ? `${progress.answered}/${progress.total}` : undefined,
         variant:
           progress && progress.answered === progress.total

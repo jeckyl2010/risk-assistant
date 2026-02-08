@@ -1,4 +1,4 @@
-import { Activity, Shield } from "lucide-react";
+import { Activity, FolderPlus, Shield } from "lucide-react";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 import { PortfolioTable } from "@/components/portfolio/PortfolioTable";
 import { SystemManagement } from "@/components/SystemManagement";
@@ -69,7 +69,10 @@ export default async function Home() {
       {/* System Management */}
       <Card className="border-2 border-dashed border-indigo-200 dark:border-indigo-900">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-indigo-900 dark:text-indigo-100">Add System to Portfolio</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-xl font-semibold text-indigo-900 dark:text-indigo-100">
+            <FolderPlus className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            Add System to Portfolio
+          </CardTitle>
           <CardDescription>Create a new risk assessment or add an existing system file</CardDescription>
         </CardHeader>
         <CardContent>
