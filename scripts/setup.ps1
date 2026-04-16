@@ -24,12 +24,21 @@ Write-Host "📦 Checking Bun (JavaScript runtime)..." -ForegroundColor Yellow
 
 if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
     Write-Host "   Installing Bun..." -ForegroundColor Gray
-    Invoke-RestMethod https://bun.sh/install.ps1 | Invoke-Expression
-    
-    # Add to PATH for current session
-    $env:Path = "$env:USERPROFILE\.bun\bin;$env:Path"
+    if ($IsWindows) {
+        Invoke-RestMethod https://bun.sh/install.ps1 | Invoke-Expression
+    } else {
+        # macOS / Linux
+        bash -c "curl -fsSL https://bun.sh/install | bash"
+    }
 } else {
     Write-Host "   ✓ Bun already installed" -ForegroundColor Green
+}
+
+# Ensure bun is on PATH for this session (handles freshly installed bun)
+if ($IsWindows) {
+    $env:Path = "$env:USERPROFILE\.bun\bin;$env:Path"
+} else {
+    $env:PATH = "$env:HOME/.bun/bin:$env:PATH"
 }
 
 # ============================================================================
@@ -37,7 +46,7 @@ if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
 # ============================================================================
 Write-Host "⚡ Installing frontend dependencies..." -ForegroundColor Yellow
 
-Set-Location "$RepoRoot\web"
+Set-Location (Join-Path $RepoRoot "web")
 bun install
 
 Write-Host "   ✓ Frontend dependencies installed" -ForegroundColor Green
