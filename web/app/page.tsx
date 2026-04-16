@@ -46,13 +46,13 @@ export default async function Home() {
       {/* Header */}
       <div className="relative overflow-hidden rounded-xl border border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-sm">
         {/* Background pattern with gradient overlay */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/header-pattern.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.50,
+            backgroundImage: "url(/header-pattern.png)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.5,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10" />
@@ -64,8 +64,16 @@ export default async function Home() {
                 <Shield className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-zinc-50" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>Risk Assistant</h1>
-                <p className="text-sm text-slate-700 dark:text-zinc-400 mt-1" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.05)' }}>
+                <h1
+                  className="text-3xl font-bold tracking-tight text-slate-950 dark:text-zinc-50"
+                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
+                >
+                  Risk Assistant
+                </h1>
+                <p
+                  className="text-sm text-slate-700 dark:text-zinc-400 mt-1"
+                  style={{ textShadow: "0 1px 1px rgba(0,0,0,0.05)" }}
+                >
                   Smart questions. Clear controls. No scores, no guesswork.
                 </p>
               </div>
@@ -82,7 +90,10 @@ export default async function Home() {
           </div>
 
           {/* Version Info - Bottom Right */}
-          <div className="absolute bottom-4 right-6 flex flex-col items-end gap-0.5 text-xs text-slate-700 dark:text-zinc-400" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
+          <div
+            className="absolute bottom-4 right-6 flex flex-col items-end gap-0.5 text-xs text-slate-700 dark:text-zinc-400"
+            style={{ textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}
+          >
             <span>Version: 0.6.7</span>
             <span>Model: {modelVersion}</span>
           </div>
