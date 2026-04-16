@@ -35,10 +35,11 @@ export async function GET(request: Request) {
     );
 
     // Filter out nulls and sort: directories first, then files
-    const filtered = items.filter(Boolean).sort((a, b) => {
-      if (a?.isDirectory && !b?.isDirectory) return -1;
-      if (!a?.isDirectory && b?.isDirectory) return 1;
-      return a?.name.localeCompare(b?.name);
+    type Item = { name: string; path: string; isDirectory: boolean; isYaml: boolean };
+    const filtered = (items.filter(Boolean) as Item[]).sort((a, b) => {
+      if (a.isDirectory && !b.isDirectory) return -1;
+      if (!a.isDirectory && b.isDirectory) return 1;
+      return a.name.localeCompare(b.name);
     });
 
     // Get parent directory

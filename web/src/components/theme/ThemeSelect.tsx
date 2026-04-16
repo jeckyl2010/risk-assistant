@@ -73,8 +73,10 @@ export function ThemeSelect() {
 
   const cycleTheme = () => {
     const nextIndex = (currentThemeIndex + 1) % themes.length;
-    setTheme(themes[nextIndex].value);
+    setTheme(themes[nextIndex]!.value);
   };
+
+  if (!currentTheme) return null;
 
   const Icon = currentTheme.icon;
 

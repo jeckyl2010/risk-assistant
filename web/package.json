@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "check": "biome check --write ."
+    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit && biome check --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -23,7 +24,7 @@
     "cmdk": "^1.1.1",
     "framer-motion": "^12.38.0",
     "js-yaml": "^4.1.1",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^1.8.0",
     "next": "16.2.4",
     "react": "19.2.5",
     "react-dom": "19.2.5",
@@ -40,10 +41,10 @@
     "@biomejs/biome": "^2.4.12",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.19.39",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "tailwindcss": "^4.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   }
 }

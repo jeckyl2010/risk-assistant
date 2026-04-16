@@ -33,13 +33,13 @@ security:
   crosses_trust_boundary: true
   privileged_access: false
   internet_facing: false
-  interactive_users: true
+  interactive_users: null
   _reasons:
     internet_facing: '**Test** '
 data:
   personal_data: true
   data_subject_region: non_eu
-  data_leaves_manufacturing_zone: null
+  data_leaves_manufacturing_zone: true
 ai:
   ai_autonomy: advisory
   model_change: retrained

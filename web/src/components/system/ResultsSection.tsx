@@ -211,8 +211,8 @@ export function ResultsSection({
 
   const categoryDistribution = derivedControls.reduce(
     (acc, c) => {
-      const prefix = c.id.split("-")[0];
-      acc[prefix] = (acc[prefix] || 0) + 1;
+      const prefix = c.id.split("-")[0]!;
+      acc[prefix] = (acc[prefix] ?? 0) + 1;
       return acc;
     },
     {} as Record<string, number>,
@@ -268,7 +268,7 @@ export function ResultsSection({
 
   // Filter controls
   const filteredControls = derivedControls.filter((control) => {
-    const controlCategory = control.id.split("-")[0];
+    const controlCategory = control.id.split("-")[0]!;
     const matchesPhase = activePhase === "all" || control.activation_phase === activePhase;
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(controlCategory);
     return matchesPhase && matchesCategory;
@@ -577,8 +577,8 @@ export function ResultsSection({
                   <Filter className="h-4 w-4 text-zinc-500" />
                   <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Filter by category:</span>
                   {categories.map((category) => {
-                    const domainColor = getDomainColor(category);
-                    const isSelected = selectedCategories.includes(category);
+                    const domainColor = getDomainColor(category!);
+                    const isSelected = selectedCategories.includes(category!);
                     return (
                       <Badge
                         key={category}
@@ -588,7 +588,7 @@ export function ResultsSection({
                             ? `${domainColor.border} ${domainColor.bg} font-semibold shadow-sm`
                             : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                         }`}
-                        onClick={() => toggleCategory(category)}
+                        onClick={() => toggleCategory(category!)}
                       >
                         {category}
                         {isSelected && <X className="ml-1 h-3 w-3" />}
@@ -619,7 +619,7 @@ export function ResultsSection({
                     {filteredControls.map((control, index) => {
                       const isExpanded = expandedControls.includes(control.id);
                       const { status, statusColor } = getControlStatus(control);
-                      const controlPrefix = control.id.split("-")[0];
+                      const controlPrefix = control.id.split("-")[0]!;
                       const domainColor = getDomainColor(controlPrefix);
                       return (
                         <motion.div

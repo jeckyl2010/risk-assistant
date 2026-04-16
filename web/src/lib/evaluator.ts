@@ -250,7 +250,8 @@ export async function evaluateFacts(facts: Facts, paths: ModelPaths): Promise<Ev
   const derived_controls = Object.keys(derived)
     .sort()
     .map((id) => {
-      const c = derived[id].control;
+      const entry = derived[id]!;
+      const c = entry.control;
       const references = linksMap.get(id);
       return {
         id,
@@ -260,7 +261,7 @@ export async function evaluateFacts(facts: Facts, paths: ModelPaths): Promise<Ev
         enforcement_intent: c?.enforcement_intent ?? "unknown",
         activation_phase: c?.activation_phase ?? "unknown",
         evidence_type: c?.evidence_type ?? [],
-        because: derived[id].because,
+        because: entry.because,
         ...(references && references.length > 0 ? { references } : {}),
       };
     });

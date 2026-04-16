@@ -186,7 +186,9 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ range, count }) => `${range}: ${count}`}
+                        label={(props) =>
+                          `${(props as unknown as { range: string; count: number }).range}: ${(props as unknown as { range: string; count: number }).count}`
+                        }
                         outerRadius={90}
                         dataKey="count"
                       >

@@ -206,5 +206,5 @@ export function sectionAccent(key: string): SectionAccent {
     },
   };
 
-  return byKey[key] ?? byKey.base;
+  return byKey[key] ?? byKey.base!;
 }
