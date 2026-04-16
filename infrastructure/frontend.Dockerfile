@@ -1,11 +1,11 @@
 # Next.js frontend
-FROM oven/bun:1.3.8-slim AS base
+FROM oven/bun:1.3.12-slim AS base
 
 WORKDIR /app
 
 # Install dependencies
 FROM base AS deps
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # Build the application

@@ -20,7 +20,7 @@ Set-Location $RepoRoot
 # ============================================================================
 Write-Host "⚡ Updating frontend dependencies..." -ForegroundColor Yellow
 
-Set-Location "$RepoRoot\web"
+Set-Location (Join-Path $RepoRoot "web")
 bun update
 
 Write-Host "   ✓ Frontend dependencies updated" -ForegroundColor Green
