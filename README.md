@@ -7,10 +7,19 @@ Non-goals: scoring, RAG, workshops, approvals.
 
 ## Quick Start
 
+### Prerequisites
+
+**macOS** — install PowerShell via Homebrew (required to run `.ps1` scripts):
+```bash
+brew install powershell/tap/powershell
+```
+
+**Windows** — PowerShell is built-in. No extra steps.
+
 ### One-Command Setup
 
 ```powershell
-.\scripts\setup.ps1
+./scripts/setup.ps1
 ```
 
 This installs Bun and all project dependencies.
@@ -21,6 +30,13 @@ This installs Bun and all project dependencies.
 <summary>Click to expand manual installation steps</summary>
 
 1. Install Bun:
+
+   **macOS:**
+   ```bash
+   brew install oven-sh/bun/bun
+   ```
+
+   **Windows:**
    ```powershell
    powershell -c "irm bun.sh/install.ps1 | iex"
    ```
@@ -53,12 +69,12 @@ Open [http://localhost:3000](http://localhost:3000)
 
 **Production deployment with Podman Compose:**
 ```powershell
-.\infrastructure\podman.ps1 up
+./infrastructure/podman.ps1 up
 ```
 
 **Development mode with hot reload:**
 ```powershell
-.\infrastructure\podman.ps1 dev
+./infrastructure/podman.ps1 dev
 ```
 
 See [infrastructure/README.md](infrastructure/README.md) for complete Podman setup, troubleshooting, and CI/CD integration.
@@ -67,7 +83,7 @@ See [infrastructure/README.md](infrastructure/README.md) for complete Podman set
 
 **Install recommended extensions:**
 ```powershell
-.\scripts\install-extensions.ps1
+./scripts/install-extensions.ps1
 ```
 
 This installs:
@@ -81,7 +97,7 @@ Alternatively, VS Code will prompt you to install recommended extensions when yo
 
 **Update all dependencies:**
 ```powershell
-.\scripts\update.ps1
+./scripts/update.ps1
 ```
 
 **Code quality:**
