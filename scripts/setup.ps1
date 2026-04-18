@@ -26,8 +26,10 @@ if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
     Write-Host "   Installing Bun..." -ForegroundColor Gray
     if ($IsWindows) {
         Invoke-RestMethod https://bun.sh/install.ps1 | Invoke-Expression
+    } elseif ($IsMacOS) {
+        brew install oven-sh/bun/bun
     } else {
-        # macOS / Linux
+        # Linux
         bash -c "curl -fsSL https://bun.sh/install | bash"
     }
 } else {
