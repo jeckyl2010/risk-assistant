@@ -44,9 +44,9 @@ export function KeyboardShortcutHint() {
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           className="fixed bottom-6 right-6 z-40"
         >
           <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-500 to-purple-600 p-4 shadow-2xl dark:border-indigo-900">

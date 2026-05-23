@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+
 import { FileSearch, FolderPlus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -63,9 +63,7 @@ export function AddExistingSystemForm() {
   }
 
   return (
-    <motion.form
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4"
     >
@@ -93,13 +91,11 @@ export function AddExistingSystemForm() {
             </Button>
           </div>
           {errors.path && (
-            <motion.p
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
+            <p
               className="text-sm text-red-600 dark:text-red-400"
             >
               {errors.path.message}
-            </motion.p>
+            </p>
           )}
           <p className="text-xs text-gray-600 dark:text-gray-400">
             Path to an existing system YAML file. Relative or absolute paths supported.
@@ -128,6 +124,6 @@ export function AddExistingSystemForm() {
         mode="file"
         title="Select Existing System File"
       />
-    </motion.form>
+    </form>
   );
 }

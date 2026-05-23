@@ -82,7 +82,7 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
   const colors = domainColors[domain as keyof typeof domainColors] || domainColors.base;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+    <div>
       <Card
         className={`group border-l-4 transition-all hover:shadow-md ${
           isAnswered
@@ -224,6 +224,6 @@ export function QuestionCard({ question, value, reason, onChange, onReasonChange
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

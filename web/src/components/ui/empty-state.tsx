@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { AlertCircle, FileQuestion, Inbox, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "./button";
 
@@ -16,46 +15,27 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center py-16 px-4 text-center"
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-        className="mb-6 rounded-full bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 p-6 shadow-lg"
-      >
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="mb-6 rounded-full bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 p-6 shadow-lg">
         <div className="text-zinc-600 dark:text-zinc-400">{icon || <Inbox className="h-12 w-12" />}</div>
-      </motion.div>
+      </div>
 
-      <motion.h3
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-2"
-      >
+      <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
         {title}
-      </motion.h3>
+      </h3>
 
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mb-6"
-      >
+      <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mb-6">
         {description}
-      </motion.p>
+      </p>
 
       {action && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+        <div>
           <Button onClick={action.onClick} size="lg" className="shadow-lg">
             {action.label}
           </Button>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 

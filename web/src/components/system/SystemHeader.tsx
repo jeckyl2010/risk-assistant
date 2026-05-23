@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { CheckCircle2, Loader2, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export function SystemHeader({
   missingAnswers,
 }: SystemHeaderProps) {
   return (
-    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+    <div>
       <div className="rounded-xl border border-zinc-200/60 bg-white p-6 shadow-sm dark:border-zinc-800/60 dark:bg-zinc-900">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-3">
@@ -100,6 +100,6 @@ export function SystemHeader({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

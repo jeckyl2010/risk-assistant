@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { CheckCircle2, FileText, Shield, Target } from "lucide-react";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,12 +23,10 @@ interface StatsCardProps {
   value: string | number;
   description: string;
   icon: React.ReactNode;
-  delay: number;
 }
-
-function StatsCard({ title, value, description, icon, delay }: StatsCardProps) {
+function StatsCard({ title, value, description, icon }: StatsCardProps) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
+    <div>
       <Card className="overflow-hidden border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-900 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
@@ -43,7 +41,7 @@ function StatsCard({ title, value, description, icon, delay }: StatsCardProps) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -101,28 +99,24 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
           value={stats.totalSystems}
           description="Active risk assessments"
           icon={<Shield className="h-5 w-5" />}
-          delay={0}
         />
         <StatsCard
           title="Derived Controls"
           value={stats.totalControls}
           description="Across all systems"
           icon={<Target className="h-5 w-5" />}
-          delay={0.1}
         />
         <StatsCard
           title="Completion Rate"
           value={`${stats.completionRate}%`}
           description="Questions answered"
           icon={<FileText className="h-5 w-5" />}
-          delay={0.2}
         />
         <StatsCard
           title="Systems Complete"
           value={stats.systemStatus.Complete || 0}
           description={`${stats.totalSystems - (stats.systemStatus.Complete || 0)} need work`}
           icon={<CheckCircle2 className="h-5 w-5" />}
-          delay={0.3}
         />
       </div>
 
@@ -131,7 +125,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
         <div className="grid gap-4 md:grid-cols-2">
           {/* Domain Activation Frequency */}
           {domainData.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+            <div>
               <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Domain Activation</CardTitle>
@@ -167,12 +161,12 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           )}
 
           {/* Controls Distribution */}
           {controlDistribution.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <div>
               <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Controls Distribution</CardTitle>
@@ -214,7 +208,7 @@ export function PortfolioStats({ stats }: { stats: PortfolioStats }) {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           )}
         </div>
       )}

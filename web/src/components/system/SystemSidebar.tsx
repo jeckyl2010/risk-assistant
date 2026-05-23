@@ -26,11 +26,8 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
         const accent = sectionAccent(item.id);
 
         return (
-          <motion.button
+          <button
             key={item.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
             onClick={() => onNavigate(item.id)}
             className={cn(
               "group relative flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all",
@@ -54,10 +51,8 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
               <span className="truncate">{item.label}</span>
             </div>
 
-            {item.badge !== undefined && (
-              <motion.span
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+           {item.badge !== undefined && (
+              <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
                   isActive
@@ -67,12 +62,12 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
                       : item.variant === "warning"
                         ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                         : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-                )}
-              >
-                {item.badge}
-              </motion.span>
+               )}
+             >
+               {item.badge}
+              </span>
             )}
-          </motion.button>
+          </button>
         );
       })}
     </nav>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { BarChart3, CheckCircle2, FileText, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +19,7 @@ export function DescriptionSection({ description, onChange, stats }: Description
   const completionRate = stats ? Math.round((stats.answeredQuestions / stats.totalQuestions) * 100) : 0;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+    <div>
       <Card className="relative overflow-hidden">
         {/* Gradient background accent */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10" />
@@ -88,6 +87,6 @@ export function DescriptionSection({ description, onChange, stats }: Description
           />
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

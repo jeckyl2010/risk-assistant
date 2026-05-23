@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { GitCompare, Loader2, Play } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +27,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
   const [newModelDir, setNewModelDir] = useState("model");
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+    <div className="space-y-4">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -69,7 +68,7 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
       </Card>
 
       {diffResult && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+        <div className="space-y-4">
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-base">Version Comparison</CardTitle>
@@ -187,8 +186,8 @@ export function DiffSection({ onRunDiff, diffResult, isRunning }: DiffSectionPro
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }

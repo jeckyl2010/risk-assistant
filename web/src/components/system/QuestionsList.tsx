@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Question } from "@/lib/uiTypes";
 import { QuestionCard } from "./QuestionCard";
@@ -31,7 +30,7 @@ export function QuestionsList({
   const answeredCount = questions.filter((q) => getValue(q.id) !== null).length;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+    <div className="space-y-4">
       {/* Section Header */}
       <div className="flex items-baseline justify-between">
         <div>
@@ -63,6 +62,6 @@ export function QuestionsList({
           ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

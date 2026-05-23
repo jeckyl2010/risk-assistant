@@ -1,12 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Card, CardContent } from "./card";
 import { Skeleton } from "./skeleton";
 
 export function QuestionCardSkeleton() {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <div>
       <Card className="border-zinc-200/30 bg-white/60 dark:border-zinc-700/30 dark:bg-zinc-900/60">
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
@@ -27,7 +26,7 @@ export function QuestionCardSkeleton() {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
