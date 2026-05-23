@@ -1,33 +1,49 @@
 # risk-assistant
 
-Lightweight, deterministic, facts-based "guardrail" engine:
-facts -> (conditional questions) -> derived controls.
+[![CI](https://github.com/jeckyl2010/risk-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/jeckyl2010/risk-assistant/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/jeckyl2010/risk-assistant/actions/workflows/codeql.yml/badge.svg)](https://github.com/jeckyl2010/risk-assistant/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jeckyl2010/risk-assistant/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jeckyl2010/risk-assistant)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
-Non-goals: scoring, RAG, workshops, approvals.
+Lightweight, deterministic, facts-based guardrail engine.
 
-## Quick Start
+```
+facts → conditional questions → derived controls
+```
+
+The engine is rule-driven and fully explainable. No scoring, no RAG, no workshops, no approval flows.
+
+## How it works
+
+1. You describe a system by answering a set of questions (facts).
+2. The engine activates relevant domains based on trigger rules.
+3. Control derivation runs directly against the facts, independent of domain activation.
+4. The result is a set of derived controls with traceability: what triggered each one, and why.
+
+## Quick start
 
 ### Prerequisites
 
-**macOS** — install PowerShell via Homebrew (required to run `.ps1` scripts):
+**macOS** — install PowerShell via Homebrew (required for `.ps1` scripts):
+
 ```bash
 brew install powershell/tap/powershell
 ```
 
-**Windows** — PowerShell is built-in. No extra steps.
+**Windows** — PowerShell is built-in.
 
-### One-Command Setup
+### One-command setup
 
 ```powershell
 ./scripts/setup.ps1
 ```
 
-This installs Bun and all project dependencies.
+Installs Bun and all project dependencies.
 
-### Manual Setup
+### Manual setup
 
 <details>
-<summary>Click to expand manual installation steps</summary>
+<summary>Expand manual steps</summary>
 
 1. Install Bun:
 
@@ -49,15 +65,9 @@ This installs Bun and all project dependencies.
 
 </details>
 
-### Run the Application
+### Run
 
-**CLI:**
-```bash
-bun riskctl evaluate systems/TestMe.yaml
-bun riskctl diff systems/TestMe.yaml --old model-v1 --new model-v2
-```
-
-**Frontend:**
+**Web UI:**
 ```bash
 cd web
 bun run dev
@@ -65,63 +75,67 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Podman / Docker Deployment
+**CLI:**
+```bash
+bun riskctl evaluate systems/TestMe.yaml
+bun riskctl diff systems/TestMe.yaml --old model-v1 --new model-v2
+```
 
-**Production deployment with Podman Compose:**
+## Deployment
+
+**Production (Podman Compose):**
 ```powershell
 ./infrastructure/podman.ps1 up
 ```
 
-**Development mode with hot reload:**
+**Development with hot reload:**
 ```powershell
 ./infrastructure/podman.ps1 dev
 ```
 
-See [infrastructure/README.md](infrastructure/README.md) for complete Podman setup, troubleshooting, and CI/CD integration.
+See [infrastructure/README.md](infrastructure/README.md) for full setup and troubleshooting.
 
-## VS Code Setup
+## Development
 
-**Install recommended extensions:**
+**VS Code extensions:**
 ```powershell
 ./scripts/install-extensions.ps1
 ```
 
-This installs:
-- **Biome** - Linting and formatting
-- **Tailwind CSS IntelliSense** - Tailwind autocomplete and IntelliSense
-- **Bun** - Bun runtime support
-
-Alternatively, VS Code will prompt you to install recommended extensions when you open the workspace.
-
-## Maintenance
-
-**Update all dependencies:**
-```powershell
-./scripts/update.ps1
-```
+Installs Biome (lint/format), Tailwind CSS IntelliSense, and Bun runtime support.
 
 **Code quality:**
 ```bash
 cd web
-bun run check
+bun run check      # typecheck + lint
+bun run test       # test suite
+bunx knip          # dead code detection
+```
+
+**Update dependencies:**
+```powershell
+./scripts/update.ps1
 ```
 
 ## Architecture
 
-**Outputs:**
-- Derived controls
-- Why each control was triggered
-- Enforcement intent metadata (automatic vs procedural)
+**Model layout:**
 
-**Semantics:**
-- Facts are the source of truth; the engine is deterministic and explainable.
-- Domain activation (via `model/rules/triggers.rules.yaml`) is used for progressive disclosure of questions (what follow-ups are relevant).
-- Control derivation (via `model/rules/controls.rules.yaml`) evaluates directly against the facts provided; it is not gated by whether a domain was activated.
+| Path | Purpose |
+|---|---|
+| `model/questions/` | Question definitions per domain |
+| `model/rules/triggers.rules.yaml` | Domain activation rules |
+| `model/rules/controls.rules.yaml` | Control derivation rules |
+| `model/controls/` | Control metadata |
+| `model/model.manifest.yaml` | Model version (SemVer) |
 
-**Validation:**
-- The CLI tool (`tools/riskctl.ts`) provides evaluation and diff capabilities.
-- The evaluation logic validates facts against question schemas and triggers, deriving applicable controls.
+**Key semantics:**
 
-**Versioning:**
-- The model uses SemVer via `model/model.manifest.yaml` (`model_version`).
-- Individual YAML files under `model/questions`, `model/rules`, and `model/controls` use `schema_version` to describe file format (not release SemVer).
+- Facts are the source of truth. The engine is deterministic and produces the same output for the same input, every time.
+- Domain activation (triggers) drives progressive disclosure — which follow-up questions are relevant.
+- Control derivation evaluates directly against facts; it is not gated by domain activation.
+- Each derived control carries a reason: which fact triggered it and via which rule.
+
+## License
+
+[GNU General Public License v3.0](LICENSE)
