@@ -1,5 +1,6 @@
 {
   "npm.packageManager": "bun",
+  "bun.runtime": "/Users/jeckyl/.bun/bin/bun",
   "chat.tools.terminal.autoApprove": {
     "npm install": true,
     "bun": true
