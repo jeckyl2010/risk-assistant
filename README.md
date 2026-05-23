@@ -10,136 +10,61 @@
 [![code style: Biome](https://img.shields.io/badge/code%20style-Biome-60a5fa.svg)](https://biomejs.dev)
 [![Last commit](https://img.shields.io/github/last-commit/jeckyl2010/risk-assistant)](https://github.com/jeckyl2010/risk-assistant/commits/main)
 
-Lightweight, deterministic, facts-based guardrail engine.
+A lightweight, deterministic guardrail engine for software systems. Describe a system, get a derived set of controls — with full traceability. No scoring, no RAG, no approval flows.
 
 ```
 facts → conditional questions → derived controls
 ```
 
-The engine is rule-driven and fully explainable. No scoring, no RAG, no workshops, no approval flows.
-
-## How it works
-
-1. You describe a system by answering a set of questions (facts).
-2. The engine activates relevant domains based on trigger rules.
-3. Control derivation runs directly against the facts, independent of domain activation.
-4. The result is a set of derived controls with traceability: what triggered each one, and why.
+---
 
 ## Quick start
 
-### Prerequisites
-
-**macOS** — install PowerShell via Homebrew (required for `.ps1` scripts):
-
 ```bash
-brew install powershell/tap/powershell
+./scripts/setup.ps1     # install Bun and dependencies (macOS/Windows)
+cd web && bun run dev   # start the web UI at http://localhost:3000
 ```
-
-**Windows** — PowerShell is built-in.
-
-### One-command setup
-
-```powershell
-./scripts/setup.ps1
-```
-
-Installs Bun and all project dependencies.
-
-### Manual setup
-
-<details>
-<summary>Expand manual steps</summary>
-
-1. Install Bun:
-
-   **macOS:**
-   ```bash
-   brew install oven-sh/bun/bun
-   ```
-
-   **Windows:**
-   ```powershell
-   powershell -c "irm bun.sh/install.ps1 | iex"
-   ```
-
-2. Install dependencies:
-   ```bash
-   cd web
-   bun install
-   ```
-
-</details>
-
-### Run
-
-**Web UI:**
-```bash
-cd web
-bun run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
 
 **CLI:**
+
 ```bash
 bun riskctl evaluate systems/TestMe.yaml
 bun riskctl diff systems/TestMe.yaml --old model-v1 --new model-v2
 ```
 
-## Deployment
+---
 
-**Production (Podman Compose):**
-```powershell
-./infrastructure/podman.ps1 up
-```
+## Documentation
 
-**Development with hot reload:**
-```powershell
-./infrastructure/podman.ps1 dev
-```
+| | |
+|---|---|
+| [docs/setup.md](docs/setup.md) | Full install, manual setup, VS Code extensions |
+| [docs/architecture.md](docs/architecture.md) | Engine design, model layout, code structure |
+| [docs/deployment.md](docs/deployment.md) | Podman Compose, container reference, troubleshooting |
+| [docs/development.md](docs/development.md) | Tests, quality gates, model changes |
 
-See [infrastructure/README.md](infrastructure/README.md) for full setup and troubleshooting.
-
-## Development
-
-**VS Code extensions:**
-```powershell
-./scripts/install-extensions.ps1
-```
-
-Installs Biome (lint/format), Tailwind CSS IntelliSense, and Bun runtime support.
-
-**Code quality:**
-```bash
-cd web
-bun run check      # typecheck + lint
-bun run test       # test suite
-bunx knip          # dead code detection
-```
-
-**Update dependencies:**
-```powershell
-./scripts/update.ps1
-```
+---
 
 ## Architecture
 
-**Model layout:**
+The engine evaluates a set of YAML fact files against a rule-driven model. Trigger rules activate domains (progressive disclosure). Control derivation runs directly against facts — not gated by domain activation. Every derived control carries a reason.
 
-| Path | Purpose |
-|---|---|
-| `model/questions/` | Question definitions per domain |
-| `model/rules/triggers.rules.yaml` | Domain activation rules |
-| `model/rules/controls.rules.yaml` | Control derivation rules |
-| `model/controls/` | Control metadata |
-| `model/model.manifest.yaml` | Model version (SemVer) |
+See [docs/architecture.md](docs/architecture.md) for detail.
 
-**Key semantics:**
+---
 
-- Facts are the source of truth. The engine is deterministic and produces the same output for the same input, every time.
-- Domain activation (triggers) drives progressive disclosure — which follow-up questions are relevant.
-- Control derivation evaluates directly against facts; it is not gated by domain activation.
-- Each derived control carries a reason: which fact triggered it and via which rule.
+## Development
+
+```bash
+cd web
+bun run check      # typecheck + lint
+bun run test       # 115 tests, >90% coverage on lib/
+bunx knip          # dead code
+```
+
+See [docs/development.md](docs/development.md) for the full quality gate setup.
+
+---
 
 ## License
 
