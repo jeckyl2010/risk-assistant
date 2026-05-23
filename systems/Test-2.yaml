@@ -1,8 +1,8 @@
 scope: system
 description: ''
 base:
-  affects_production: false
-  external_access: false
+  affects_production: true
+  external_access: true
   uses_ai: false
   handles_sensitive_data: false
   integration_present: false
