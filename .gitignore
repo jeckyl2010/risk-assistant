@@ -8,7 +8,8 @@ dist/
 build/
 
 # IDEs
-.vscode/
+.vscode/*.code-snippets
+.vscode/launch.json
 .idea/
 *.swp
 *.swo
