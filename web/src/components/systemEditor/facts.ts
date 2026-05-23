@@ -1,7 +1,7 @@
-import type { Facts } from "@/lib/evaluator";
+import type { Facts } from "@/lib/facts";
 
-export type { Facts } from "@/lib/evaluator";
-export { deepGet } from "@/lib/evaluator";
+export type { Facts } from "@/lib/facts";
+export { deepGet } from "@/lib/facts";
 
 export function deepSet(obj: unknown, dotted: string, value: unknown): Facts {
   const parts = dotted.split(".");

@@ -13,7 +13,7 @@ import { ResultsSection } from "../system/ResultsSection";
 import { SystemHeader } from "../system/SystemHeader";
 import { SystemSidebar } from "../system/SystemSidebar";
 import { CommandPalette } from "../ui/command-palette";
-import { matchesCondition } from "@/lib/evaluator";
+import { matchesCondition } from "@/lib/facts";
 import { deepDelete, deepGet, deepSet, type Facts } from "./facts";
 import { domainTitle } from "./sectionAccent";
 
