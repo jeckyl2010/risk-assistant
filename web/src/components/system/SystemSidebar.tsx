@@ -21,12 +21,13 @@ interface SystemSidebarProps {
 export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProps) {
   return (
     <nav className="sticky top-6 flex flex-col gap-1.5">
-      {items.map((item, index) => {
+      {items.map((item, _index) => {
         const isActive = activeId === item.id;
         const accent = sectionAccent(item.id);
 
         return (
           <button
+            type="button"
             key={item.id}
             onClick={() => onNavigate(item.id)}
             className={cn(
@@ -51,7 +52,7 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
               <span className="truncate">{item.label}</span>
             </div>
 
-           {item.badge !== undefined && (
+            {item.badge !== undefined && (
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
@@ -62,9 +63,9 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
                       : item.variant === "warning"
                         ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                         : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-               )}
-             >
-               {item.badge}
+                )}
+              >
+                {item.badge}
               </span>
             )}
           </button>

@@ -63,10 +63,7 @@ export function AddExistingSystemForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
           <Label htmlFor="system-path">Existing System File Path</Label>
@@ -90,13 +87,7 @@ export function AddExistingSystemForm() {
               Browse
             </Button>
           </div>
-          {errors.path && (
-            <p
-              className="text-sm text-red-600 dark:text-red-400"
-            >
-              {errors.path.message}
-            </p>
-          )}
+          {errors.path && <p className="text-sm text-red-600 dark:text-red-400">{errors.path.message}</p>}
           <p className="text-xs text-gray-600 dark:text-gray-400">
             Path to an existing system YAML file. Relative or absolute paths supported.
           </p>

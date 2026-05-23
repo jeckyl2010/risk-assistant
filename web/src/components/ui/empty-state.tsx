@@ -20,13 +20,9 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         <div className="text-zinc-600 dark:text-zinc-400">{icon || <Inbox className="h-12 w-12" />}</div>
       </div>
 
-      <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
-        {title}
-      </h3>
+      <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-2">{title}</h3>
 
-      <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mb-6">
-        {description}
-      </p>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mb-6">{description}</p>
 
       {action && (
         <div>

@@ -4,6 +4,7 @@ import { BarChart3, Cog, Database, DollarSign, FileText, GitCompare, Link2, Lock
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDiffSystem, useEvaluateSystem, useSaveSystem } from "@/hooks/useSystemApi";
 import { SECTION_IDS } from "@/lib/constants";
+import { matchesCondition } from "@/lib/facts";
 import type { Question, TriggerRule } from "@/lib/uiTypes";
 import { DescriptionSection } from "../system/DescriptionSection";
 import { DiffSection } from "../system/DiffSection";
@@ -13,10 +14,8 @@ import { ResultsSection } from "../system/ResultsSection";
 import { SystemHeader } from "../system/SystemHeader";
 import { SystemSidebar } from "../system/SystemSidebar";
 import { CommandPalette } from "../ui/command-palette";
-import { matchesCondition } from "@/lib/facts";
 import { deepDelete, deepGet, deepSet, type Facts } from "./facts";
 import { domainTitle } from "./sectionAccent";
-
 
 function getDomainIcon(domain: string) {
   const iconClass = "h-4 w-4";

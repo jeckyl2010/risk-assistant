@@ -30,16 +30,12 @@ describe("parseQuestions", () => {
   });
 
   it("parses a valid set question", () => {
-    const result = parseQuestions([
-      { id: "signals", text: "Signals?", type: "set", allowed: ["logs", "traces"] },
-    ]);
+    const result = parseQuestions([{ id: "signals", text: "Signals?", type: "set", allowed: ["logs", "traces"] }]);
     expect(result[0]!.type).toBe("set");
   });
 
   it("includes description when present and non-empty", () => {
-    const result = parseQuestions([
-      { id: "x", text: "X?", type: "bool", description: "  some detail  " },
-    ]);
+    const result = parseQuestions([{ id: "x", text: "X?", type: "bool", description: "  some detail  " }]);
     expect(result[0]!.description).toBe("some detail");
   });
 
@@ -64,9 +60,7 @@ describe("parseQuestions", () => {
   });
 
   it("filters non-string values out of allowed array", () => {
-    const result = parseQuestions([
-      { id: "x", text: "X?", type: "enum", allowed: ["a", 42, null, "b"] },
-    ]);
+    const result = parseQuestions([{ id: "x", text: "X?", type: "enum", allowed: ["a", 42, null, "b"] }]);
     expect(result[0]!.allowed).toEqual(["a", "b"]);
   });
 
@@ -186,9 +180,7 @@ describe("parseTriggers", () => {
     const { loadYamlFile } = await import("@/lib/yaml");
     const path = await import("node:path");
     const REPO_ROOT = path.resolve(import.meta.dir, "../../..");
-    const raw = await loadYamlFile<{ triggers: unknown[] }>(
-      path.join(REPO_ROOT, "model/rules/triggers.rules.yaml")
-    );
+    const raw = await loadYamlFile<{ triggers: unknown[] }>(path.join(REPO_ROOT, "model/rules/triggers.rules.yaml"));
     const triggers = parseTriggers(raw.triggers);
     expect(triggers.length).toBe(raw.triggers.length);
     expect(triggers.every((t) => Array.isArray(t.activate) && t.activate.length > 0)).toBe(true);

@@ -26,10 +26,7 @@ export async function GET(request: Request) {
   const startPath = requestedPath ? path.resolve(requestedPath) : roots[0]!;
 
   if (!isPathAllowed(startPath, roots)) {
-    return NextResponse.json(
-      { error: "Path is outside the allowed directories", currentPath: startPath },
-      { status: 403 },
-    );
+    return NextResponse.json({ error: "Path is outside the allowed directories", currentPath: startPath }, { status: 403 });
   }
 
   try {

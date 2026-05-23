@@ -22,7 +22,15 @@ interface QuestionCardProps {
   domain?: string;
 }
 
-export function QuestionCard({ question, value, reason, onChange, onReasonChange, index, domain = "base" }: QuestionCardProps) {
+export function QuestionCard({
+  question,
+  value,
+  reason,
+  onChange,
+  onReasonChange,
+  index: _index,
+  domain = "base",
+}: QuestionCardProps) {
   const isAnswered = value !== null;
   const [isEditingReason, setIsEditingReason] = useState(false);
   const hasReason = typeof reason === "string" && reason.trim().length > 0;

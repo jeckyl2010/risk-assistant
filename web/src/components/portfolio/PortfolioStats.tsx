@@ -1,6 +1,5 @@
 "use client";
 
-
 import { CheckCircle2, FileText, Shield, Target } from "lucide-react";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

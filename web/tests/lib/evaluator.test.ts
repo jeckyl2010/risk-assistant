@@ -10,11 +10,11 @@
 import { describe, expect, it } from "bun:test";
 import path from "node:path";
 import {
-  type EvaluateResult,
-  type Facts,
   deriveActivatedDomains,
   deriveControls,
+  type EvaluateResult,
   evaluateFacts,
+  type Facts,
   normalizeFactsForDump,
   requiredQuestionIds,
 } from "@/lib/evaluator";

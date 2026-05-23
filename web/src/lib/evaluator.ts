@@ -1,8 +1,9 @@
+import { deepGet, type Facts, matchesCondition } from "./facts";
 import type { ModelPaths } from "./model";
 import { loadYamlFile } from "./yaml";
-import { deepGet, matchesCondition, type Facts } from "./facts";
-export { deepGet, matchesCondition } from "./facts";
+
 export type { Facts } from "./facts";
+export { deepGet, matchesCondition } from "./facts";
 
 export type ControlReference = {
   type: string;
@@ -36,7 +37,6 @@ export type EvaluateResult = {
     references?: ControlReference[];
   }>;
 };
-
 
 export async function deriveActivatedDomains(facts: Facts, paths: ModelPaths): Promise<string[]> {
   const triggersDoc = await loadYamlFile<unknown>(paths.triggersFile);

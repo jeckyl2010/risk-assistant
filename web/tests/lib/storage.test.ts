@@ -13,10 +13,12 @@
  *   System YAML files land in a tmp dir to keep the systems/ folder clean.
  */
 
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import type { Facts } from "@/lib/evaluator";
+import { findRepoRoot } from "@/lib/repoRoot";
 import {
   addExistingSystem,
   createSystem,
@@ -27,9 +29,6 @@ import {
   sanitizeSystemId,
   saveSystemFacts,
 } from "@/lib/storage";
-import { findRepoRoot } from "@/lib/repoRoot";
-import { loadYamlFile } from "@/lib/yaml";
-import type { Facts } from "@/lib/evaluator";
 
 // ---------------------------------------------------------------------------
 // sanitizeSystemId — pure

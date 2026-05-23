@@ -4,9 +4,9 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import type { EvaluateResult as LibEvaluateResult } from "@/lib/evaluator";
 import type { Facts } from "@/components/systemEditor/facts";
 import { ApiError, api } from "@/lib/apiClient";
+import type { EvaluateResult as LibEvaluateResult } from "@/lib/evaluator";
 
 type AsyncState = "idle" | "loading" | "success" | "error";
 

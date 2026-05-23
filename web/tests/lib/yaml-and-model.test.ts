@@ -8,12 +8,12 @@
  * real model directory so any structural drift is caught immediately.
  */
 
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { dumpYaml, loadYamlFile } from "@/lib/yaml";
 import { getModelVersion, modelPaths } from "@/lib/model";
+import { dumpYaml, loadYamlFile } from "@/lib/yaml";
 
 const REPO_ROOT = path.resolve(import.meta.dir, "../../..");
 const TEST_MODEL_PATHS = modelPaths(REPO_ROOT, "model");
@@ -132,9 +132,7 @@ describe("loadYamlFile", () => {
   });
 
   it("throws when the file does not exist", async () => {
-    await expect(
-      loadYamlFile(path.join(tmpDir, "nonexistent.yaml"))
-    ).rejects.toThrow();
+    await expect(loadYamlFile(path.join(tmpDir, "nonexistent.yaml"))).rejects.toThrow();
   });
 
   it("throws on malformed YAML", async () => {
@@ -225,11 +223,7 @@ describe("getModelVersion", () => {
     const fakeRoot = await fs.mkdtemp(path.join(os.tmpdir(), "risk-model-"));
     const modelDir = path.join(fakeRoot, "model");
     await fs.mkdir(modelDir, { recursive: true });
-    await fs.writeFile(
-      path.join(modelDir, "model.manifest.yaml"),
-      "description: no version field\n",
-      "utf-8"
-    );
+    await fs.writeFile(path.join(modelDir, "model.manifest.yaml"), "description: no version field\n", "utf-8");
 
     const v = await getModelVersion(fakeRoot, "model");
     expect(v).toBe("(unknown)");
@@ -241,11 +235,7 @@ describe("getModelVersion", () => {
     const fakeRoot = await fs.mkdtemp(path.join(os.tmpdir(), "risk-model-"));
     const modelDir = path.join(fakeRoot, "model");
     await fs.mkdir(modelDir, { recursive: true });
-    await fs.writeFile(
-      path.join(modelDir, "model.manifest.yaml"),
-      "model_version: ''\n",
-      "utf-8"
-    );
+    await fs.writeFile(path.join(modelDir, "model.manifest.yaml"), "model_version: ''\n", "utf-8");
 
     const v = await getModelVersion(fakeRoot, "model");
     expect(v).toBe("(unknown)");
