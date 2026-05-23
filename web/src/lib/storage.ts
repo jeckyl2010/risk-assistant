@@ -168,7 +168,7 @@ export async function addExistingSystem(systemPath: string): Promise<{ id: strin
 
   // Load the facts to verify it's a valid system file and get the name
   const facts = await loadYamlFile<Facts>(yamlPath);
-  if (!facts || typeof facts !== "object") {
+  if (!facts || typeof facts !== "object" || Array.isArray(facts)) {
     throw new Error("Invalid system file");
   }
 

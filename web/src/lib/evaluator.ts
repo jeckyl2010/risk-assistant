@@ -36,7 +36,7 @@ export type EvaluateResult = {
   }>;
 };
 
-function deepGet(obj: unknown, dotted: string): unknown {
+export function deepGet(obj: unknown, dotted: string): unknown {
   let cur: unknown = obj;
   for (const part of dotted.split(".")) {
     if (!cur || typeof cur !== "object") return null;
@@ -47,7 +47,7 @@ function deepGet(obj: unknown, dotted: string): unknown {
   return cur;
 }
 
-function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean {
+export function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean {
   for (const [k, expected] of Object.entries(cond)) {
     const actual = k.includes(".") ? deepGet(facts, k) : deepGet(facts, `base.${k}`);
 

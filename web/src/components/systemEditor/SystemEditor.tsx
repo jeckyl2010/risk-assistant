@@ -13,20 +13,10 @@ import { ResultsSection } from "../system/ResultsSection";
 import { SystemHeader } from "../system/SystemHeader";
 import { SystemSidebar } from "../system/SystemSidebar";
 import { CommandPalette } from "../ui/command-palette";
+import { matchesCondition } from "@/lib/evaluator";
 import { deepDelete, deepGet, deepSet, type Facts } from "./facts";
 import { domainTitle } from "./sectionAccent";
 
-function matchesCondition(facts: Facts, cond: Record<string, unknown>): boolean {
-  for (const [k, expected] of Object.entries(cond)) {
-    const actual = k.includes(".") ? deepGet(facts, k) : deepGet(facts, `base.${k}`);
-    if (Array.isArray(actual) && !Array.isArray(expected)) {
-      if (!actual.includes(expected)) return false;
-    } else {
-      if (actual !== expected) return false;
-    }
-  }
-  return true;
-}
 
 function getDomainIcon(domain: string) {
   const iconClass = "h-4 w-4";

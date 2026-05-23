@@ -15,9 +15,8 @@ export default async function Home() {
   const totalControls = rows.reduce((sum, r) => sum + r.derivedControls, 0);
   const totalMissing = rows.reduce((sum, r) => sum + r.missingAnswers, 0);
 
-  // Calculate completion rate (rough estimate based on missing answers)
-  const avgQuestionsPerSystem = 15; // rough estimate
-  const totalPossibleAnswers = rows.length * avgQuestionsPerSystem;
+  // Calculate completion rate from actual question counts
+  const totalPossibleAnswers = rows.reduce((sum, r) => sum + r.totalQuestions, 0);
   const answeredQuestions = totalPossibleAnswers - totalMissing;
   const completionRate = totalPossibleAnswers > 0 ? Math.round((answeredQuestions / totalPossibleAnswers) * 100) : 0;
 

@@ -4,6 +4,7 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import type { EvaluateResult as LibEvaluateResult } from "@/lib/evaluator";
 import type { Facts } from "@/components/systemEditor/facts";
 import { ApiError, api } from "@/lib/apiClient";
 
@@ -12,19 +13,7 @@ type AsyncState = "idle" | "loading" | "success" | "error";
 export type EvaluateResult = {
   modelDir: string;
   modelVersion: string;
-  result: {
-    activated_domains: string[];
-    required_questions: { id: string; answered: boolean }[];
-    derived_controls: Array<{
-      id: string;
-      title: string;
-      scope: string;
-      enforcement_intent: string;
-      activation_phase: string;
-      evidence_type: string[];
-      because: Record<string, unknown>[];
-    }>;
-  };
+  result: LibEvaluateResult;
 };
 
 export type DiffResult = {

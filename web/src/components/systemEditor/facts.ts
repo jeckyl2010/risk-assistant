@@ -1,15 +1,7 @@
-export type Facts = Record<string, unknown>;
+import type { Facts } from "@/lib/evaluator";
 
-export function deepGet(obj: unknown, dotted: string): unknown {
-  let cur: unknown = obj;
-  for (const part of dotted.split(".")) {
-    if (!cur || typeof cur !== "object") return null;
-    const rec = cur as Record<string, unknown>;
-    if (!(part in rec)) return null;
-    cur = rec[part];
-  }
-  return cur;
-}
+export type { Facts } from "@/lib/evaluator";
+export { deepGet } from "@/lib/evaluator";
 
 export function deepSet(obj: unknown, dotted: string, value: unknown): Facts {
   const parts = dotted.split(".");
