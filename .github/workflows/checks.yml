@@ -53,7 +53,7 @@ jobs:
         working-directory: web
 
       - name: Test coverage
-        run: bun run test:coverage
+        run: bun test tests/ --coverage --coverage-reporter=lcov
         working-directory: web
 
       - name: Dependency audit (osv-scanner)
@@ -67,4 +67,5 @@ jobs:
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: web/coverage/lcov.info
           fail_ci_if_error: false

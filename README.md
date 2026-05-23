@@ -2,8 +2,13 @@
 
 [![CI](https://github.com/jeckyl2010/risk-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/jeckyl2010/risk-assistant/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/jeckyl2010/risk-assistant/actions/workflows/codeql.yml/badge.svg)](https://github.com/jeckyl2010/risk-assistant/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/jeckyl2010/risk-assistant/graph/badge.svg)](https://codecov.io/gh/jeckyl2010/risk-assistant)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jeckyl2010/risk-assistant/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jeckyl2010/risk-assistant)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/runtime-Bun-fbf0df?logo=bun&logoColor=black)](https://bun.sh)
+[![code style: Biome](https://img.shields.io/badge/code%20style-Biome-60a5fa.svg)](https://biomejs.dev)
+[![Last commit](https://img.shields.io/github/last-commit/jeckyl2010/risk-assistant)](https://github.com/jeckyl2010/risk-assistant/commits/main)
 
 Lightweight, deterministic, facts-based guardrail engine.
 
