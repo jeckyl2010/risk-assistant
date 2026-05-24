@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "framer-motion";
 import { FolderOpen, FolderPlus, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -162,85 +161,77 @@ export function SystemManagement() {
       </div>
 
       {/* Create Form (Expandable) */}
-      <AnimatePresence>
-        {mode === "create" && (
-          <motion.form
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            onSubmit={handleSubmit(onSubmit)}
-            className="overflow-hidden"
-          >
-            <div className="space-y-4 rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/20">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label htmlFor="system-id">System ID</Label>
-                  <Input
-                    id="system-id"
-                    {...register("id")}
-                    placeholder="e.g. shopfloor-analytics"
-                    disabled={isCreating}
-                    autoFocus
-                  />
-                  {errors.id && <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 sm:w-auto">
-                  <Label>&nbsp;</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="default"
-                    onClick={() => {
-                      setBrowserMode("directory");
-                      setShowBrowser(true);
-                    }}
-                    disabled={isCreating || !systemId}
-                    className="gap-2"
-                  >
-                    <FolderOpen className="h-4 w-4" />
-                    Choose Location
-                  </Button>
-                </div>
+      {mode === "create" && (
+        <form onSubmit={handleSubmit(onSubmit)} className="overflow-hidden">
+          <div className="space-y-4 rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/20">
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex flex-1 flex-col gap-2">
+                <Label htmlFor="system-id">System ID</Label>
+                <Input
+                  id="system-id"
+                  {...register("id")}
+                  placeholder="e.g. shopfloor-analytics"
+                  disabled={isCreating}
+                  autoFocus
+                />
+                {errors.id && <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>}
               </div>
 
-              <div className="flex flex-col gap-2">
-                <Label className="text-xs text-zinc-600 dark:text-zinc-400">Save Location</Label>
-                <code className="rounded bg-white px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-                  {displayPath}
-                </code>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button type="submit" disabled={isCreating} className="gap-2">
-                  {isCreating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4" />
-                      Create System
-                    </>
-                  )}
-                </Button>
+              <div className="flex flex-col gap-2 sm:w-auto">
+                <Label>&nbsp;</Label>
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
+                  size="default"
                   onClick={() => {
-                    setMode("none");
-                    reset();
+                    setBrowserMode("directory");
+                    setShowBrowser(true);
                   }}
-                  disabled={isCreating}
+                  disabled={isCreating || !systemId}
+                  className="gap-2"
                 >
-                  Cancel
+                  <FolderOpen className="h-4 w-4" />
+                  Choose Location
                 </Button>
               </div>
             </div>
-          </motion.form>
-        )}
-      </AnimatePresence>
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-xs text-zinc-600 dark:text-zinc-400">Save Location</Label>
+              <code className="rounded bg-white px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+                {displayPath}
+              </code>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button type="submit" disabled={isCreating} className="gap-2">
+                {isCreating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Create System
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setMode("none");
+                  reset();
+                }}
+                disabled={isCreating}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </form>
+      )}
 
       {/* File Browser Modal */}
       <FileBrowserModal

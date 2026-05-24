@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { sectionAccent } from "../systemEditor/sectionAccent";
 
@@ -35,13 +34,7 @@ export function SystemSidebar({ items, activeId, onNavigate }: SystemSidebarProp
               isActive ? cn(accent.navActive, "shadow-sm") : cn(accent.navIdle),
             )}
           >
-            {isActive && (
-              <motion.div
-                layoutId="sidebar-indicator"
-                className={cn("absolute left-0 top-0 h-full w-1 rounded-r-full", accent.bar)}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            )}
+            {isActive && <div className={cn("absolute left-0 top-0 h-full w-1 rounded-r-full", accent.bar)} />}
 
             <div className="flex flex-1 items-center gap-3">
               {item.icon && (

@@ -1,7 +1,6 @@
 "use client";
 
 import { Command } from "cmdk";
-import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, FileText, GitCompare, Home, Save, Search, Shield, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -36,26 +35,16 @@ export function CommandPalette({ systemId: _systemId, onSave, onNavigate, questi
   }, []);
 
   return (
-    <AnimatePresence>
+    <>
       {open && (
         <>
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-          />
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: backdrop dismiss, keyboard users can press Escape or use the close button */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss, keyboard users can press Escape or use the close button */}
+          <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
 
           {/* Command Palette */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed left-1/2 top-[20%] z-50 w-full max-w-2xl -translate-x-1/2"
-          >
+          <div className="fixed left-1/2 top-[20%] z-50 w-full max-w-2xl -translate-x-1/2">
             <Command className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
               <div className="flex items-center gap-3 border-b border-zinc-200 px-4 dark:border-zinc-800">
                 <Search className="h-5 w-5 text-zinc-500" />
@@ -156,9 +145,9 @@ export function CommandPalette({ systemId: _systemId, onSave, onNavigate, questi
                 </div>
               </div>
             </Command>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </>
   );
 }

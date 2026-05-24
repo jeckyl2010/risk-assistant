@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -187,47 +186,39 @@ export function QuestionCard({
               </div>
 
               {/* Reason Field - Show when answered */}
-              <AnimatePresence>
-                {isAnswered && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-2"
-                  >
-                    <Label className="text-sm font-medium">
-                      Reason (optional)
-                      {!isEditingReason && hasReason && (
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingReason(true)}
-                          className="ml-2 text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </Label>
-                    {!hasReason || isEditingReason ? (
-                      <div className="space-y-2">
-                        <Textarea
-                          value={typeof reason === "string" ? reason : ""}
-                          onChange={(e) => onReasonChange(e.target.value)}
-                          onBlur={() => setIsEditingReason(false)}
-                          placeholder="Explain why this answer was chosen... (Markdown supported)"
-                          className="min-h-[80px] resize-none text-sm"
-                          autoFocus={isEditingReason}
-                        />
-                        <p className="text-xs text-zinc-500">Supports Markdown: **bold**, *italic*, `code`, links, lists</p>
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-4 dark:border-zinc-700/50 dark:bg-zinc-900/50">
-                        <MarkdownViewer content={typeof reason === "string" ? reason : ""} />
-                      </div>
+              {isAnswered && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">
+                    Reason (optional)
+                    {!isEditingReason && hasReason && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingReason(true)}
+                        className="ml-2 text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                      >
+                        Edit
+                      </button>
                     )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  </Label>
+                  {!hasReason || isEditingReason ? (
+                    <div className="space-y-2">
+                      <Textarea
+                        value={typeof reason === "string" ? reason : ""}
+                        onChange={(e) => onReasonChange(e.target.value)}
+                        onBlur={() => setIsEditingReason(false)}
+                        placeholder="Explain why this answer was chosen... (Markdown supported)"
+                        className="min-h-[80px] resize-none text-sm"
+                        autoFocus={isEditingReason}
+                      />
+                      <p className="text-xs text-zinc-500">Supports Markdown: **bold**, *italic*, `code`, links, lists</p>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-4 dark:border-zinc-700/50 dark:bg-zinc-900/50">
+                      <MarkdownViewer content={typeof reason === "string" ? reason : ""} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

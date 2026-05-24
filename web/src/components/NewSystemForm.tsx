@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 import { FolderOpen, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -71,25 +70,12 @@ export function NewSystemForm() {
   }
 
   return (
-    <motion.form
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
           <Label htmlFor="system-id">System ID</Label>
           <Input id="system-id" {...register("id")} placeholder="e.g. shopfloor-analytics" disabled={isCreating} />
-          {errors.id && (
-            <motion.p
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-red-600 dark:text-red-400"
-            >
-              {errors.id.message}
-            </motion.p>
-          )}
+          {errors.id && <p className="text-sm text-red-600 dark:text-red-400">{errors.id.message}</p>}
         </div>
 
         <div className="flex flex-1 flex-col gap-2">
@@ -138,6 +124,6 @@ export function NewSystemForm() {
         mode="directory"
         title="Select Directory for System File"
       />
-    </motion.form>
+    </form>
   );
 }

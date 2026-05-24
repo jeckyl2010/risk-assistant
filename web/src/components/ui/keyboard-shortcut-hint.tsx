@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { Command, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -41,14 +40,9 @@ export function KeyboardShortcutHint() {
   if (dismissed) return null;
 
   return (
-    <AnimatePresence>
+    <>
       {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed bottom-6 right-6 z-40"
-        >
+        <div className="fixed bottom-6 right-6 z-40 animate-in fade-in duration-300">
           <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-500 to-purple-600 p-4 shadow-2xl dark:border-indigo-900">
             <div className="absolute inset-0 bg-grid-white/10" />
 
@@ -73,8 +67,8 @@ export function KeyboardShortcutHint() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

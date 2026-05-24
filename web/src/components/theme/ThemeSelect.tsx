@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { applyTheme } from "./theme";
@@ -81,9 +80,8 @@ export function ThemeSelect() {
   const Icon = currentTheme.icon;
 
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <button
+      type="button"
       onClick={cycleTheme}
       className="flex items-center gap-2 rounded-full border border-zinc-200/50 bg-white/90 px-3 py-2 shadow-lg backdrop-blur transition-all hover:scale-105 hover:shadow-xl active:scale-95 dark:border-zinc-700/50 dark:bg-zinc-900/90 opacity-70 hover:opacity-100"
       aria-label={`Current theme: ${currentTheme.label}. Click to switch.`}
@@ -91,6 +89,6 @@ export function ThemeSelect() {
     >
       <Icon className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
       <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hidden sm:inline">{currentTheme.label}</span>
-    </motion.button>
+    </button>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronUp, FileText, Folder, Loader2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -112,14 +111,13 @@ export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: Fil
   if (!mounted) return null;
 
   return createPortal(
-    <AnimatePresence>
+    <>
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop click-to-close is valid UX, close button is keyboard accessible */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop click-to-close is valid UX, close button is keyboard accessible */}
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation on modal content div, keyboard users are served by the close button */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation on modal content div, keyboard users are served by the close button */}
+        <div
           onClick={(e) => e.stopPropagation()}
           className="w-full max-w-2xl rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
         >
@@ -196,9 +194,9 @@ export function FileBrowserModal({ isOpen, onClose, onSelect, mode, title }: Fil
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </AnimatePresence>,
+    </>,
     document.body,
   );
 }

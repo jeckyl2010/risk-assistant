@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   ArrowRight,
@@ -301,7 +300,7 @@ export function ResultsSection({
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+    <div className="space-y-4">
       {/* Missing Questions */}
       {missingQuestions.length > 0 ? (
         <Card className="border-amber-300 bg-amber-50 shadow-md dark:border-amber-700 dark:bg-amber-950/30">
@@ -367,7 +366,7 @@ export function ResultsSection({
       {derivedControls.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
           {/* Enforcement Intent */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold">
@@ -417,10 +416,10 @@ export function ResultsSection({
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Activation Phase */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold">
@@ -452,10 +451,10 @@ export function ResultsSection({
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Evidence Types */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold">
@@ -487,10 +486,10 @@ export function ResultsSection({
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Control Categories */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold">
@@ -521,7 +520,7 @@ export function ResultsSection({
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
       )}
 
@@ -604,272 +603,244 @@ export function ResultsSection({
               )}
 
               {/* Controls List */}
-              <AnimatePresence mode="popLayout">
-                {filteredControls.length === 0 ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="rounded-lg border border-dashed border-zinc-300/70 bg-zinc-50/50 p-8 text-center text-zinc-600 backdrop-blur dark:border-zinc-700/70 dark:bg-zinc-900/50 dark:text-zinc-400"
-                  >
-                    No controls match the selected filters
-                  </motion.div>
-                ) : (
-                  <div className="space-y-2">
-                    {filteredControls.map((control, index) => {
-                      const isExpanded = expandedControls.includes(control.id);
-                      const { status, statusColor } = getControlStatus(control);
-                      const controlPrefix = control.id.split("-")[0]!;
-                      const domainColor = getDomainColor(controlPrefix);
-                      return (
-                        <motion.div
-                          key={control.id}
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ delay: Math.min(index * 0.03, 0.3) }}
+              {filteredControls.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-zinc-300/70 bg-zinc-50/50 p-8 text-center text-zinc-600 backdrop-blur dark:border-zinc-700/70 dark:bg-zinc-900/50 dark:text-zinc-400">
+                  No controls match the selected filters
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredControls.map((control, _index) => {
+                    const isExpanded = expandedControls.includes(control.id);
+                    const { status, statusColor } = getControlStatus(control);
+                    const controlPrefix = control.id.split("-")[0]!;
+                    const domainColor = getDomainColor(controlPrefix);
+                    return (
+                      <div key={control.id}>
+                        <Card
+                          className={`group cursor-pointer border-l-4 shadow-sm transition-all duration-200 ${domainColor.borderIdle} border-zinc-200 dark:border-zinc-800 ${domainColor.borderHover} hover:shadow-lg hover:${domainColor.bg} hover:-translate-y-0.5`}
+                          onClick={() => toggleExpanded(control.id)}
                         >
-                          <Card
-                            className={`group cursor-pointer border-l-4 shadow-sm transition-all duration-200 ${domainColor.borderIdle} border-zinc-200 dark:border-zinc-800 ${domainColor.borderHover} hover:shadow-lg hover:${domainColor.bg} hover:-translate-y-0.5`}
-                            onClick={() => toggleExpanded(control.id)}
-                          >
-                            <CardContent className="p-4">
-                              {/* Compact Header */}
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <Badge variant="outline" className="shrink-0 font-mono text-xs">
-                                      {control.id}
-                                    </Badge>
-                                    {status === "Pending Evidence" ? (
-                                      <InfoTooltip content="This control requires evidence (logs, configs, test results, etc.). Add Implementation references below with links to where your evidence lives (Azure DevOps work items, Confluence docs, CI/CD reports, etc.).">
-                                        <Badge className={`shrink-0 text-xs ${statusColor}`}>{status}</Badge>
-                                      </InfoTooltip>
-                                    ) : (
+                          <CardContent className="p-4">
+                            {/* Compact Header */}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <Badge variant="outline" className="shrink-0 font-mono text-xs">
+                                    {control.id}
+                                  </Badge>
+                                  {status === "Pending Evidence" ? (
+                                    <InfoTooltip content="This control requires evidence (logs, configs, test results, etc.). Add Implementation references below with links to where your evidence lives (Azure DevOps work items, Confluence docs, CI/CD reports, etc.).">
                                       <Badge className={`shrink-0 text-xs ${statusColor}`}>{status}</Badge>
-                                    )}
-                                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{control.title}</h3>
+                                    </InfoTooltip>
+                                  ) : (
+                                    <Badge className={`shrink-0 text-xs ${statusColor}`}>{status}</Badge>
+                                  )}
+                                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{control.title}</h3>
+                                </div>
+                                {!isExpanded && (
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    <Badge variant="secondary" className="text-xs">
+                                      {formatPhase(control.activation_phase)}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {control.enforcement_intent}
+                                    </Badge>
                                   </div>
-                                  {!isExpanded && (
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                      <Badge variant="secondary" className="text-xs">
-                                        {formatPhase(control.activation_phase)}
+                                )}
+                              </div>
+                              <ChevronDown
+                                className={`h-5 w-5 shrink-0 text-zinc-500 transition-transform ${
+                                  isExpanded ? "rotate-180" : ""
+                                }`}
+                              />
+                            </div>
+
+                            {/* Expanded Details */}
+                            {isExpanded && (
+                              <div className="overflow-hidden">
+                                <div className="mt-3 space-y-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
+                                  {control.description && (
+                                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{control.description}</p>
+                                  )}
+
+                                  <div className="flex flex-wrap gap-2">
+                                    <Badge variant="secondary">scope: {formatScope(control.scope)}</Badge>
+                                    <Badge variant="secondary">
+                                      intent: {formatEnforcementIntent(control.enforcement_intent)}
+                                    </Badge>
+                                    <Badge variant="secondary">phase: {formatPhase(control.activation_phase)}</Badge>
+                                    {control.evidence_type?.length > 0 && (
+                                      <Badge variant="secondary">
+                                        evidence: {control.evidence_type.map(formatEvidenceType).join(", ")}
                                       </Badge>
-                                      <Badge variant="secondary" className="text-xs">
-                                        {control.enforcement_intent}
-                                      </Badge>
+                                    )}
+                                  </div>
+
+                                  {/* Helper callout for controls needing evidence but missing references */}
+                                  {control.evidence_type &&
+                                    control.evidence_type.length > 0 &&
+                                    (!control.references || control.references.length === 0) && (
+                                      <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/50">
+                                        <div className="flex items-start gap-2">
+                                          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                                          <div className="text-xs">
+                                            <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                                              Evidence Required
+                                            </p>
+                                            <p className="text-amber-800 dark:text-amber-200">
+                                              This control needs{" "}
+                                              <span className="font-semibold">
+                                                {control.evidence_type.map(formatEvidenceType).join(", ")}
+                                              </span>
+                                              . Edit the system YAML file to add{" "}
+                                              <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">references</code>{" "}
+                                              linking to where your evidence lives (Azure DevOps work items, Confluence docs,
+                                              CI/CD test reports, config repos, etc.).
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                  {control.because && control.because.length > 0 && (
+                                    <div>
+                                      <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
+                                        <GitBranch className="h-3 w-3" />
+                                        Derivation Path
+                                      </div>
+
+                                      {/* Visual Flow Diagram */}
+                                      <div className="mt-3 overflow-x-auto pb-2">
+                                        <div className="flex items-center gap-2 min-w-max">
+                                          {/* Facts Nodes */}
+                                          {control.because.map((fact, i) => (
+                                            <div key={JSON.stringify(fact)} className="flex items-center">
+                                              <div className="group relative">
+                                                <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:bg-indigo-950/50">
+                                                  {Object.entries(fact).map(([key, val]) => (
+                                                    <div key={key} className="flex items-center gap-1.5 text-xs">
+                                                      <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                                                        {key}:
+                                                      </span>
+                                                      <span className="font-mono text-indigo-900 dark:text-indigo-100">
+                                                        {JSON.stringify(val)}
+                                                      </span>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                              {i < control.because.length - 1 && (
+                                                <div className="flex items-center px-2">
+                                                  <div className="h-0.5 w-6 bg-gradient-to-r from-indigo-300 to-purple-300 dark:from-indigo-600 dark:to-purple-600" />
+                                                  <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-purple-300 dark:border-l-purple-600" />
+                                                </div>
+                                              )}
+                                            </div>
+                                          ))}
+
+                                          {/* Arrow to Control */}
+                                          <div className="flex items-center px-2">
+                                            <div className="h-0.5 w-8 bg-gradient-to-r from-purple-300 to-emerald-300 dark:from-purple-600 dark:to-emerald-600" />
+                                            <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-emerald-300 dark:border-l-emerald-600" />
+                                          </div>
+
+                                          {/* Control Node */}
+                                          <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:bg-emerald-950/50">
+                                            <div className="flex items-center gap-2">
+                                              <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                              <span className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">
+                                                {control.id}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Implementation References */}
+                                  {control.references && control.references.length > 0 && (
+                                    <div>
+                                      <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2 flex items-center gap-2">
+                                        Implementation & Evidence
+                                        <InfoTooltip content="Link to requirements, work items, test results, documentation, and other evidence that demonstrates this control is implemented and working." />
+                                      </div>
+                                      <div className="space-y-1.5">
+                                        {control.references.map((ref) => {
+                                          const isUrl = ref.ref.startsWith("http://") || ref.ref.startsWith("https://");
+                                          const _isFilePath = !isUrl;
+
+                                          // Subtle color coding by type
+                                          const typeColors: Record<string, string> = {
+                                            requirement:
+                                              "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30",
+                                            work_item: "border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30",
+                                            documentation:
+                                              "border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30",
+                                          };
+
+                                          const typeBadgeColors: Record<string, string> = {
+                                            requirement:
+                                              "border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300",
+                                            work_item: "border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300",
+                                            documentation:
+                                              "border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300",
+                                          };
+
+                                          const containerColor =
+                                            typeColors[ref.type] ||
+                                            "border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50";
+                                          const badgeColor =
+                                            typeBadgeColors[ref.type] ||
+                                            "border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300";
+
+                                          return (
+                                            <div
+                                              key={ref.ref}
+                                              className={`flex items-start gap-2 rounded-md border px-2.5 py-1.5 text-xs ${containerColor}`}
+                                            >
+                                              <Badge variant="outline" className={`mt-0.5 text-[10px] ${badgeColor}`}>
+                                                {formatReferenceType(ref.type)}
+                                              </Badge>
+                                              <div className="flex-1 min-w-0">
+                                                {isUrl ? (
+                                                  <a
+                                                    href={ref.ref}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 break-all"
+                                                  >
+                                                    {ref.description || ref.ref}
+                                                  </a>
+                                                ) : (
+                                                  <span className="font-mono text-zinc-700 dark:text-zinc-300">{ref.ref}</span>
+                                                )}
+                                                {ref.description && isUrl && (
+                                                  <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400 break-all">
+                                                    {ref.ref}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
                                     </div>
                                   )}
                                 </div>
-                                <ChevronDown
-                                  className={`h-5 w-5 shrink-0 text-zinc-500 transition-transform ${
-                                    isExpanded ? "rotate-180" : ""
-                                  }`}
-                                />
                               </div>
-
-                              {/* Expanded Details */}
-                              <AnimatePresence>
-                                {isExpanded && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="mt-3 space-y-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-                                      {control.description && (
-                                        <p className="text-sm text-zinc-600 dark:text-zinc-400">{control.description}</p>
-                                      )}
-
-                                      <div className="flex flex-wrap gap-2">
-                                        <Badge variant="secondary">scope: {formatScope(control.scope)}</Badge>
-                                        <Badge variant="secondary">
-                                          intent: {formatEnforcementIntent(control.enforcement_intent)}
-                                        </Badge>
-                                        <Badge variant="secondary">phase: {formatPhase(control.activation_phase)}</Badge>
-                                        {control.evidence_type?.length > 0 && (
-                                          <Badge variant="secondary">
-                                            evidence: {control.evidence_type.map(formatEvidenceType).join(", ")}
-                                          </Badge>
-                                        )}
-                                      </div>
-
-                                      {/* Helper callout for controls needing evidence but missing references */}
-                                      {control.evidence_type &&
-                                        control.evidence_type.length > 0 &&
-                                        (!control.references || control.references.length === 0) && (
-                                          <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/50">
-                                            <div className="flex items-start gap-2">
-                                              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                                              <div className="text-xs">
-                                                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                                                  Evidence Required
-                                                </p>
-                                                <p className="text-amber-800 dark:text-amber-200">
-                                                  This control needs{" "}
-                                                  <span className="font-semibold">
-                                                    {control.evidence_type.map(formatEvidenceType).join(", ")}
-                                                  </span>
-                                                  . Edit the system YAML file to add{" "}
-                                                  <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">
-                                                    references
-                                                  </code>{" "}
-                                                  linking to where your evidence lives (Azure DevOps work items, Confluence
-                                                  docs, CI/CD test reports, config repos, etc.).
-                                                </p>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        )}
-
-                                      {control.because && control.because.length > 0 && (
-                                        <div>
-                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-                                            <GitBranch className="h-3 w-3" />
-                                            Derivation Path
-                                          </div>
-
-                                          {/* Visual Flow Diagram */}
-                                          <div className="mt-3 overflow-x-auto pb-2">
-                                            <div className="flex items-center gap-2 min-w-max">
-                                              {/* Facts Nodes */}
-                                              {control.because.map((fact, i) => (
-                                                <div key={JSON.stringify(fact)} className="flex items-center">
-                                                  <div className="group relative">
-                                                    <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-3 py-2 shadow-sm dark:border-indigo-700 dark:bg-indigo-950/50">
-                                                      {Object.entries(fact).map(([key, val]) => (
-                                                        <div key={key} className="flex items-center gap-1.5 text-xs">
-                                                          <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-                                                            {key}:
-                                                          </span>
-                                                          <span className="font-mono text-indigo-900 dark:text-indigo-100">
-                                                            {JSON.stringify(val)}
-                                                          </span>
-                                                        </div>
-                                                      ))}
-                                                    </div>
-                                                  </div>
-                                                  {i < control.because.length - 1 && (
-                                                    <div className="flex items-center px-2">
-                                                      <div className="h-0.5 w-6 bg-gradient-to-r from-indigo-300 to-purple-300 dark:from-indigo-600 dark:to-purple-600" />
-                                                      <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-purple-300 dark:border-l-purple-600" />
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              ))}
-
-                                              {/* Arrow to Control */}
-                                              <div className="flex items-center px-2">
-                                                <div className="h-0.5 w-8 bg-gradient-to-r from-purple-300 to-emerald-300 dark:from-purple-600 dark:to-emerald-600" />
-                                                <div className="h-0 w-0 border-y-4 border-l-4 border-y-transparent border-l-emerald-300 dark:border-l-emerald-600" />
-                                              </div>
-
-                                              {/* Control Node */}
-                                              <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 px-4 py-2 shadow-md dark:border-emerald-700 dark:bg-emerald-950/50">
-                                                <div className="flex items-center gap-2">
-                                                  <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                                  <span className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">
-                                                    {control.id}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Implementation References */}
-                                      {control.references && control.references.length > 0 && (
-                                        <div>
-                                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2 flex items-center gap-2">
-                                            Implementation & Evidence
-                                            <InfoTooltip content="Link to requirements, work items, test results, documentation, and other evidence that demonstrates this control is implemented and working." />
-                                          </div>
-                                          <div className="space-y-1.5">
-                                            {control.references.map((ref) => {
-                                              const isUrl = ref.ref.startsWith("http://") || ref.ref.startsWith("https://");
-                                              const _isFilePath = !isUrl;
-
-                                              // Subtle color coding by type
-                                              const typeColors: Record<string, string> = {
-                                                requirement:
-                                                  "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/30",
-                                                work_item:
-                                                  "border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30",
-                                                documentation:
-                                                  "border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30",
-                                              };
-
-                                              const typeBadgeColors: Record<string, string> = {
-                                                requirement:
-                                                  "border-violet-300 text-violet-700 dark:border-violet-600 dark:text-violet-300",
-                                                work_item:
-                                                  "border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-300",
-                                                documentation:
-                                                  "border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-300",
-                                              };
-
-                                              const containerColor =
-                                                typeColors[ref.type] ||
-                                                "border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50";
-                                              const badgeColor =
-                                                typeBadgeColors[ref.type] ||
-                                                "border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300";
-
-                                              return (
-                                                <div
-                                                  key={ref.ref}
-                                                  className={`flex items-start gap-2 rounded-md border px-2.5 py-1.5 text-xs ${containerColor}`}
-                                                >
-                                                  <Badge variant="outline" className={`mt-0.5 text-[10px] ${badgeColor}`}>
-                                                    {formatReferenceType(ref.type)}
-                                                  </Badge>
-                                                  <div className="flex-1 min-w-0">
-                                                    {isUrl ? (
-                                                      <a
-                                                        href={ref.ref}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 break-all"
-                                                      >
-                                                        {ref.description || ref.ref}
-                                                      </a>
-                                                    ) : (
-                                                      <span className="font-mono text-zinc-700 dark:text-zinc-300">
-                                                        {ref.ref}
-                                                      </span>
-                                                    )}
-                                                    {ref.description && isUrl && (
-                                                      <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400 break-all">
-                                                        {ref.ref}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                )}
-              </AnimatePresence>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </>
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
