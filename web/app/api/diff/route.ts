@@ -1,22 +1,12 @@
 import { NextResponse } from "next/server";
 import { evaluateFacts, type Facts, requiredQuestionIds } from "@/lib/evaluator";
+import { deepGet } from "@/lib/facts";
 import { getModelVersion, modelPaths } from "@/lib/model";
 import { findRepoRoot } from "@/lib/repoRoot";
 import { DiffRequestSchema } from "@/lib/schemas";
 
 function setDiff<T>(a: Set<T>, b: Set<T>): T[] {
   return Array.from(a).filter((x) => !b.has(x));
-}
-
-function deepGet(obj: unknown, dotted: string): unknown {
-  let cur: unknown = obj;
-  for (const part of dotted.split(".")) {
-    if (!cur || typeof cur !== "object") return undefined;
-    const rec = cur as Record<string, unknown>;
-    if (!(part in rec)) return undefined;
-    cur = rec[part];
-  }
-  return cur;
 }
 
 function missingFromRequired(required: string[], facts: Facts): Set<string> {

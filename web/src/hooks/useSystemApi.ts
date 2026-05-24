@@ -4,16 +4,16 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import type { Facts } from "@/components/systemEditor/facts";
+import type { Facts } from "@/lib/facts";
 import { ApiError, api } from "@/lib/apiClient";
-import type { EvaluateResult as LibEvaluateResult } from "@/lib/evaluator";
+import type { EvaluateResult } from "@/lib/evaluator";
 
 type AsyncState = "idle" | "loading" | "success" | "error";
 
-export type EvaluateResult = {
+export type EvaluateApiResponse = {
   modelDir: string;
   modelVersion: string;
-  result: LibEvaluateResult;
+  result: EvaluateResult;
 };
 
 export type DiffResult = {
@@ -62,14 +62,14 @@ export function useSaveSystem(systemId: string) {
 export function useEvaluateSystem() {
   const [state, setState] = useState<AsyncState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<EvaluateResult | null>(null);
+  const [result, setResult] = useState<EvaluateApiResponse | null>(null);
 
   const evaluate = useCallback(async (facts: Facts, modelDir: string) => {
     setError(null);
     setState("loading");
 
     try {
-      const data = await api.post<EvaluateResult>("/api/evaluate", { facts, modelDir });
+      const data = await api.post<EvaluateApiResponse>("/api/evaluate", { facts, modelDir });
       setResult(data);
       setState("success");
       toast.success("Evaluation completed");
