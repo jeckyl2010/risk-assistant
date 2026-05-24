@@ -107,7 +107,7 @@ export async function createSystem(id: string, systemPath?: string): Promise<{ i
     const manifest = await readPortfolio();
     const entry = manifest.systems.find((s) => s.name === safe);
     if (!entry) {
-      manifest.systems.push({ name: safe, path: targetPath });
+      manifest.systems.push({ name: safe, path: path.relative(path.dirname(portfolioPath()), yamlPath) });
       await writePortfolio(manifest);
     }
 
@@ -122,7 +122,7 @@ export async function createSystem(id: string, systemPath?: string): Promise<{ i
 
     // Add to portfolio
     const manifest = await readPortfolio();
-    manifest.systems.push({ name: safe, path: targetPath });
+    manifest.systems.push({ name: safe, path: path.relative(path.dirname(portfolioPath()), yamlPath) });
     await writePortfolio(manifest);
 
     return { id: safe, factsPath: yamlPath, facts };
@@ -185,7 +185,7 @@ export async function addExistingSystem(systemPath: string): Promise<{ id: strin
     throw new Error(`System "${id}" is already in the portfolio`);
   }
 
-  manifest.systems.push({ name: id, path: systemPath });
+  manifest.systems.push({ name: id, path: path.relative(path.dirname(portfolioPath()), yamlPath) });
   await writePortfolio(manifest);
 
   return { id, factsPath: yamlPath, facts };

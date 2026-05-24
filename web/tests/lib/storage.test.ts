@@ -258,6 +258,13 @@ describe("addExistingSystem", () => {
     expect(result.id).toBe(id);
     expect(result.facts.scope).toBe("system");
 
+    // Stored path must be relative, not absolute — keeps portfolio.yaml portable
+    const { loadYamlFile } = await import("@/lib/yaml");
+    const manifest = await loadYamlFile<{ systems: { name: string; path: string }[] }>(PORTFOLIO_PATH);
+    const entry = manifest?.systems.find((s) => s.name === id);
+    expect(entry).toBeDefined();
+    expect(path.isAbsolute(entry!.path)).toBe(false);
+
     const listed = await listSystems();
     expect(listed).toContain(id);
   });
