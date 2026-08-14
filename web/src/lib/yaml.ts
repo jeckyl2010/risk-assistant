@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 
 export async function loadYamlFile<T = unknown>(filePath: string): Promise<T> {
   const text = await fs.readFile(filePath, "utf-8");

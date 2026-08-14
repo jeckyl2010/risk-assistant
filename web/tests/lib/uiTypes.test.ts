@@ -7,7 +7,25 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { parseQuestions, parseTriggers } from "@/lib/uiTypes";
+import { parseQuestions, parseTriggers, type Question, type TriggerRule } from "@/lib/uiTypes";
+
+function expectSingleQuestion(result: Question[]): Question {
+  expect(result).toHaveLength(1);
+  const [question] = result;
+  if (!question) {
+    throw new Error("Expected one parsed question");
+  }
+  return question;
+}
+
+function expectSingleTrigger(result: TriggerRule[]): TriggerRule {
+  expect(result).toHaveLength(1);
+  const [trigger] = result;
+  if (!trigger) {
+    throw new Error("Expected one parsed trigger");
+  }
+  return trigger;
+}
 
 // ---------------------------------------------------------------------------
 // parseQuestions
@@ -15,53 +33,58 @@ import { parseQuestions, parseTriggers } from "@/lib/uiTypes";
 
 describe("parseQuestions", () => {
   it("parses a minimal valid bool question", () => {
-    const result = parseQuestions([{ id: "uses_ai", text: "Uses AI?", type: "bool" }]);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("uses_ai");
-    expect(result[0]!.text).toBe("Uses AI?");
-    expect(result[0]!.type).toBe("bool");
+    const question = expectSingleQuestion(parseQuestions([{ id: "uses_ai", text: "Uses AI?", type: "bool" }]));
+    expect(question.id).toBe("uses_ai");
+    expect(question.text).toBe("Uses AI?");
+    expect(question.type).toBe("bool");
   });
 
   it("parses a valid enum question with allowed values", () => {
-    const result = parseQuestions([
-      { id: "user_population", text: "Who?", type: "enum", allowed: ["internal", "partners", "public"] },
-    ]);
-    expect(result[0]!.allowed).toEqual(["internal", "partners", "public"]);
+    const question = expectSingleQuestion(
+      parseQuestions([{ id: "user_population", text: "Who?", type: "enum", allowed: ["internal", "partners", "public"] }]),
+    );
+    expect(question.allowed).toEqual(["internal", "partners", "public"]);
   });
 
   it("parses a valid set question", () => {
-    const result = parseQuestions([{ id: "signals", text: "Signals?", type: "set", allowed: ["logs", "traces"] }]);
-    expect(result[0]!.type).toBe("set");
+    const question = expectSingleQuestion(
+      parseQuestions([{ id: "signals", text: "Signals?", type: "set", allowed: ["logs", "traces"] }]),
+    );
+    expect(question.type).toBe("set");
   });
 
   it("includes description when present and non-empty", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "bool", description: "  some detail  " }]);
-    expect(result[0]!.description).toBe("some detail");
+    const question = expectSingleQuestion(
+      parseQuestions([{ id: "x", text: "X?", type: "bool", description: "  some detail  " }]),
+    );
+    expect(question.description).toBe("some detail");
   });
 
   it("omits description when it is an empty string", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "bool", description: "" }]);
-    expect(result[0]!.description).toBeUndefined();
+    const question = expectSingleQuestion(parseQuestions([{ id: "x", text: "X?", type: "bool", description: "" }]));
+    expect(question.description).toBeUndefined();
   });
 
   it("omits description when it is whitespace only", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "bool", description: "   " }]);
-    expect(result[0]!.description).toBeUndefined();
+    const question = expectSingleQuestion(parseQuestions([{ id: "x", text: "X?", type: "bool", description: "   " }]));
+    expect(question.description).toBeUndefined();
   });
 
   it("omits description when the field is absent", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "bool" }]);
-    expect(result[0]!.description).toBeUndefined();
+    const question = expectSingleQuestion(parseQuestions([{ id: "x", text: "X?", type: "bool" }]));
+    expect(question.description).toBeUndefined();
   });
 
   it("omits allowed when the field is absent", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "bool" }]);
-    expect(result[0]!.allowed).toBeUndefined();
+    const question = expectSingleQuestion(parseQuestions([{ id: "x", text: "X?", type: "bool" }]));
+    expect(question.allowed).toBeUndefined();
   });
 
   it("filters non-string values out of allowed array", () => {
-    const result = parseQuestions([{ id: "x", text: "X?", type: "enum", allowed: ["a", 42, null, "b"] }]);
-    expect(result[0]!.allowed).toEqual(["a", "b"]);
+    const question = expectSingleQuestion(
+      parseQuestions([{ id: "x", text: "X?", type: "enum", allowed: ["a", 42, null, "b"] }]),
+    );
+    expect(question.allowed).toEqual(["a", "b"]);
   });
 
   it("skips entries that are not objects", () => {
@@ -96,8 +119,12 @@ describe("parseQuestions", () => {
       { id: "c", text: "C?", type: "enum", allowed: ["x", "y"] },
     ]);
     expect(result).toHaveLength(2);
-    expect(result[0]!.id).toBe("a");
-    expect(result[1]!.id).toBe("c");
+    const [first, second] = result;
+    if (!first || !second) {
+      throw new Error("Expected two parsed questions");
+    }
+    expect(first.id).toBe("a");
+    expect(second.id).toBe("c");
   });
 
   it("returns empty array for empty input", () => {
@@ -111,23 +138,22 @@ describe("parseQuestions", () => {
 
 describe("parseTriggers", () => {
   it("parses a minimal valid trigger", () => {
-    const result = parseTriggers([{ when: { uses_ai: true }, activate: ["ai"] }]);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.when).toEqual({ uses_ai: true });
-    expect(result[0]!.activate).toEqual(["ai"]);
+    const trigger = expectSingleTrigger(parseTriggers([{ when: { uses_ai: true }, activate: ["ai"] }]));
+    expect(trigger.when).toEqual({ uses_ai: true });
+    expect(trigger.activate).toEqual(["ai"]);
   });
 
   it("preserves multi-condition when clause", () => {
-    const result = parseTriggers([
-      { when: { handles_sensitive_data: true, external_access: true }, activate: ["security", "data"] },
-    ]);
-    expect(result[0]!.when).toEqual({ handles_sensitive_data: true, external_access: true });
-    expect(result[0]!.activate).toEqual(["security", "data"]);
+    const trigger = expectSingleTrigger(
+      parseTriggers([{ when: { handles_sensitive_data: true, external_access: true }, activate: ["security", "data"] }]),
+    );
+    expect(trigger.when).toEqual({ handles_sensitive_data: true, external_access: true });
+    expect(trigger.activate).toEqual(["security", "data"]);
   });
 
   it("filters non-string values from activate array", () => {
-    const result = parseTriggers([{ when: { x: true }, activate: ["ai", 99, null, "cost"] }]);
-    expect(result[0]!.activate).toEqual(["ai", "cost"]);
+    const trigger = expectSingleTrigger(parseTriggers([{ when: { x: true }, activate: ["ai", 99, null, "cost"] }]));
+    expect(trigger.activate).toEqual(["ai", "cost"]);
   });
 
   it("skips entries that are not objects", () => {
@@ -167,8 +193,12 @@ describe("parseTriggers", () => {
       { when: { affects_production: true }, activate: ["operations"] },
     ]);
     expect(result).toHaveLength(2);
-    expect(result[0]!.activate).toEqual(["ai"]);
-    expect(result[1]!.activate).toEqual(["operations"]);
+    const [first, second] = result;
+    if (!first || !second) {
+      throw new Error("Expected two parsed triggers");
+    }
+    expect(first.activate).toEqual(["ai"]);
+    expect(second.activate).toEqual(["operations"]);
   });
 
   it("returns empty array for empty input", () => {
